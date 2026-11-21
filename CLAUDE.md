@@ -8,7 +8,20 @@ Rozwiązanie zadania COI na HackNation 2026 (drużyna AKAI): API do cyfryzacji f
 
 Plan implementacji backendu: `docs/plan-implementacji.md`. Zadania do równoległej pracy agentów, jeden plik na blok: `docs/bloki/` (indeks w `docs/bloki/README.md`). Zakres: tylko backend.
 
-Materiały zadania leżą w `dane_zadania/` (tylko do odczytu). `dane_zadania/blankiety/` zawiera 9 formularzy, każdy w wielu formatach. Formularze 1 i 5 mają oczekiwany JSON (`konfiguracja_form_*.json`) i to on jest wzorcem; tam gdzie przeczy schematowi (np. `repeatingSectionGrid`), wygrywa przykład. Kontrakt wyjściowy to `dane_zadania/materialy/importowanyPlikJsonSchemat (1).json` (JSON Schema `FormDefinition`: `title` → `tabs[]` → `questions[]` z pozycją `x/y/rows/cols` i obiektem `field`). Opis pól jest w `OpisImportowanegoPlikuJSON (1).docx`, reguły walidacji w `Reguły techniczne konfiguracji formularzy...docx`. Zanim zmienisz model danych, sprawdź go z tymi plikami.
+Materiały zadania leżą w `dane_zadania/` (tylko do odczytu). `dane_zadania/blankiety/` zawiera 9 formularzy, każdy w wielu formatach. Kontrakt wyjściowy to `dane_zadania/materialy/importowanyPlikJsonSchemat (1).json` (JSON Schema `FormDefinition`: `title` → `tabs[]` → `questions[]` z pozycją `x/y/rows/cols` i obiektem `field`). Opis pól jest w `OpisImportowanegoPlikuJSON (1).docx`, reguły walidacji w `Reguły techniczne konfiguracji formularzy...docx`. Zanim zmienisz model danych, sprawdź go z tymi plikami.
+
+### Źródło prawdy: specyfikacja, nie przykłady
+
+Gdy dokumenty się różnią, decyduje specyfikacja z `dane_zadania/materialy/`:
+- Reguły techniczne konfiguracji formularzy,
+- Opis importowanego pliku JSON i schemat `importowanyPlikJsonSchemat`,
+- Standardy,
+- Słowniki,
+- Dane inicjalne.
+
+Oczekiwane JSON-y formularzy 1 i 5 (`konfiguracja_form_*.json`) są tylko **przykładami**. Mogą zawierać błędy, więc nie zmieniaj kontraktu ani kodu, żeby się do nich dopasować. Służą do porównania tylko tam, gdzie specyfikacja milczy, np. w kształcie siatki czy techName sekcji. Testy porównujące wynik z przykładem wymieniają każde odstępstwo razem z uzasadnieniem ze specyfikacji (np. `SPEC_OVERRIDES` w `tests/builder/test_builder_reference.py`). Jeśli sprzeczne są same dokumenty specyfikacji, nie zgaduj, tylko zapytaj człowieka.
+
+Pisownia `repeatingSectionGrid` zostaje, bo używają jej też wyrażenia JSONata w Regułach technicznych.
 
 Stack: Python 3.14 + FastAPI (menedżer: **uv**), React + Vite (menedżer: **npm**), Docker / Docker Compose.
 
