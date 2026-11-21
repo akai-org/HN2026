@@ -32,7 +32,7 @@ Bez działającego backendu da się obejrzeć wszystko na przykładzie: na pierw
 
 Trzy kolumny jak w makiecie z Figmy: **Oryginał**, **Formularz** i **JSON**. Kolumny można włączać w dowolnym zestawie, przestawiać (przeciąganie albo strzałki w nagłówku) i rozciągać (uchwyt między kolumnami, także strzałkami z klawiatury). Układ zapamiętuje się w przeglądarce. Na wąskim ekranie kolumny przełącza się zakładkami.
 
-- **Oryginał**: PDF przez pdf.js (strony, powiększenie, warstwa tekstu dla czytników ekranu) albo zdjęcie (powiększenie, obrót).
+- **Oryginał**: PDF przez pdf.js (strony, powiększenie, warstwa tekstu dla czytników ekranu) albo zdjęcie (powiększenie, obrót). **Zaznaczone pole jest podświetlane na oryginale**: szukamy jego etykiety w tekście PDF-a (z tolerancją odmiany słów), a gdy jej nie ma, tytułu sekcji; podgląd sam przechodzi na właściwą stronę. Skany bez warstwy tekstu i zdjęcia nie mają tekstu, więc tam pokazujemy tylko komunikat.
 - **Formularz**: podgląd eUsługi rysowany wprost z JSON-a: strony z `flow`, siatka 3 kolumn z `x/y/cols`, sekcje (`repeatingSectionGrid`), słowniki (Kraje, TERYT), dane z rejestrów (`EXTERNAL_SYSTEM`), zgody. **Warunki `states` (JSONata) działają naprawdę**: wybierz „Osoby prawnej…” albo zmień kraj, a pola pokażą się lub znikną. Objaśnienia mówią, skąd pole bierze wartość i kiedy się pokazuje.
 - **JSON**: edytor CodeMirror (składnia, zwijanie, wyszukiwanie, polskie komunikaty o błędach) albo uproszczona **Struktura** (drzewo strona → sekcja → pole).
 - **Połączenie na żywo**: kliknięcie pola w podglądzie podświetla jego fragment w JSON-ie i opisuje go zwykłym językiem. Kursor w JSON-ie zaznacza pole w podglądzie. Edycja w podglądzie (etykieta, „Obowiązkowe”, kolejność, usunięcie) od razu przepisuje JSON, a edycja JSON-a od razu zmienia podgląd. Przy błędzie składni podgląd zostaje na ostatniej poprawnej wersji. Działa cofnij/ponów.
@@ -63,7 +63,7 @@ src/features/konwerter/
   pages/ReviewPage.jsx       krok 3: trzy kolumny i zatwierdzanie
   state/                     reducer (czysty) + ConverterProvider (kolejka, API, adresy blob:)
   lib/                       logika bez Reacta: formModel, conditions (JSONata), jsonPositions,
-                             checks (reguły COI), grouping, files, folders, pdfMerge, api, doc (historia)
+                             checks (reguły COI), grouping, files, folders, pdfMerge, pdfSearch, api, doc (historia)
   lib/__tests__/             testy vitest na wzorcowych JSON-ach COI (form1.json tylko do testów)
   components/                wspólne klocki UI, podgląd PDF/zdjęć, karty formularzy
   review/                    kolumny, podgląd eUsługi, edytor JSON, drzewo, opis pola

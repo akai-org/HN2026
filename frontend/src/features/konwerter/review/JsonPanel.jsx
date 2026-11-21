@@ -60,13 +60,15 @@ export function JsonActions({ doc, title, onText, announce }) {
 
 export default function JsonPanel({ doc, onText, selectedEntry, selectedState, highlight, onCursor, onSelect, titles, states }) {
   const [view, setView] = useState("code");
+  // Opis pola domyślnie zwinięty, żeby edytor miał jak najwięcej miejsca.
+  const [explainOpen, setExplainOpen] = useState(false);
   const explainerId = useId();
   const statusId = useId();
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-3 py-2">
-        <div role="group" aria-label="Widok JSON" className="inline-flex rounded-xl bg-slate-100 p-1">
+      <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 bg-white px-3 py-1.5">
+        <div role="group" aria-label="Widok JSON" className="inline-flex rounded-xl bg-slate-100 p-0.5">
           {VIEWS.map((option) => (
             <button
               key={option.id}
@@ -87,12 +89,12 @@ export default function JsonPanel({ doc, onText, selectedEntry, selectedState, h
         </p>
       </div>
       {doc.error && (
-        <p className="border-b border-red-200 bg-red-50 px-4 py-2 text-sm text-red-900">
+        <p className="border-b border-red-200 bg-red-50 px-3 py-1.5 text-sm text-red-900">
           Podgląd formularza pokazuje ostatnią poprawną wersję. Popraw błąd albo cofnij zmianę.
         </p>
       )}
       <ErrorBoundary resetKey={doc.text} title="Nie udało się opisać pola.">
-        <FieldExplainer id={explainerId} entry={selectedEntry} titles={titles} state={selectedState} />
+        <FieldExplainer id={explainerId} entry={selectedEntry} titles={titles} state={selectedState} open={explainOpen} onToggle={setExplainOpen} />
       </ErrorBoundary>
       <div className="min-h-0 flex-1">
         {view === "code" ? (

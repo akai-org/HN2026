@@ -18,11 +18,11 @@ function Row({ term, children, code }) {
   );
 }
 
-export default function FieldExplainer({ entry, titles, state, id }) {
+export default function FieldExplainer({ entry, titles, state, id, open, onToggle }) {
   if (!entry) {
     return (
-      <p id={id} className="border-b border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-600">
-        Kliknij pole w podglądzie albo w drzewie, a podświetlimy jego fragment w JSON-ie i opiszemy go tutaj.
+      <p id={id} className="border-b border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-600">
+        Kliknij pole w podglądzie, a podświetlimy jego fragment w JSON-ie.
       </p>
     );
   }
@@ -33,13 +33,22 @@ export default function FieldExplainer({ entry, titles, state, id }) {
   const options = asArray(field.options);
 
   return (
-    <details id={id} open className="group border-b border-slate-200 bg-(--blue-soft)/50">
-      <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-2.5 text-sm [&::-webkit-details-marker]:hidden">
-        <span className="font-semibold text-slate-900">Zaznaczone pole:</span>
-        <span className="min-w-0 flex-1 truncate">{field.title || field.techName || "bez nazwy"}</span>
+    <details
+      id={id}
+      open={open}
+      onToggle={(event) => onToggle?.(event.currentTarget.open)}
+      className="group shrink-0 border-b border-slate-200 bg-(--blue-soft)/50"
+    >
+      <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-1.5 text-sm [&::-webkit-details-marker]:hidden">
+        <span className="font-semibold text-slate-900">Zaznaczone:</span>
+        <span className="min-w-0 flex-1 truncate">
+          {field.title || field.techName || "bez nazwy"}
+          <span className="text-slate-600"> · {typeLabel(field.type)}</span>
+        </span>
+        <span className="shrink-0 text-xs font-semibold text-(--blue)">{open ? "Zwiń opis" : "Co to znaczy?"}</span>
         <ChevronDown aria-hidden="true" size={16} className="shrink-0 text-slate-500 transition-transform group-open:rotate-180" />
       </summary>
-      <dl className="px-4 pb-3 text-[13px]">
+      <dl className="kv-scroll max-h-44 overflow-y-auto px-3 pb-2 text-[13px]">
         <Row term="Rodzaj" code={field.type}>
           {typeLabel(field.type)}
         </Row>

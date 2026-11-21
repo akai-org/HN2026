@@ -30,7 +30,7 @@ import { scrollWithin } from "../lib/scroll.js";
 import { FORMS, count } from "../lib/text.js";
 import ApproveDialog from "../review/ApproveDialog.jsx";
 import ChecksPanel from "../review/ChecksPanel.jsx";
-import { Columns, ColumnsToolbar } from "../review/Columns.jsx";
+import { Columns, ColumnsChips } from "../review/Columns.jsx";
 import FormBar from "../review/FormBar.jsx";
 import FormPreview from "../review/FormPreview.jsx";
 import JsonPanel, { JsonActions } from "../review/JsonPanel.jsx";
@@ -173,6 +173,14 @@ function Workbench({ group, groups, actions }) {
   const selectedEntry = selection.id ? index.byId.get(selection.id) ?? null : null;
   const selectedId = selectedEntry ? selection.id : null;
 
+  // Etykieta zaznaczonego pola (a w zapasie tytuł jego sekcji) do podświetlenia na oryginale.
+  const pdfSearch = useMemo(() => {
+    const label = selectedEntry?.field.title?.trim();
+    if (!label) return null;
+    const parent = selectedEntry.parentId ? index.byId.get(selectedEntry.parentId)?.field.title?.trim() : "";
+    return { key: `${selection.id}:${selection.at}`, label, queries: [label, parent].filter(Boolean) };
+  }, [selectedEntry, index, selection.id, selection.at]);
+
   const highlight = useMemo(() => {
     if (!selectedEntry || doc.error) return null;
     const range = rangeForPath(tree, selectedEntry.path);
@@ -293,7 +301,12 @@ function Workbench({ group, groups, actions }) {
     original: {
       title: "Oryginał",
       subtitle: group.source?.merged ? `${group.source.merged} pliki połączone w PDF` : group.source?.name ?? "Papierowy formularz",
-      body: group.source?.url ? <SourceViewer source={group.source} /> : group.source?.kind === "none" ? <SourceViewer source={group.source} /> : <AttachOriginal onAttach={(file) => actions.attachSource(group.id, file)} />,
+      body:
+        group.source?.url || group.source?.kind === "none" ? (
+          <SourceViewer source={group.source} search={pdfSearch} />
+        ) : (
+          <AttachOriginal onAttach={(file) => actions.attachSource(group.id, file)} />
+        ),
     },
     form: {
       title: "Formularz",
@@ -344,7 +357,8 @@ function Workbench({ group, groups, actions }) {
   };
 
   return (
-    <>
+    // Na szerokim ekranie widok zajmuje dokładnie wysokość okna, a kolumny dostają całą resztę miejsca.
+    <div className={isWide ? "flex h-[calc(100dvh-4.25rem)] min-h-[640px] flex-col" : ""}>
       <FormBar
         group={group}
         groups={groups}
@@ -354,11 +368,12 @@ function Workbench({ group, groups, actions }) {
         onDownload={download}
         onApprove={() => setApproveOpen(true)}
       />
-      <div className="mx-auto w-full max-w-[1800px] space-y-4 px-4 py-4 sm:px-6">
+      <div className={`mx-auto flex w-full max-w-[1800px] flex-col gap-3 px-4 py-3 sm:px-6 ${isWide ? "min-h-0 flex-1" : ""}`}>
         <ErrorBoundary resetKey={doc.text} title="Nie udało się sprawdzić formularza.">
-          <ChecksPanel stats={stats} checks={checks} onShowField={(id) => selectField(id, "checks")} />
+          <ChecksPanel stats={stats} checks={checks} onShowField={(id) => selectField(id, "checks")}>
+            {isWide && <ColumnsChips {...columns} />}
+          </ChecksPanel>
         </ErrorBoundary>
-        {isWide && <ColumnsToolbar {...columns} isWide />}
         <Columns {...columns} panels={panels} isWide={isWide} mobileTab={mobileTab} onMobileTab={setMobileTab} />
       </div>
 
@@ -424,7 +439,7 @@ function Workbench({ group, groups, actions }) {
         }}
         onBackToList={() => navigate("/konwerter")}
       />
-    </>
+    </div>
   );
 }
 

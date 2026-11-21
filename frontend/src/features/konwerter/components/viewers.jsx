@@ -1,7 +1,9 @@
 // Podgląd oryginału: PDF (pdf.js, z warstwą tekstu dla czytników ekranu) i zdjęcia.
-import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, LoaderCircle, Maximize2, RotateCw, TriangleAlert, ZoomIn, ZoomOut } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, Crosshair, LoaderCircle, Maximize2, RotateCw, SearchX, TriangleAlert, ZoomIn, ZoomOut } from "lucide-react";
 import { closePdf, loadPdfjs, openPdf } from "../lib/pdfjs.js";
+import { findText } from "../lib/pdfSearch.js";
+import { scrollWithin } from "../lib/scroll.js";
 import { IconButton } from "./primitives.jsx";
 
 const ZOOM_STEPS = [0.5, 0.67, 0.75, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3];
@@ -54,26 +56,127 @@ function Status({ icon: Icon, children, spin }) {
   );
 }
 
+/** Pasek pod narzędziami: czy zaznaczone pole udało się znaleźć w oryginale. */
+function SearchStatus({ search, result }) {
+  if (!search) return null;
+  let icon = Crosshair;
+  let text;
+  let tone = "bg-(--kv-highlight) text-slate-900";
+  if (result?.status === "found") {
+    text = (
+      <>
+        Zaznaczone pole „{search.label}”: {result.viaParent ? `pokazujemy sekcję „${result.text}”` : "podświetlone"} na stronie {result.page}.
+      </>
+    );
+  } else if (result?.status === "noText") {
+    icon = SearchX;
+    tone = "bg-slate-100 text-slate-700";
+    text = "Ten plik to skan bez warstwy tekstu, więc nie wskażemy na nim pola.";
+  } else if (result?.status === "notFound") {
+    icon = SearchX;
+    tone = "bg-slate-100 text-slate-700";
+    text = `Nie ma napisu „${search.label}” na oryginale. To pole mogło zostać dodane według standardu eUsług.`;
+  } else {
+    return null;
+  }
+  const Icon = icon;
+  return (
+    <p role="status" className={`flex items-start gap-2 border-b border-slate-200 px-3 py-1.5 text-sm ${tone}`}>
+      <Icon aria-hidden="true" size={16} className="mt-0.5 shrink-0" />
+      <span>{text}</span>
+    </p>
+  );
+}
+
+/** Pierwsza pasująca fraza z listy (np. etykieta pola, potem tytuł jego sekcji). */
+function searchPages(pages, search) {
+  if (!pages || !search) return null;
+  if (pages.every((p) => p.items.every((item) => !item.trim()))) return { status: "noText" };
+  for (const [index, query] of search.queries.entries()) {
+    const hit = findText(pages, query);
+    if (hit) return { status: "found", page: hit.page, text: query, viaParent: index > 0 };
+  }
+  return { status: "notFound" };
+}
+
 /**
  * Podgląd PDF z nawigacją po stronach i powiększeniem.
  * Źródło: `url` (blob:/http) albo `file` (Blob/File). Komponent trzeba montować z key = źródło,
  * wtedy zmiana pliku zaczyna od czystego stanu.
+ * search: { key, label, queries: string[] } — etykieta zaznaczonego pola do podświetlenia na oryginale.
  */
-export function PdfViewer({ url, file, title }) {
+export function PdfViewer({ url, file, title, search }) {
   const [doc, setDoc] = useState(null);
   const [error, setError] = useState("");
-  const [page, setPageState] = useState(1);
+  const [pageState, setPageState] = useState({ value: 1, forKey: null });
   const [zoom, setZoom] = useState(1);
   const [fit, setFit] = useState(true);
   const [renderedKey, setRenderedKey] = useState("");
+  const [pageTexts, setPageTexts] = useState(null);
+  const [marker, setMarker] = useState(null);
   const scrollRef = useRef(null);
   const canvasRef = useRef(null);
   const textRef = useRef(null);
+  const layerRef = useRef(null);
   const width = useWidth(scrollRef);
   const numPages = doc?.numPages ?? 0;
+  const result = useMemo(() => searchPages(pageTexts, search), [pageTexts, search]);
+  // Nowe zaznaczenie przełącza na stronę z polem; ręczna zmiana strony wygrywa do następnego zaznaczenia.
+  const page = result?.status === "found" && pageState.forKey !== search?.key ? result.page : pageState.value;
   const renderKey = `${page}|${zoom}|${fit}|${width}`;
 
-  const setPage = useCallback((value) => setPageState(Math.min(Math.max(1, value), numPages || 1)), [numPages]);
+  const setPage = useCallback(
+    (value) => setPageState({ value: Math.min(Math.max(1, value), numPages || 1), forKey: search?.key ?? null }),
+    [numPages, search],
+  );
+
+  // Tekst wszystkich stron (raz na plik) do wyszukiwania etykiet pól.
+  useEffect(() => {
+    if (!doc) return undefined;
+    let cancelled = false;
+    (async () => {
+      const pages = [];
+      for (let number = 1; number <= doc.numPages; number += 1) {
+        const content = await (await doc.getPage(number)).getTextContent();
+        pages.push({ items: content.items.filter((item) => "str" in item).map((item) => item.str) });
+      }
+      if (!cancelled) setPageTexts(pages);
+    })().catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [doc]);
+
+  /** Zaznacza na warstwie tekstu fragmenty z etykietą pola i przewija do nich. */
+  const applyHighlight = useCallback(() => {
+    const layer = layerRef.current;
+    if (!layer) return;
+    layer.divs.forEach((div) => div.classList.remove("kv-hit"));
+    if (result?.status !== "found" || layer.page !== result.page) {
+      setMarker(null);
+      return;
+    }
+    const hit = findText([{ items: layer.strs }], result.text);
+    const divs = (hit?.indices ?? []).map((index) => layer.divs[index]).filter(Boolean);
+    divs.forEach((div) => div.classList.add("kv-hit"));
+    // Ramka wokół etykiety z podpisem (jak marker w makiecie), widoczna także przy małym powiększeniu.
+    const pageBox = canvasRef.current?.parentElement?.getBoundingClientRect();
+    if (divs.length && pageBox) {
+      const rects = divs.map((div) => div.getBoundingClientRect());
+      const left = Math.min(...rects.map((r) => r.left)) - pageBox.left;
+      const top = Math.min(...rects.map((r) => r.top)) - pageBox.top;
+      const right = Math.max(...rects.map((r) => r.right)) - pageBox.left;
+      const bottom = Math.max(...rects.map((r) => r.bottom)) - pageBox.top;
+      setMarker({ left: left - 6, top: top - 5, width: right - left + 12, height: bottom - top + 10, label: search?.label ?? "" });
+    } else {
+      setMarker(null);
+    }
+    if (divs[0]) scrollWithin(scrollRef.current, divs[0], "center");
+  }, [result, search?.label]);
+
+  useEffect(() => {
+    applyHighlight();
+  }, [applyHighlight, search?.key]);
 
   useEffect(() => {
     let cancelled = false;
@@ -126,6 +229,9 @@ export function PdfViewer({ url, file, title }) {
       container.style.height = `${Math.floor(viewport.height)}px`;
       textLayer = new lib.TextLayer({ textContentSource: pdfPage.streamTextContent(), container, viewport });
       await textLayer.render();
+      if (cancelled) return;
+      layerRef.current = { page: Math.min(page, doc.numPages), divs: textLayer.textDivs, strs: textLayer.textContentItemsStr };
+      applyHighlight();
     })()
       .catch((renderError) => {
         if (!cancelled && renderError?.name !== "RenderingCancelledException") setError("Nie udało się wyświetlić strony.");
@@ -136,6 +242,8 @@ export function PdfViewer({ url, file, title }) {
       task?.cancel();
       textLayer?.cancel();
     };
+    // applyHighlight celowo poza zależnościami: zmiana zaznaczenia nie wymaga ponownego rysowania strony.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doc, page, zoom, fit, width, renderKey]);
 
   const busy = !doc || renderedKey !== renderKey;
@@ -158,6 +266,7 @@ export function PdfViewer({ url, file, title }) {
           onFit={() => setFit(true)}
         />
       </Toolbar>
+      <SearchStatus search={search} result={result} />
       <div ref={scrollRef} className="kv-scroll relative min-h-0 flex-1 overflow-auto p-4">
         {error ? (
           <Status icon={TriangleAlert}>{error}</Status>
@@ -165,6 +274,15 @@ export function PdfViewer({ url, file, title }) {
           <div className="relative mx-auto w-fit bg-white shadow-md ring-1 ring-slate-300">
             <canvas ref={canvasRef} role="img" aria-label={`Strona ${page} z ${numPages || "?"}: ${title}`} className="block" />
             <div ref={textRef} className="kv-textlayer" />
+            {marker && (
+              <div
+                aria-hidden="true"
+                className="kv-marker pointer-events-none absolute z-[2] rounded-md"
+                style={{ left: marker.left, top: marker.top, width: marker.width, height: marker.height }}
+              >
+                <span className="absolute bottom-full left-0 mb-1 max-w-56 truncate rounded px-1.5 py-0.5 text-[11px] font-bold">{marker.label}</span>
+              </div>
+            )}
             {busy && (
               <div className="absolute inset-0 flex min-h-48 min-w-48 items-center justify-center bg-white/60">
                 <LoaderCircle aria-hidden="true" size={26} className="text-(--blue) motion-safe:animate-spin" />
@@ -179,7 +297,7 @@ export function PdfViewer({ url, file, title }) {
 }
 
 /** Podgląd zdjęcia z powiększeniem i obrotem (tylko do oglądania). */
-export function ImageViewer({ url, title }) {
+export function ImageViewer({ url, title, search }) {
   const [zoom, setZoom] = useState(1);
   const [fit, setFit] = useState(true);
   const [rotation, setRotation] = useState(0);
@@ -200,6 +318,7 @@ export function ImageViewer({ url, title }) {
           onFit={() => setFit(true)}
         />
       </Toolbar>
+      <SearchStatus search={search} result={search ? { status: "noText" } : null} />
       <div className="kv-scroll min-h-0 flex-1 overflow-auto p-4">
         {failed ? (
           <Status icon={TriangleAlert}>Nie udało się wyświetlić zdjęcia.</Status>
@@ -225,10 +344,10 @@ export function ImageViewer({ url, title }) {
 }
 
 /** Wybiera właściwy podgląd dla źródła { kind, url, name }. */
-export function SourceViewer({ source, emptyHint }) {
-  if (source?.kind === "pdf" && source.file) return <PdfViewer key={`${source.name}-${source.file.size}`} file={source.file} title={source.name} />;
-  if (source?.kind === "pdf" && source.url) return <PdfViewer key={source.url} url={source.url} title={source.name} />;
-  if (source?.kind === "image" && source.url) return <ImageViewer key={source.url} url={source.url} title={source.name} />;
+export function SourceViewer({ source, emptyHint, search }) {
+  if (source?.kind === "pdf" && source.file) return <PdfViewer key={`${source.name}-${source.file.size}`} file={source.file} title={source.name} search={search} />;
+  if (source?.kind === "pdf" && source.url) return <PdfViewer key={source.url} url={source.url} title={source.name} search={search} />;
+  if (source?.kind === "image" && source.url) return <ImageViewer key={source.url} url={source.url} title={source.name} search={search} />;
   return (
     <div className="flex h-full min-h-48 flex-col items-center justify-center gap-2 bg-slate-50 p-6 text-center text-sm text-slate-600">
       <TriangleAlert aria-hidden="true" size={26} className="text-amber-600" />

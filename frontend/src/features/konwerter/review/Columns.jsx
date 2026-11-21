@@ -2,7 +2,7 @@
 // Wszystko działa też z klawiatury: przyciski „w lewo / w prawo” i uchwyty sterowane strzałkami.
 import { useId, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, GripVertical, RotateCcw, X } from "lucide-react";
-import { Button, IconButton } from "../components/primitives.jsx";
+import { IconButton } from "../components/primitives.jsx";
 import { COLUMN_LABELS, MIN_WIDTH, visibleWidths } from "./useColumns.js";
 
 const DRAG_TYPE = "application/x-kv-column";
@@ -11,18 +11,19 @@ function hasColumnDrag(event) {
   return Array.from(event.dataTransfer?.types ?? []).includes(DRAG_TYPE);
 }
 
-export function ColumnsToolbar({ layout, toggle, move, reset, isWide }) {
+/** Wybór kolumn (zwarty, do paska nad kolumnami): włączanie i przestawianie przeciąganiem. */
+export function ColumnsChips({ layout, toggle, move, reset }) {
   const [dragOver, setDragOver] = useState(null);
   return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 shadow-xs">
-      <fieldset className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
+      <fieldset className="flex flex-wrap items-center gap-1.5" title="Przeciągnij kolumnę, aby zmienić kolejność. Krawędź między kolumnami zmienia ich szerokość.">
         <legend className="float-left mr-1 text-sm font-semibold text-slate-800">Kolumny:</legend>
         {layout.order.map((id) => {
           const checked = layout.visible[id];
           return (
             <label
               key={id}
-              draggable={isWide}
+              draggable
               onDragStart={(event) => {
                 event.dataTransfer.setData(DRAG_TYPE, id);
                 event.dataTransfer.effectAllowed = "move";
@@ -38,11 +39,11 @@ export function ColumnsToolbar({ layout, toggle, move, reset, isWide }) {
                 setDragOver(null);
                 if (source && source !== id) move(source, { targetId: id });
               }}
-              className={`inline-flex h-9 cursor-pointer items-center gap-2 rounded-full border-2 px-3 text-sm font-semibold transition select-none has-focus-visible:outline-3 has-focus-visible:outline-(--kv-focus) ${
+              className={`inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full border-2 px-2.5 text-sm font-semibold transition select-none has-focus-visible:outline-3 has-focus-visible:outline-(--kv-focus) ${
                 checked ? "border-(--blue) bg-(--blue-soft) text-(--blue)" : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
               } ${dragOver === id ? "ring-4 ring-(--blue-ring)" : ""}`}
             >
-              {isWide && <GripVertical aria-hidden="true" size={14} className="-ml-1 cursor-grab text-slate-500" />}
+              <GripVertical aria-hidden="true" size={14} className="-ml-1 cursor-grab text-slate-500" />
               <input type="checkbox" className="sr-only" checked={checked} onChange={() => toggle(id)} />
               <span
                 aria-hidden="true"
@@ -55,12 +56,7 @@ export function ColumnsToolbar({ layout, toggle, move, reset, isWide }) {
           );
         })}
       </fieldset>
-      <p className="hidden text-sm text-slate-600 xl:block">
-        {isWide ? "Przeciągnij kolumnę za uchwyt, aby zmienić kolejność. Krawędź między kolumnami zmienia ich szerokość." : "Na węższym ekranie kolumny przełączasz zakładkami."}
-      </p>
-      <Button variant="quiet" size="sm" onClick={reset} className="ml-auto">
-        <RotateCcw aria-hidden="true" size={15} /> Przywróć układ
-      </Button>
+      <IconButton label="Przywróć układ kolumn" icon={RotateCcw} size={16} onClick={reset} />
     </div>
   );
 }
@@ -201,7 +197,7 @@ export function Columns({ layout, move, toggle, resize, panels, isWide, mobileTa
   }
 
   return (
-    <div ref={containerRef} className="flex h-[calc(100dvh-9.5rem)] min-h-[620px] items-stretch">
+    <div ref={containerRef} className="flex min-h-[420px] flex-1 items-stretch">
       {shares.map(({ id, percent }, index) => {
         const panel = panels[id];
         const titleId = `${baseId}-title-${id}`;

@@ -269,6 +269,41 @@ dialog.kv-modal::backdrop {
   display: contents;
 }
 
+/* Etykieta zaznaczonego pola na oryginale (jak marker w makiecie z Figmy). */
+.kv-textlayer .kv-hit {
+  background: rgb(255 191 71 / 0.5);
+  box-shadow: 0 0 0 3px rgb(242 182 0 / 0.9);
+  border-radius: 3px;
+  animation: kv-flash 900ms ease-out 2;
+}
+
+.kv-marker {
+  border: 3px solid #e0a800;
+  background: rgb(255 191 71 / 0.18);
+  box-shadow: 0 0 0 4px rgb(255 191 71 / 0.35);
+  animation: kv-flash 900ms ease-out 2;
+}
+
+.kv-marker > span {
+  background: #ffbf47;
+  color: #15233b;
+}
+
+html.kv-hc .kv-marker {
+  border-color: #000;
+  background: rgb(255 212 0 / 0.3);
+}
+
+html.kv-hc .kv-marker > span {
+  background: #ffd400;
+  color: #000;
+}
+
+html.kv-hc .kv-textlayer .kv-hit {
+  background: rgb(255 212 0 / 0.6);
+  box-shadow: 0 0 0 3px #000;
+}
+
 .kv-textlayer ::selection {
   background: rgb(11 78 162 / 0.28);
 }
