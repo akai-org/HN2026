@@ -41,7 +41,9 @@ def _error_detail(response: httpx.Response) -> tuple[str, str, str]:
 
 
 def _post(client: httpx.Client, settings: Settings, payload: dict[str, Any]) -> httpx.Response:
-  url = settings.llm_base_url.rstrip("/") + "/chat/completions"
+  url = settings.llm_base_url.rstrip("/")
+  if not url.endswith("/chat/completions"):   # accept both a base URL and the full endpoint (EdenAI docs give the latter)
+    url += "/chat/completions"
   headers = {"Authorization": f"Bearer {settings.llm_api_key}"}
   try:
     return client.post(url, json=payload, headers=headers)

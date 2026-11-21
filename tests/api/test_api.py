@@ -117,3 +117,13 @@ def test_dispatcher_covers_every_format(pattern, fmt):
   path = next(p for p in BLANKIETY.glob(pattern) if not p.name.startswith("~$"))
   document = extract_document(path.read_bytes(), fmt)
   assert document.format == fmt and document.blocks
+
+
+def test_health_with_full_endpoint_url(client, monkeypatch):
+  http, _ = client
+  app.dependency_overrides[get_settings] = lambda: Settings(
+    _env_file=None, llm_api_key="k", llm_model="m", llm_base_url="https://llm.test/v3/chat/completions")
+  seen = []
+  monkeypatch.setattr(httpx, "get", lambda url, **_: seen.append(url) or httpx.Response(200, json={"data": []}))
+  assert http.get("/api/health").json()["llm"] == "ok"
+  assert seen == ["https://llm.test/v3/models"]
