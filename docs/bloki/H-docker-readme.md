@@ -9,7 +9,7 @@ Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i
 **Pliki:** `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `.env.example`, `README.md`
 
 **Wymagania:**
-- Obrazy z przypiętymi wersjami (bez `latest`), użytkownik bez uprawnień roota, w obrazie `tesseract-ocr` z `tesseract-ocr-pol` (i ewentualnie to, czego wymaga blok B2).
+- Obrazy z przypiętymi wersjami (bez `latest`), użytkownik bez uprawnień roota, w obrazie `tesseract-ocr` z `tesseract-ocr-pol` (OpenCV jest z PyPI jako `opencv-python-headless`, bez bibliotek systemowych X11) (i ewentualnie to, czego wymaga blok B2).
 - Aplikacja na porcie **3000** (`HOST=0.0.0.0`, `PORT=3000` już są w Dockerfile).
 - `docker-compose.yml`: serwis `app` (port 3000, `env_file: .env`) i serwis `ollama` z przypiętą wersją, wolumenem na modele i portem tylko w sieci compose, `LLM_BASE_URL=http://ollama:11434`. Model pobierany przy starcie (entrypoint z `ollama pull`).
 - README (wymóg zadania): build obrazu, uruchomienie, opis konfiguracji (tabela zmiennych z `Settings`), opis REST API z przykładami `curl`, skrót architektury (diagram pipeline'u z `plan-implementacji.md`).

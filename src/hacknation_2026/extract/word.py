@@ -31,9 +31,11 @@ def extract_docx(data: bytes) -> ExtractedDocument:
     archive = zipfile.ZipFile(io.BytesIO(data))
     root = etree.fromstring(archive.read("word/document.xml"))
     bullets = _bullet_glyphs(archive)
+    leader_styles = _leader_tab_styles(archive)
   except Exception as exc:
     raise AppError("UNREADABLE_FILE", "Nie udało się odczytać pliku DOCX", 422) from exc
-  walker = _DocxWalker(bullets, rendered_breaks=root.find(f".//{_w('lastRenderedPageBreak')}") is not None)
+  walker = _DocxWalker(bullets, rendered_breaks=root.find(f".//{_w('lastRenderedPageBreak')}") is not None,
+                       leader_styles=leader_styles)
   walker.walk(root.find(_w("body")))
   return ExtractedDocument(format=FileFormat.DOCX, blocks=walker.blocks)
 
@@ -60,11 +62,52 @@ def _bullet_glyphs(archive: zipfile.ZipFile) -> dict[tuple[str, str], str]:
   return glyphs
 
 
+LEADERS = {"dot", "underscore", "hyphen", "middleDot", "heavy"}
+
+
+def _has_leader_tab(element) -> bool:
+  """A tab stop drawn with dots/underscores: on paper it is a fill-in line, in the XML only a tab character."""
+  tabs = element.find(_w("tabs")) if element is not None else None
+  return tabs is not None and any(t.get(_w("leader")) in LEADERS for t in tabs.iter(_w("tab")))
+
+
+def _leader_tab_styles(archive: zipfile.ZipFile) -> set[str]:
+  """Paragraph style ids whose tab stops (own or inherited through basedOn) have a fill-in leader."""
+  if "word/styles.xml" not in archive.namelist():
+    return set()
+  styles = etree.fromstring(archive.read("word/styles.xml"))
+  based_on, own = {}, set()
+  for style in styles.iter(_w("style")):
+    style_id = style.get(_w("styleId"))
+    parent = style.find(_w("basedOn"))
+    based_on[style_id] = parent.get(_w("val")) if parent is not None else None
+    if _has_leader_tab(style.find(_w("pPr"))):
+      own.add(style_id)
+  result = set()
+  for style_id in based_on:
+    seen, current = set(), style_id
+    while current and current not in seen:
+      if current in own:
+        result.add(style_id)
+        break
+      seen.add(current)
+      current = based_on.get(current)
+  return result
+
+
+def _underlined(node) -> bool:
+  run = node.getparent()
+  props = run.find(_w("rPr")) if run is not None and run.tag == _w("r") else None
+  underline = props.find(_w("u")) if props is not None else None
+  return underline is not None and underline.get(_w("val"), "single") != "none"
+
+
 class _DocxWalker:
   """Visits body content in document order; text boxes are read once (mc:Choice), never their mc:Fallback copy."""
 
-  def __init__(self, bullets: dict[tuple[str, str], str], rendered_breaks: bool):
+  def __init__(self, bullets: dict[tuple[str, str], str], rendered_breaks: bool, leader_styles: set[str] = frozenset()):
     self.blocks: list[Block] = []
+    self.leader_styles = leader_styles
     self.page = 1
     self.bullets = bullets
     # Word stores both explicit page breaks and where it last broke pages; count only one kind.
@@ -77,7 +120,8 @@ class _DocxWalker:
       if child.tag == _w("tbl"):
         rows = [[normalize(self._cell_text(cell)).replace(BOX, "[ ]") for cell in row.iter(_w("tc"))]
                 for row in child.iter(_w("tr"))]
-        rows = [row for row in rows if any(row)]
+        # An empty cell next to filled-in labels is a place to write; rows with no text at all are layout filler.
+        rows = [[cell or "____" for cell in row] for row in rows if any(row)]
         if rows:
           self.blocks.append(Block(kind="table", rows=rows, page=self.page))
       elif child.tag == _w("p"):
@@ -94,6 +138,9 @@ class _DocxWalker:
   def _paragraph_text(self, paragraph) -> tuple[str, bool]:
     """Own text of the paragraph (not of nested text boxes) and whether its checkbox is ticked."""
     parts, checked = [], False
+    props = paragraph.find(_w("pPr"))
+    style = props.find(_w("pStyle")) if props is not None else None
+    leader = _has_leader_tab(props) or (style is not None and style.get(_w("val")) in self.leader_styles)
     num = paragraph.find(f"{_w('pPr')}/{_w('numPr')}")
     if num is not None:
       ids = (num.find(_w("numId")), num.find(_w("ilvl")))
@@ -107,7 +154,12 @@ class _DocxWalker:
         continue
       tag = node.tag
       if tag == _w("t") and node.text:
-        parts.append(node.text)
+        # underlined spaces print as a fill-in line
+        parts.append(" ____ " if not node.text.strip() and _underlined(node) else node.text)
+      elif tag == _w("tab") and node.getparent().tag == _w("r") and (leader or _underlined(node)):
+        parts.append(" ____ ")   # shortcut: every tab in a paragraph with a leader stop is taken as that stop
+      elif tag == _w("fldChar") and node.find(f"{_w('ffData')}/{_w('textInput')}") is not None:
+        parts.append(" ____ ")   # legacy FORMTEXT field
       elif tag in (_w("tab"), _w("br")):
         if tag == _w("br") and node.get(_w("type")) == "page" and self.page_mark is None:
           self.page += 1
