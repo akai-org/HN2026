@@ -11,6 +11,8 @@ Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i
 
 Zadania J1–J6 są od siebie niezależne. Każde może zrobić inny agent, bo dotykają różnych plików.
 
+> **Stan 2026-11-21 (wdrożone):** `extract/fields.py` (OpenCV) wykrywa na obrazie strony linie do wpisania (podkreślenia, linie z kropek, także sklejone z tekstem), ramki, kratki i rzędy kratek na znaki. Używa go `image.py` (skany: znaczniki wstawiane między słowa z Tesseracta po położeniu) i `pdf.py` (grafika wektorowa po zamalowaniu znaków tekstu, także w komórkach tabel). To realizuje **J3 i J7**. W `word.py` doszły tabulatory z wypełnieniem kropkami, podkreślone spacje i tabulatory oraz pola FORMTEXT. Pomiar `scripts/ocr_benchmark.py`: liczba pól z obrazu = wzorzec z PDF (formularz 9: 161/161, 6: 45/45, skan 5: 19/19), odczyt słów 98%. Otwarte: J1 (kolumny), J4, J5, tabulatory z kropkami w binarnym `.doc`.
+
 ## Zadanie
 
 ### J1 – Rozdzielanie kolumn w PDF
@@ -76,22 +78,13 @@ Blok C dołoży te wskazówki do promptu i nadpisze nimi pola `FormSpec`, gdy ni
 
 - Odczyt list z binarnego Worda ([MS-DOC]: `PlfLst`/`PlfLfo` w strumieniu tabeli i `sprmPIlfo`/`sprmPIlvl` we właściwościach akapitów). Punktor kratki daje checkbox, inny punktor daje `- `, tak samo jak w DOCX.
 - Kolejność ramek tekstowych po pozycji (`PlcfSpa` / FSPA).
-- To najtrudniejsze zadanie w bloku i dotyczy tylko starego formatu. Zrób je tylko wtedy, gdy mentor nie zgodzi się na konwersję przez LibreOffice (J6).
+- To najtrudniejsze zadanie w bloku i dotyczy tylko starego formatu. Jedyny sposób na punktory i kratki z list w `.doc`, bo konwersji przez LibreOffice nie używamy (J6).
 
 **Gotowe, gdy:** formularz 3 (`.doc`) ma punktory `- `, a formularz 9 (`.doc`) ma te same checkboxy co DOCX.
 
-### J6 – (warunkowo) Konwersja do PDF przez LibreOffice
+### J6 – Konwersja do PDF przez LibreOffice – ODRZUCONE
 
-**Czeka na decyzję mentora o licencji MPL-2.0.** Jeśli się zgodzi:
-
-**Pliki:** `src/hacknation_2026/extract/convert.py`, `tests/extract_convert/`
-
-- `soffice --headless --convert-to pdf` w katalogu tymczasowym (usuwany po żądaniu) dla DOC, DOCX, XLSX i ODS, potem `extract_pdf`.
-- Gdy konwersja się nie uda albo LibreOffice nie ma w systemie, zostaje bezpośrednie parsowanie (B2/B3).
-- Sprawdzić mapowanie glifów Wingdings po konwersji na Linuksie (brak fontu, podmiana znaków).
-- Porównać na wszystkich blankietach z bezpośrednim parsowaniem: liczba checkboxów, kolejność, tabele.
-
-**Gotowe, gdy:** raport porównania w `docs/wybor-modelu.md` (sekcja „Konwersja do PDF”) i decyzja, która ścieżka jest domyślna.
+Sprawdzone 2026-11-21 na wszystkich blankietach: konwersja gubiła tekst z ramek tekstowych (formularz 8 DOCX bez tekstu na stronach 1–3, formularz 2 DOCX połowa tekstu), a w arkuszach pola i kratki zamieniały się w samą grafikę. Pomagała tylko przy binarnym `.doc` (punktory, kratki z list). Decyzja zespołu: nie używamy. Pliki biurowe czyta się bezpośrednio (B2, B3).
 
 ## Zasady wspólne
 
@@ -100,5 +93,5 @@ Blok C dołoży te wskazówki do promptu i nadpisze nimi pola `FormSpec`, gdy ni
 - Python z wcięciem **2 spacjami**. Zależności dodawaj przez `uv add`.
 - Testy: `uv run pytest tests/`. Zadanie jest skończone, gdy jego testy i wszystkie dotychczasowe przechodzą.
 - **Nie rób `git commit`.** Commituje człowiek.
-- Licencje: tylko MIT, BSD, Apache 2.0 lub podobne. Żadnego GPL ani AGPL, żadnych zewnętrznych API. LibreOffice (MPL) wyłącznie po zgodzie mentora (J6).
+- Licencje: tylko MIT, BSD, Apache 2.0 lub podobne. Żadnego GPL ani AGPL, żadnych zewnętrznych API.
 - Dane testowe: `dane_zadania/blankiety/`. **W kodzie aplikacji nie może być treści żadnego konkretnego formularza.** Wartości z blankietów wolno wpisywać tylko do testów.

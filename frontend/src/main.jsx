@@ -7,18 +7,22 @@ import Header from './components/header.jsx'
 import Footer from './components/footer.jsx'
 import EnsureAI from './components/EnsureAI'
 import NotFound from './pages/NotFound.jsx'
-import InspectForm from './pages/InspectForm.jsx'
+import IdentifyForm from './pages/IdentifyForm.jsx'
+import VerifyForm from './pages/VerifyForm.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <Header/>
       {/* <EnsureAI/> */}
-      <Routes>
-        <Route path="/" element={<ImportForm />} />
-        <Route path="/inspect-form" element={<InspectForm />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <main className="flex-1">
+        <Routes>
+          <Route path="/" element={<ImportForm />} />
+          <Route path="/digitalize" element={<IdentifyForm />} />
+          <Route path="/verify" element={<VerifyForm />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
       <Footer/>
     </BrowserRouter>
   </StrictMode>,
