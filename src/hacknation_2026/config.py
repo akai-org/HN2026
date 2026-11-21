@@ -9,11 +9,6 @@ class Settings(BaseSettings):
   model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
   max_file_size_mb: int = 10
-  jwt_secret: str
-  jwt_algorithm: str = "HS256"
-  jwt_expire_minutes: int = 60
-  auth_username: str
-  auth_password: str
   llm_base_url: str = "https://api.groq.com/openai/v1"  # any OpenAI-compatible /chat/completions API
   llm_api_key: str                                       # required, set in .env
   llm_model: str                                         # required, set in .env
