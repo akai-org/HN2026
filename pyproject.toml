@@ -5,7 +5,11 @@ description = "Rozwiązanie zadania COI na HackNation 2026"
 readme = "README.md"
 authors = [{ name = "zakhildev", email = "piotr.blecharski02@gmail.com" }]
 requires-python = ">=3.14"
-dependencies = ["fastapi>=0.165.0", "uvicorn[standard]>=0.54.0"]
+dependencies = [
+    "fastapi>=0.165.0",
+    "pydantic-settings>=2.16.3",
+    "uvicorn[standard]>=0.54.0",
+]
 
 [project.scripts]
 hacknation-2026 = "hacknation_2026:main"

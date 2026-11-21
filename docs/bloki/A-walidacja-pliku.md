@@ -4,6 +4,8 @@ Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i
 
 **Wymaga:** ukończonego bloku 0. Typy (`AppError`, `FileFormat`, `ExtractedDocument`, `FormSpec`, `FormDefinition`, `RuleViolation`, `ConvertResult`, `Settings`) importuj z `hacknation_2026.contracts` i `hacknation_2026.config`; ich pełna definicja jest w `docs/bloki/00-kontrakty.md`.
 
+> **Status: zrobione.** `src/hacknation_2026/ingest/validation.py`, testy w `tests/ingest/`. Bez nowych zależności (magic bytes ręcznie, ZIP przez `zipfile`). Dodatkowo publiczna `detect_format(data)`. Uproszczenie: każdy kontener OLE2 to DOC (także .xls), bez sprawdzania strumienia `WordDocument`.
+
 ## Zadanie
 
 **Pliki:** `src/hacknation_2026/ingest/validation.py`, `tests/ingest/`
