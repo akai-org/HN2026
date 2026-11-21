@@ -4,13 +4,6 @@ import { Link } from "react-router-dom";
 import { ArrowLeft, BadgeCheck, Download, Redo2, Undo2 } from "lucide-react";
 import { Badge, Button, IconButton } from "../components/primitives.jsx";
 
-function originText(group) {
-  if (group.origin === "example") return "Przykład do testu: PDF i wzorcowy JSON z materiałów COI";
-  if (group.origin === "import") return "Wczytany plik JSON";
-  if (group.source?.merged) return `Rozpoznano z ${group.source.merged} plików połączonych w jeden PDF`;
-  return group.source?.name ? `Rozpoznano z pliku ${group.source.name}` : "Rozpoznany formularz";
-}
-
 export default function FormBar({ group, groups, onSwitch, onUndo, onRedo, onDownload, onApprove }) {
   const selectId = useId();
   const doc = group.doc;
@@ -19,7 +12,7 @@ export default function FormBar({ group, groups, onSwitch, onUndo, onRedo, onDow
 
   return (
     <div className="border-b border-slate-200 bg-white">
-      <div className="mx-auto flex max-w-[1800px] flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3 sm:px-6">
+      <div className="mx-auto flex max-w-[1800px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-2.5 sm:px-6">
         <Link to="/konwerter" className="inline-flex h-10 items-center gap-1.5 rounded-xl px-2 text-sm font-semibold text-(--blue) hover:bg-(--blue-soft)">
           <ArrowLeft aria-hidden="true" size={17} /> Wszystkie formularze
         </Link>
@@ -30,13 +23,13 @@ export default function FormBar({ group, groups, onSwitch, onUndo, onRedo, onDow
             </span>
             {group.approved && <Badge tone="green" icon={BadgeCheck}>Zatwierdzony</Badge>}
           </h1>
-          <p className="truncate text-sm text-slate-600">{originText(group)}</p>
         </div>
 
         {groups.length > 1 && (
           <div className="flex items-center gap-2">
             <label htmlFor={selectId} className="text-sm font-semibold text-slate-800">
-              Formularz {position + 1} z {groups.length}
+              {position + 1} z {groups.length}
+              <span className="sr-only"> formularzy, przełącz formularz</span>
             </label>
             <select
               id={selectId}

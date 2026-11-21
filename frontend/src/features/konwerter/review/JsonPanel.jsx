@@ -83,16 +83,17 @@ export default function JsonPanel({ doc, onText, selectedEntry, selectedState, h
             </button>
           ))}
         </div>
-        <p id={statusId} role="status" className={`ml-auto inline-flex items-center gap-1.5 text-sm font-semibold ${doc.error ? "text-red-700" : "text-emerald-800"}`}>
-          {doc.error ? <CircleAlert aria-hidden="true" size={16} /> : <CircleCheck aria-hidden="true" size={16} />}
-          {doc.error ? `Błąd w linii ${doc.error.line}: ${doc.error.message}` : "Poprawny JSON"}
+        <p
+          id={statusId}
+          role="status"
+          title={doc.error ? "Podgląd formularza pokazuje ostatnią poprawną wersję. Popraw błąd albo cofnij zmianę." : undefined}
+          className={`ml-auto inline-flex min-w-0 items-center gap-1.5 text-sm font-semibold ${doc.error ? "text-red-700" : "text-emerald-800"}`}
+        >
+          {doc.error ? <CircleAlert aria-hidden="true" size={16} className="shrink-0" /> : <CircleCheck aria-hidden="true" size={16} className="shrink-0" />}
+          <span className="truncate">{doc.error ? `Błąd w linii ${doc.error.line}: ${doc.error.message}` : "Poprawny"}</span>
+          {doc.error && <span className="sr-only">. Podgląd pokazuje ostatnią poprawną wersję.</span>}
         </p>
       </div>
-      {doc.error && (
-        <p className="border-b border-red-200 bg-red-50 px-3 py-1.5 text-sm text-red-900">
-          Podgląd formularza pokazuje ostatnią poprawną wersję. Popraw błąd albo cofnij zmianę.
-        </p>
-      )}
       <ErrorBoundary resetKey={doc.text} title="Nie udało się opisać pola.">
         <FieldExplainer id={explainerId} entry={selectedEntry} titles={titles} state={selectedState} open={explainOpen} onToggle={setExplainOpen} />
       </ErrorBoundary>

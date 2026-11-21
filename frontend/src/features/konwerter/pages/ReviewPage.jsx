@@ -3,8 +3,9 @@
 // a zaznaczone pole jest podświetlone w obu miejscach.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { BookOpenCheck, FilePlus2, FileUp, RotateCcw } from "lucide-react";
+import { BookOpenCheck, FilePlus2, FileUp, RotateCcw, SlidersHorizontal } from "lucide-react";
 import ErrorBoundary from "../components/ErrorBoundary.jsx";
+import Popover from "../components/Popover.jsx";
 import { Button, Modal, Switch } from "../components/primitives.jsx";
 import { buttonClass } from "../components/buttonClass.js";
 import { SourceViewer } from "../components/viewers.jsx";
@@ -34,7 +35,7 @@ import { Columns, ColumnsChips } from "../review/Columns.jsx";
 import FormBar from "../review/FormBar.jsx";
 import FormPreview from "../review/FormPreview.jsx";
 import JsonPanel, { JsonActions } from "../review/JsonPanel.jsx";
-import { useColumns, useMediaQuery } from "../review/useColumns.js";
+import { restrictLayout, useColumns, useMediaQuery } from "../review/useColumns.js";
 import { useConverter } from "../state/ConverterProvider.jsx";
 
 function EmptyReview({ actions, missing }) {
@@ -94,32 +95,6 @@ function EmptyReview({ actions, missing }) {
   );
 }
 
-function AttachOriginal({ onAttach }) {
-  const ref = useRef(null);
-  return (
-    <div className="flex h-full flex-col items-center justify-center gap-3 bg-slate-50 p-6 text-center text-sm text-slate-700">
-      <p className="max-w-xs font-semibold text-slate-900">Brak oryginału do porównania</p>
-      <p className="max-w-xs">Dołącz PDF albo zdjęcie papierowego formularza, żeby widzieć je obok wyniku.</p>
-      <Button onClick={() => ref.current?.click()}>
-        <FileUp aria-hidden="true" size={17} /> Dołącz oryginał
-      </Button>
-      <input
-        ref={ref}
-        type="file"
-        accept=".pdf,.jpg,.jpeg,.png"
-        className="sr-only"
-        tabIndex={-1}
-        aria-hidden="true"
-        onChange={(event) => {
-          const [file] = event.target.files ?? [];
-          if (file) onAttach(file);
-          event.target.value = "";
-        }}
-      />
-    </div>
-  );
-}
-
 function Workbench({ group, groups, actions }) {
   const navigate = useNavigate();
   const doc = group.doc;
@@ -137,7 +112,7 @@ function Workbench({ group, groups, actions }) {
   const [flashId, setFlashId] = useState(null);
   const [renamingId, setRenamingId] = useState(null);
   const [showHidden, setShowHidden] = useState(false);
-  const [showNotes, setShowNotes] = useState(true);
+  const [showNotes, setShowNotes] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [approveOpen, setApproveOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState("form");
@@ -173,13 +148,17 @@ function Workbench({ group, groups, actions }) {
   const selectedEntry = selection.id ? index.byId.get(selection.id) ?? null : null;
   const selectedId = selectedEntry ? selection.id : null;
 
-  // Etykieta zaznaczonego pola (a w zapasie tytuł jego sekcji) do podświetlenia na oryginale.
+  // Etykieta zaznaczonego pola do wskazania na oryginale PDF.
   const pdfSearch = useMemo(() => {
     const label = selectedEntry?.field.title?.trim();
-    if (!label) return null;
-    const parent = selectedEntry.parentId ? index.byId.get(selectedEntry.parentId)?.field.title?.trim() : "";
-    return { key: `${selection.id}:${selection.at}`, label, queries: [label, parent].filter(Boolean) };
-  }, [selectedEntry, index, selection.id, selection.at]);
+    return label ? { key: `${selection.id}:${selection.at}`, label } : null;
+  }, [selectedEntry, selection.id, selection.at]);
+
+  // „Oryginał” ma sens tylko dla PDF-a dodanego przez urzędnika (tam działa wskazywanie pól).
+  // Dla zdjęć, Worda i arkuszy zostają formularz i JSON.
+  const hasPdf = group.source?.kind === "pdf" && Boolean(group.source.url) && !group.source.imagesOnly;
+  const available = hasPdf ? ["original", "form", "json"] : ["form", "json"];
+  const shownColumns = { ...columns, layout: restrictLayout(columns.layout, available) };
 
   const highlight = useMemo(() => {
     if (!selectedEntry || doc.error) return null;
@@ -300,34 +279,38 @@ function Workbench({ group, groups, actions }) {
   const panels = {
     original: {
       title: "Oryginał",
-      subtitle: group.source?.merged ? `${group.source.merged} pliki połączone w PDF` : group.source?.name ?? "Papierowy formularz",
-      body:
-        group.source?.url || group.source?.kind === "none" ? (
-          <SourceViewer source={group.source} search={pdfSearch} />
-        ) : (
-          <AttachOriginal onAttach={(file) => actions.attachSource(group.id, file)} />
-        ),
+      body: hasPdf ? <SourceViewer source={group.source} search={pdfSearch} /> : null,
     },
     form: {
       title: "Formularz",
-      subtitle: "Podgląd na żywo, tak zobaczy go mieszkaniec",
+      actions: (
+        <Popover
+          label="Ustawienia podglądu"
+          width="w-80"
+          button={<SlidersHorizontal aria-hidden="true" size={17} />}
+          buttonClassName="flex size-9 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100"
+        >
+          {(close) => (
+            <div className="space-y-3">
+              <Switch checked={showHidden} onChange={setShowHidden} label="Pokaż pola ukryte warunkami" />
+              <Switch checked={showNotes} onChange={setShowNotes} label="Objaśnienia przy polach" description="Skąd wartość, kiedy pole się pokazuje" />
+              <Button
+                variant="quiet"
+                size="sm"
+                onClick={() => {
+                  setAnswers(initialAnswers(form, resolveRegistryValue));
+                  actions.announce("Wyczyszczono odpowiedzi w podglądzie.");
+                  close();
+                }}
+              >
+                <RotateCcw aria-hidden="true" size={15} /> Wyczyść odpowiedzi
+              </Button>
+            </div>
+          )}
+        </Popover>
+      ),
       body: (
         <div className="flex h-full min-h-0 flex-col">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-slate-200 bg-white px-3 py-2">
-            <Switch checked={showHidden} onChange={setShowHidden} label="Pokaż pola ukryte warunkami" />
-            <Switch checked={showNotes} onChange={setShowNotes} label="Objaśnienia" />
-            <Button
-              variant="quiet"
-              size="sm"
-              className="ml-auto"
-              onClick={() => {
-                setAnswers(initialAnswers(form, resolveRegistryValue));
-                actions.announce("Wyczyszczono odpowiedzi w podglądzie.");
-              }}
-            >
-              <RotateCcw aria-hidden="true" size={15} /> Wyczyść odpowiedzi
-            </Button>
-          </div>
           <div ref={previewScrollRef} className="kv-scroll min-h-0 flex-1 overflow-y-auto">
             <ErrorBoundary resetKey={doc.text} title="Nie udało się narysować podglądu formularza.">
               <FormPreview form={form} page={page} onPage={setPage} context={previewContext} />
@@ -338,7 +321,6 @@ function Workbench({ group, groups, actions }) {
     },
     json: {
       title: "JSON",
-      subtitle: "Plik do importu w eUsługach",
       actions: <JsonActions doc={doc} title={form.title || group.name} onText={(text) => actions.setDocText(group.id, text)} announce={actions.announce} />,
       body: (
         <JsonPanel
@@ -371,10 +353,10 @@ function Workbench({ group, groups, actions }) {
       <div className={`mx-auto flex w-full max-w-[1800px] flex-col gap-3 px-4 py-3 sm:px-6 ${isWide ? "min-h-0 flex-1" : ""}`}>
         <ErrorBoundary resetKey={doc.text} title="Nie udało się sprawdzić formularza.">
           <ChecksPanel stats={stats} checks={checks} onShowField={(id) => selectField(id, "checks")}>
-            {isWide && <ColumnsChips {...columns} />}
+            {isWide && <ColumnsChips {...shownColumns} />}
           </ChecksPanel>
         </ErrorBoundary>
-        <Columns {...columns} panels={panels} isWide={isWide} mobileTab={mobileTab} onMobileTab={setMobileTab} />
+        <Columns {...shownColumns} panels={panels} isWide={isWide} mobileTab={available.includes(mobileTab) ? mobileTab : "form"} onMobileTab={setMobileTab} />
       </div>
 
       <Modal

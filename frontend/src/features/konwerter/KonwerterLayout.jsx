@@ -11,12 +11,10 @@ import { useAccessibilitySettings } from "./components/useAccessibilitySettings.
 import { ConverterProvider, useConverter } from "./state/ConverterProvider.jsx";
 
 function Shell() {
-  const { state, announcement } = useConverter();
+  const { announcement } = useConverter();
   const [helpOpen, setHelpOpen] = useState(false);
   const [a11y, setA11y] = useAccessibilitySettings();
   const isReview = Boolean(useMatch("/konwerter/sprawdz/*"));
-  const started = state.groups.some((group) => group.status !== "ready");
-  const activeStep = isReview ? 3 : started ? 2 : 1;
 
   return (
     <div className="kv-app relative isolate flex min-h-screen flex-col bg-slate-50 text-slate-900">
@@ -28,7 +26,6 @@ function Shell() {
         className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-120 bg-[radial-gradient(70%_100%_at_50%_0%,#dce8f8_0%,rgba(248,250,252,0)_100%)]"
       />
       <AppHeader
-        activeStep={activeStep}
         onHelp={() => setHelpOpen(true)}
         a11ySettings={a11y}
         onA11yChange={setA11y}

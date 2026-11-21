@@ -20,11 +20,7 @@ function Row({ term, children, code }) {
 
 export default function FieldExplainer({ entry, titles, state, id, open, onToggle }) {
   if (!entry) {
-    return (
-      <p id={id} className="border-b border-slate-200 bg-slate-50 px-3 py-1.5 text-sm text-slate-600">
-        Kliknij pole w podglądzie, a podświetlimy jego fragment w JSON-ie.
-      </p>
-    );
+    return null;
   }
   const { field, question } = entry;
   const conditions = asArray(field.states).filter((s) => typeof s?.query === "string");

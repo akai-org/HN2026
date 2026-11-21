@@ -1,4 +1,4 @@
-import { Accessibility, Braces, Camera, ChevronDown, FileStack, FolderTree, Keyboard, ShieldCheck } from "lucide-react";
+import { Accessibility, Braces, Camera, ChevronDown, FileStack, FolderTree, Keyboard, ListChecks, ShieldCheck } from "lucide-react";
 import { FORMAT_SUMMARY, MAX_FILE_SIZE_MB } from "../lib/files.js";
 import { Kbd, Modal } from "./primitives.jsx";
 
@@ -16,6 +16,17 @@ const JSON_TERMS = [
 ];
 
 const TOPICS = [
+  {
+    icon: ListChecks,
+    title: "Jak to działa?",
+    body: (
+      <ol className="list-decimal space-y-1 pl-5">
+        <li>Dodaj pliki z formularzem: skan, zdjęcie, PDF albo dokument.</li>
+        <li>Kliknij „Rozpoznaj”: przygotujemy pola, formaty i zależności między nimi.</li>
+        <li>Sprawdź wynik obok oryginału, popraw go i zatwierdź. Pobierzesz plik JSON do eUsług.</li>
+      </ol>
+    ),
+  },
   {
     icon: FileStack,
     title: "Jakie pliki mogę dodać?",

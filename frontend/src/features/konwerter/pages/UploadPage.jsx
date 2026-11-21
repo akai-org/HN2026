@@ -1,4 +1,4 @@
-// Krok 1–2: dodawanie plików, grupowanie w formularze i rozpoznawanie.
+// Dodawanie plików, grupowanie w formularze i rozpoznawanie.
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -7,13 +7,11 @@ import {
   BookOpenCheck,
   ChevronsDownUp,
   ChevronsUpDown,
+  Ellipsis,
   FileJson,
-  FilePlus2,
-  ListChecks,
   LoaderCircle,
   Merge,
   RotateCcw,
-  ScanText,
   Split,
   Trash2,
   TriangleAlert,
@@ -22,20 +20,16 @@ import {
 import Dropzone from "../components/Dropzone.jsx";
 import GroupCard from "../components/GroupCard.jsx";
 import PreviewDialog from "../components/PreviewDialog.jsx";
+import Popover from "../components/Popover.jsx";
 import { Button, IconButton, Modal } from "../components/primitives.jsx";
 import { buttonClass } from "../components/buttonClass.js";
-import { EXAMPLE, STEPS } from "../lib/constants.js";
-import { FORMAT_SUMMARY, MAX_FILE_SIZE_MB } from "../lib/files.js";
+import { EXAMPLE } from "../lib/constants.js";
+import { MAX_FILE_SIZE_MB } from "../lib/files.js";
 import { collectDropEntries, readDropEntries } from "../lib/folders.js";
 import { groupProblem, groupStats, isEditable } from "../lib/grouping.js";
 import { FORMS, count } from "../lib/text.js";
 import { useConverter } from "../state/ConverterProvider.jsx";
 
-const HOW_IT_WORKS = [
-  { icon: FilePlus2, title: "Dodaj pliki", text: "Skan, zdjęcie albo dokument. Kilka stron jednego wniosku połączymy w jeden formularz." },
-  { icon: ScanText, title: "Rozpoznamy pola", text: "Nazwy, formaty, listy dozwolonych wartości i zależności między polami." },
-  { icon: ListChecks, title: "Sprawdzisz i zatwierdzisz", text: "Obok oryginału zobaczysz gotowy formularz i jego plik JSON. Poprawisz wynik przed importem." },
-];
 
 const FILTERS = [
   { id: "all", label: "Wszystkie", match: () => true },
@@ -44,8 +38,6 @@ const FILTERS = [
   { id: "error", label: "Z błędem", match: (group) => group.status === "error" },
 ];
 
-/** Dopełniacz po „z”: „z 1 pliku”, „z 5 plików”. */
-const fromFiles = (n) => `${n} ${n === 1 ? "pliku" : "plików"}`;
 
 const PASTE_EXTENSIONS = { "image/png": "png", "image/jpeg": "jpg" };
 
@@ -122,45 +114,31 @@ function useNow(active) {
   return now;
 }
 
-function ExampleCard({ onExample, onImport, busy }) {
+/** Przykład do testu i wczytanie gotowego JSON-a: jedna linijka pod strefą plików. */
+function ExampleRow({ onExample, onImport, busy }) {
   const importRef = useRef(null);
   return (
-    <section aria-labelledby="kv-example-title" className="mt-6 rounded-2xl border border-(--blue-ring) bg-(--blue-soft)/60 p-5 sm:p-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-white text-(--blue) ring-1 ring-(--blue-ring)">
-          <BookOpenCheck aria-hidden="true" size={24} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <h2 id="kv-example-title" className="font-bold text-slate-900">
-            Nie masz formularza pod ręką?
-          </h2>
-          <p className="text-sm text-slate-700">
-            Otwórz przykład do testu: PDF papierowego wniosku, gotowy formularz i jego JSON, który zmienia się na żywo.
-          </p>
-        </div>
-      </div>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <Button variant="primary" size="sm" disabled={busy} onClick={onExample}>
-          <BookOpenCheck aria-hidden="true" size={16} /> Otwórz przykład<span className="sr-only">: {EXAMPLE.label}</span>
-        </Button>
-        <Button variant="quiet" size="sm" disabled={busy} onClick={() => importRef.current?.click()}>
-          <FileJson aria-hidden="true" size={16} /> Wczytaj własny JSON
-        </Button>
-        <input
-          ref={importRef}
-          type="file"
-          multiple
-          accept=".json,.pdf,.jpg,.jpeg,.png,application/json"
-          className="sr-only"
-          tabIndex={-1}
-          aria-hidden="true"
-          onChange={(event) => {
-            onImport(event.target.files);
-            event.target.value = "";
-          }}
-        />
-      </div>
-    </section>
+    <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+      <Button variant="soft" size="sm" disabled={busy} onClick={onExample}>
+        <BookOpenCheck aria-hidden="true" size={16} /> Otwórz przykład<span className="sr-only">: {EXAMPLE.label}</span>
+      </Button>
+      <Button variant="quiet" size="sm" disabled={busy} onClick={() => importRef.current?.click()}>
+        <FileJson aria-hidden="true" size={16} /> Wczytaj JSON
+      </Button>
+      <input
+        ref={importRef}
+        type="file"
+        multiple
+        accept=".json,.pdf,.jpg,.jpeg,.png,application/json"
+        className="sr-only"
+        tabIndex={-1}
+        aria-hidden="true"
+        onChange={(event) => {
+          onImport(event.target.files);
+          event.target.value = "";
+        }}
+      />
+    </div>
   );
 }
 
@@ -192,7 +170,6 @@ export default function UploadPage() {
   const manyGroups = groups.length > 12;
   const isExpanded = (group) => expandedOverrides[group.id] ?? (!manyGroups && group.itemIds.length <= 6);
   const allExpanded = groups.every(isExpanded);
-  const activeStep = stats.total > stats.ready ? 2 : 1;
 
   const openReview = (group) => navigate(`/konwerter/sprawdz/${group.id}`);
 
@@ -280,29 +257,18 @@ export default function UploadPage() {
   return (
     <>
       <div className={`mx-auto w-full max-w-4xl flex-1 px-4 sm:px-6 ${hasGroups ? "pt-8 pb-10" : "pt-10 pb-16 sm:pt-12"}`}>
-        <div className="text-center motion-safe:animate-[kv-rise-in_400ms_ease-out]">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-(--blue-ring) bg-white/80 px-3 py-1 text-xs font-semibold text-(--blue) shadow-xs">
-            Krok {activeStep} z {STEPS.length} · {STEPS[activeStep - 1]}
-          </span>
-          <h1 className={`font-bold tracking-tight text-balance text-slate-900 ${hasGroups ? "mt-3 text-2xl sm:text-3xl" : "mt-5 text-3xl sm:text-5xl sm:leading-[1.1]"}`}>
-            Zamień papierowy formularz na eFormularz
-          </h1>
-          {!hasGroups && (
-            <p className="mx-auto mt-4 max-w-2xl text-base text-pretty text-slate-700 sm:text-lg">
-              Dodaj skan, zdjęcie lub plik z formularzem. Rozpoznamy jego pola, a Ty sprawdzisz wynik obok oryginału, zanim trafi do eUsługi.
-            </p>
-          )}
-        </div>
+        <h1
+          className={`text-center font-bold tracking-tight text-balance text-slate-900 motion-safe:animate-[kv-rise-in_400ms_ease-out] ${
+            hasGroups ? "text-2xl sm:text-3xl" : "text-3xl sm:text-5xl sm:leading-[1.1]"
+          }`}
+        >
+          Zamień papierowy formularz na eFormularz
+        </h1>
 
         {health !== "ok" && health !== "unknown" && (
           <div role="status" className="mt-8 flex items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
             <TriangleAlert aria-hidden="true" size={18} className="mt-0.5 shrink-0 text-amber-700" />
-            <p>
-              <span className="font-semibold">Rozpoznawanie może teraz nie działać.</span>{" "}
-              {health === "offline"
-                ? "Nie udało się połączyć z serwerem. Możesz dodać pliki albo otworzyć przykład."
-                : "Model językowy jest chwilowo niedostępny. Pliki możesz dodać już teraz."}
-            </p>
+            <p>{health === "offline" ? "Serwer nie odpowiada, rozpoznawanie może nie działać." : "Model językowy jest chwilowo niedostępny."}</p>
           </div>
         )}
 
@@ -322,9 +288,6 @@ export default function UploadPage() {
                   </li>
                 ))}
               </ul>
-              <p className="mt-2 text-red-900/90">
-                Obsługujemy: {FORMAT_SUMMARY}, do {MAX_FILE_SIZE_MB} MB.
-              </p>
             </div>
             <IconButton label="Zamknij komunikat" icon={X} variant="danger" onClick={actions.dismissRejected} />
           </div>
@@ -339,32 +302,61 @@ export default function UploadPage() {
         {hasGroups ? (
           <section ref={listRef} aria-labelledby="kv-groups-title" className="mt-8">
             <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h2 id="kv-groups-title" className="text-xl font-bold text-slate-900">
-                  Formularze do rozpoznania
-                </h2>
-                <p className="text-sm text-slate-600">
-                  {count(groups.length, FORMS.form)} z {fromFiles(Object.keys(items).length)}. Każdy formularz to osobny wniosek; pliki w nim to jego strony.
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                <Button variant="quiet" size="sm" onClick={toggleAll}>
-                  {allExpanded ? <ChevronsDownUp aria-hidden="true" size={16} /> : <ChevronsUpDown aria-hidden="true" size={16} />}
-                  {allExpanded ? "Zwiń wszystkie" : "Rozwiń wszystkie"}
-                </Button>
-                {editableCount > 1 && (
-                  <Button variant="quiet" size="sm" onClick={actions.mergeAll} disabled={running}>
-                    <Merge aria-hidden="true" size={16} /> Połącz wszystkie w jeden
-                  </Button>
-                )}
-                {groups.some((group) => isEditable(group) && group.itemIds.length > 1) && (
-                  <Button variant="quiet" size="sm" onClick={actions.splitAll} disabled={running}>
-                    <Split aria-hidden="true" size={16} /> Każdy plik osobno
-                  </Button>
-                )}
-                <Button variant="danger" size="sm" onClick={() => setConfirmClear(true)}>
-                  <Trash2 aria-hidden="true" size={16} /> Wyczyść listę
-                </Button>
+              <h2 id="kv-groups-title" className="text-xl font-bold text-slate-900">
+                Formularze <span className="text-slate-500">({groups.length})</span>
+              </h2>
+              <div className="flex items-center gap-1">
+                <IconButton
+                  label={allExpanded ? "Zwiń wszystkie formularze" : "Rozwiń wszystkie formularze"}
+                  icon={allExpanded ? ChevronsDownUp : ChevronsUpDown}
+                  onClick={toggleAll}
+                />
+                <Popover
+                  label="Więcej działań na liście"
+                  button={<Ellipsis aria-hidden="true" size={18} />}
+                  buttonClassName="flex size-9 items-center justify-center rounded-lg text-slate-700 hover:bg-slate-100"
+                  width="w-64"
+                >
+                  {(close) => (
+                    <div className="-m-2 flex flex-col">
+                      <Button
+                        variant="quiet"
+                        size="sm"
+                        className="justify-start"
+                        disabled={running || editableCount < 2}
+                        onClick={() => {
+                          actions.mergeAll();
+                          close();
+                        }}
+                      >
+                        <Merge aria-hidden="true" size={16} /> Połącz wszystkie w jeden
+                      </Button>
+                      <Button
+                        variant="quiet"
+                        size="sm"
+                        className="justify-start"
+                        disabled={running || !groups.some((group) => isEditable(group) && group.itemIds.length > 1)}
+                        onClick={() => {
+                          actions.splitAll();
+                          close();
+                        }}
+                      >
+                        <Split aria-hidden="true" size={16} /> Każdy plik osobno
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        className="justify-start"
+                        onClick={() => {
+                          setConfirmClear(true);
+                          close();
+                        }}
+                      >
+                        <Trash2 aria-hidden="true" size={16} /> Wyczyść listę
+                      </Button>
+                    </div>
+                  )}
+                </Popover>
               </div>
             </div>
 
@@ -422,28 +414,7 @@ export default function UploadPage() {
           </section>
         ) : (
           <>
-            <section aria-labelledby="kv-how-title" className="mt-14">
-              <h2 id="kv-how-title" className="text-center text-xs font-bold tracking-[0.14em] text-slate-600 uppercase">
-                Jak to działa
-              </h2>
-              <ol className="mt-5 grid gap-4 sm:grid-cols-3">
-                {HOW_IT_WORKS.map(({ icon: Icon, title, text }, index) => (
-                  <li key={title} className="relative rounded-2xl border border-slate-200/80 bg-white/80 p-5 shadow-xs backdrop-blur-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="flex size-11 items-center justify-center rounded-xl bg-(--blue-soft) text-(--blue)">
-                        <Icon aria-hidden="true" size={22} strokeWidth={1.9} />
-                      </span>
-                      <span aria-hidden="true" className="text-3xl font-bold text-slate-300">
-                        {index + 1}
-                      </span>
-                    </div>
-                    <p className="mt-4 font-semibold text-slate-900">{title}</p>
-                    <p className="mt-1 text-sm leading-relaxed text-slate-700">{text}</p>
-                  </li>
-                ))}
-              </ol>
-            </section>
-            <ExampleCard
+            <ExampleRow
               busy={loading}
               onExample={() => runLoader(() => actions.loadExample())}
               onImport={(files) => runLoader(() => actions.importFiles(files))}

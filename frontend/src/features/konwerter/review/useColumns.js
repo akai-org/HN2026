@@ -33,6 +33,17 @@ function read() {
   }
 }
 
+/**
+ * Układ ograniczony do dostępnych kolumn (np. bez „Oryginału”, gdy formularz nie pochodzi z PDF-a).
+ * Gdy zostaje zero widocznych, pokazujemy wszystkie dostępne.
+ */
+export function restrictLayout(layout, available) {
+  const order = layout.order.filter((id) => available.includes(id));
+  const visible = Object.fromEntries(order.map((id) => [id, layout.visible[id]]));
+  if (!order.some((id) => visible[id])) order.forEach((id) => (visible[id] = true));
+  return { ...layout, order, visible };
+}
+
 /** Szerokości widocznych kolumn w procentach (sumują się do 100). */
 export function visibleWidths(layout) {
   const ids = layout.order.filter((id) => layout.visible[id]);

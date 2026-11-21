@@ -1,22 +1,15 @@
 // Strefa dodawania plików (jak na /makieta) z dodatkowym przyciskiem „Dodaj folder”.
 // Upuszczanie obsługuje nakładka na całe okno (UploadPage), więc tu są tylko przyciski i opis.
 import { useRef } from "react";
-import { ArrowUp, Camera, FolderOpen, FolderPlus, Plus, ShieldCheck } from "lucide-react";
+import { ArrowUp, Camera, FolderOpen, FolderPlus, Info, Plus } from "lucide-react";
 import { ACCEPT, MAX_FILE_SIZE_MB } from "../lib/files.js";
 import { entriesFromFileList } from "../lib/folders.js";
 import { buttonClass } from "./buttonClass.js";
+import Popover from "./Popover.jsx";
 import { Kbd } from "./primitives.jsx";
 
 const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
 
-const CHIPS = [
-  { label: "PDF", tone: "bg-red-700" },
-  { label: "Word", tone: "bg-blue-700" },
-  { label: "Excel", tone: "bg-emerald-700" },
-  { label: "ODS", tone: "bg-teal-700" },
-  { label: "JPG", tone: "bg-violet-700" },
-  { label: "PNG", tone: "bg-violet-700" },
-];
 
 function Illustration({ isDragging }) {
   return (
@@ -60,7 +53,7 @@ export default function Dropzone({ compact, isDragging, onEntries, disabled }) {
 
   // Klik w puste miejsce strefy otwiera wybór plików; przyciski obsługują się same.
   function handleAreaClick(event) {
-    if (disabled || event.target.closest("button, a, input, kbd")) return;
+    if (disabled || event.target.closest("button, a, input, kbd, [role='group']")) return;
     filesRef.current?.click();
   }
 
@@ -82,11 +75,23 @@ export default function Dropzone({ compact, isDragging, onEntries, disabled }) {
     </>
   );
 
-  const pasteHint = (
-    <span className="hidden sm:inline">
-      {" "}
-      · wklej obraz: <Kbd>{isMac ? "⌘" : "Ctrl"}</Kbd> + <Kbd>V</Kbd>
-    </span>
+  // Szczegóły (foldery, wklejanie, prywatność) są pod przyciskiem „i”, żeby strefa była czysta.
+  const details = (
+    <Popover
+      label="Jak dodawać pliki"
+      width="w-80"
+      align="left"
+      button={<Info aria-hidden="true" size={17} />}
+      buttonClassName="flex size-8 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+    >
+      <ul className="space-y-2 text-left">
+        <li>Pliki z jednego folderu łączymy w jeden formularz (np. zdjęcia kolejnych stron).</li>
+        <li>
+          Obraz ze schowka wkleisz skrótem <Kbd>{isMac ? "⌘" : "Ctrl"}</Kbd> + <Kbd>V</Kbd>.
+        </li>
+        <li>Pliki służą tylko do rozpoznania formularza. Nie zapisujemy ich.</li>
+      </ul>
+    </Popover>
   );
 
   if (compact) {
@@ -101,13 +106,7 @@ export default function Dropzone({ compact, isDragging, onEntries, disabled }) {
         <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-(--blue-soft) text-(--blue) transition-transform group-hover:-translate-y-0.5">
           <ArrowUp aria-hidden="true" size={20} strokeWidth={2.5} />
         </span>
-        <div className="min-w-0 flex-1">
-          <p className="font-semibold text-slate-900">Dodaj kolejne pliki</p>
-          <p className="text-sm text-slate-600">
-            Przeciągnij je tutaj, wybierz z dysku albo dodaj cały folder
-            {pasteHint}
-          </p>
-        </div>
+        <p className="min-w-0 flex-1 font-semibold text-slate-900">Dodaj kolejne pliki</p>
         <div className="flex flex-wrap gap-2">
           <button type="button" disabled={disabled} onClick={() => cameraRef.current?.click()} className={buttonClass({ size: "sm", className: "sm:hidden" })}>
             <Camera aria-hidden="true" size={17} /> Zdjęcie
@@ -134,11 +133,10 @@ export default function Dropzone({ compact, isDragging, onEntries, disabled }) {
       >
         <Illustration isDragging={isDragging} />
         <h2 id="kv-drop-title" className="mt-7 text-xl font-bold text-slate-900 sm:text-2xl">
-          {isDragging ? "Upuść pliki tutaj" : "Przeciągnij pliki albo folder tutaj"}
+          {isDragging ? "Upuść pliki tutaj" : "Przeciągnij pliki albo folder"}
         </h2>
-        <p className="mt-1.5 text-slate-600">albo</p>
 
-        <div className="mt-4 flex flex-wrap justify-center gap-3">
+        <div className="mt-5 flex flex-wrap justify-center gap-3">
           <button type="button" disabled={disabled} onClick={() => filesRef.current?.click()} className={buttonClass({ variant: "primary", size: "lg" })}>
             <FolderOpen aria-hidden="true" size={19} /> Wybierz pliki
           </button>
@@ -150,24 +148,12 @@ export default function Dropzone({ compact, isDragging, onEntries, disabled }) {
           </button>
         </div>
 
-        <ul aria-label="Obsługiwane formaty" className="mt-7 flex flex-wrap justify-center gap-2">
-          {CHIPS.map(({ label, tone }) => (
-            <li key={label} className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 py-1 pr-3 pl-1.5 text-xs font-semibold text-slate-800 ring-1 ring-slate-200">
-              <span aria-hidden="true" className={`size-2.5 rounded-full ${tone}`} />
-              {label}
-            </li>
-          ))}
-        </ul>
-        <p className="mt-3 text-sm text-slate-600">
-          Każdy plik do {MAX_FILE_SIZE_MB} MB · pliki z jednego folderu połączymy w jeden formularz
-          {pasteHint}
-        </p>
+        <div className="mt-5 flex items-center justify-center gap-1 text-sm text-slate-600">
+          <span>PDF, Word, Excel, JPG, PNG · do {MAX_FILE_SIZE_MB} MB</span>
+          {details}
+        </div>
         {inputs}
       </div>
-      <p className="mt-4 flex items-center justify-center gap-2 text-sm text-slate-600">
-        <ShieldCheck aria-hidden="true" size={16} className="shrink-0 text-emerald-700" />
-        Pliki służą tylko do rozpoznania formularza. Nie zapisujemy ich.
-      </p>
     </section>
   );
 }

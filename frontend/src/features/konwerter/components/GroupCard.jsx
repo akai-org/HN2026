@@ -180,7 +180,6 @@ export default function GroupCard({ group, index, items, problem, now, expanded,
             ) : (
               <span>
                 {count(items.length, FORMS.file)} · {formatSize(totalSize)}
-                {items.length > 1 ? " · połączymy je w jeden PDF" : ""}
               </span>
             )}
             <span aria-hidden="true">·</span>

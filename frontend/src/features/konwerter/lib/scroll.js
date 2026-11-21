@@ -23,3 +23,13 @@ export function scrollWithin(container, element, block = "nearest") {
   }
   container.scrollTo({ top: Math.max(0, target), behavior: prefersReducedMotion() ? "auto" : "smooth" });
 }
+
+/** Ustawia element na środku kontenera w obu osiach (np. pole na powiększonym PDF-ie). */
+export function scrollToCenter(container, element) {
+  if (!container || !element) return;
+  const box = container.getBoundingClientRect();
+  const rect = element.getBoundingClientRect();
+  const top = rect.top - box.top + container.scrollTop - (container.clientHeight - rect.height) / 2;
+  const left = rect.left - box.left + container.scrollLeft - (container.clientWidth - rect.width) / 2;
+  container.scrollTo({ top: Math.max(0, top), left: Math.max(0, left), behavior: prefersReducedMotion() ? "auto" : "smooth" });
+}

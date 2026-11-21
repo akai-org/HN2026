@@ -54,9 +54,6 @@ export default function ChecksPanel({ stats, checks, onShowField, children }) {
         <dl className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <Stat value={stats.pages} label={plural(stats.pages, FORMS.page)} />
           <Stat value={stats.fields} label={plural(stats.fields, FORMS.field)} />
-          <Stat value={stats.autoFilled} label="z rejestrów" />
-          <Stat value={stats.conditional} label="z warunkiem" />
-          <Stat value={stats.required} label={plural(stats.required, ["obowiązkowe", "obowiązkowe", "obowiązkowych"])} />
         </dl>
         <div className="flex flex-wrap items-center gap-2">
           <Toggle open={open} controls={listId} onClick={() => setOpen((value) => !value)}>
@@ -107,7 +104,12 @@ export default function ChecksPanel({ stats, checks, onShowField, children }) {
         )}
       </div>
 
-      <ul id={rulesId} hidden={!rulesOpen} className="grid gap-x-6 gap-y-1.5 border-t border-slate-100 px-4 py-2.5 text-sm sm:grid-cols-2 lg:grid-cols-3">
+      <div id={rulesId} hidden={!rulesOpen} className="border-t border-slate-100 px-4 py-2.5 text-sm">
+        <p className="mb-2 text-slate-700">
+          {stats.autoFilled} z rejestrów · {stats.conditional} z warunkiem · {stats.required}{" "}
+          {plural(stats.required, ["obowiązkowe", "obowiązkowe", "obowiązkowych"])}
+        </p>
+        <ul className="grid gap-x-6 gap-y-1.5 sm:grid-cols-2 lg:grid-cols-3">
         {rules.map((rule) => (
           <li key={rule.id} className="flex items-center gap-2">
             {rule.passed ? <CircleCheck aria-hidden="true" size={16} className="shrink-0 text-emerald-700" /> : <CircleX aria-hidden="true" size={16} className="shrink-0 text-red-700" />}
@@ -115,7 +117,8 @@ export default function ChecksPanel({ stats, checks, onShowField, children }) {
             {rule.label}
           </li>
         ))}
-      </ul>
+        </ul>
+      </div>
     </section>
   );
 }

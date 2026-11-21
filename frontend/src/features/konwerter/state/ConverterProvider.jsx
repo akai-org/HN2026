@@ -131,7 +131,14 @@ export function ConverterProvider({ children }) {
             `Połączone pliki mają ${formatSize(file.size)}, a limit to ${MAX_FILE_SIZE_MB} MB. Podziel formularz na mniejsze części.`,
           );
         }
-        source = { kind: "pdf", url: URL.createObjectURL(file), owned: true, name: file.name, merged: items.length };
+        source = {
+          kind: "pdf",
+          url: URL.createObjectURL(file),
+          owned: true,
+          name: file.name,
+          merged: items.length,
+          imagesOnly: items.every((item) => item.type?.kind === "image"),
+        };
       }
       dispatch({ type: "SOURCE", groupId, source });
 
