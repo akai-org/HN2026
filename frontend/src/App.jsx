@@ -1,8 +1,6 @@
-import './App.css'
-
 function App() {
   return (
-    <div className="background-primary">
+    <div className="bg-black text-white">
       cos
     </div>
   )
