@@ -20,7 +20,8 @@ def health(settings: SettingsDep) -> dict[str, str]:
 def _llm_status(settings: Settings) -> str:
   """`ok` when the OpenAI-compatible API lists models with our key, otherwise `unavailable`."""
   try:
-    response = httpx.get(settings.llm_base_url.rstrip("/") + "/models", timeout=3,
+    base = settings.llm_base_url.rstrip("/").removesuffix("/chat/completions")   # the URL may be the full endpoint
+    response = httpx.get(base + "/models", timeout=3,
                          headers={"Authorization": f"Bearer {settings.llm_api_key}"})
   except httpx.HTTPError:
     return "unavailable"

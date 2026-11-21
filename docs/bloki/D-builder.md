@@ -6,7 +6,7 @@ Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i
 
 **Używa interfejsów innych bloków:** `enrich_field()` i `Enrichment` z bloku E: `docs/bloki/E-wzbogacanie-pol.md` (sekcja Interfejs). Do czasu ich ukończenia mockuj je w swoich testach.
 
-> **Do poprawy (zgłoszone 2026-11-21, przy pracy nad promptem bloku C):** w `standard_sections.py` (`contact_sections`) oświadczenia z `spec.consents` **zastępują** standardową zgodę na przetwarzanie danych (`DEFAULT_CONSENT`), zamiast trafić obok niej: `statements = [...] or [DEFAULT_CONSENT]`. Formularz z jakimkolwiek „Oświadczam, że…” traci przez to zgodę RODO z linkiem do klauzuli, której wymagają Standardy. Poprawka: `statements = [DEFAULT_CONSENT] + [...]` (bez duplikatu, jeśli model zwrócił zgodę o tej samej treści). Prompt bloku C od tej zmiany nie wypisuje już klauzuli RODO do `consents`, tylko oświadczenia z blankietu.
+> **Poprawione (2026-11-21):** standardowa zgoda na przetwarzanie danych (`DEFAULT_CONSENT`) zawsze zostaje w sekcji zgód, a oświadczenia z `spec.consents` trafiają obok niej, bez duplikatu. Tytuł sekcji to wtedy „Zgody i oświadczenia” (Standardy).
 
 ## Zadanie
 

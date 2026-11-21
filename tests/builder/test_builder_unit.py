@@ -138,8 +138,16 @@ def test_consent_section_uses_spec_consents(settings):
   consent = form["tabs"][-2]["questions"][-1]["field"]["repeatingSectionGrid"][0]["field"]
   assert consent["type"] == "CONSENT_SECTION"
   consents = consent["consentSectionConfig"]["consents"]
-  assert len(consents) == 2 and all(c["required"] for c in consents)
-  assert "Oświadczam" in consents[0]["description"]
+  assert len(consents) == 3 and all(c["required"] for c in consents)
+  assert "klauzulą informacyjną" in consents[0]["description"]   # standard consent kept, statements added after it
+  assert "Oświadczam" in consents[1]["description"]
+
+
+def test_default_consent_is_not_duplicated(settings):
+  from hacknation_2026.builder.standard_sections import DEFAULT_CONSENT
+  form = build_form(minimal_spec(consents=[DEFAULT_CONSENT]), settings)
+  consent = form["tabs"][-2]["questions"][-1]["field"]["repeatingSectionGrid"][0]["field"]
+  assert len(consent["consentSectionConfig"]["consents"]) == 1
 
 
 def test_default_consent(settings):
