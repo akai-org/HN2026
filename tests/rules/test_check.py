@@ -97,8 +97,8 @@ def _spec() -> FormSpec:
   )
 
 
-def test_builder_output_has_no_violations(monkeypatch):
-  monkeypatch.setattr(build, "enrich_field", None)  # block E stubbed out
+def test_builder_output_has_no_violations():
+  """Blocks D + E (real enrichment, no LLM) produce a form that passes every rule."""
   settings = Settings(_env_file=None, llm_api_key="k", llm_model="m")
   form = build.build_form(_spec(), settings)
   assert check_form(form) == []

@@ -13,6 +13,12 @@ import VerifyForm from './pages/VerifyForm.jsx'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
+      <a
+        href="#main-content"
+        className="sr-only fixed left-4 top-4 z-[100] rounded-md bg-primary px-4 py-3 font-semibold text-primary-foreground focus:not-sr-only focus:outline-none focus:ring-3 focus:ring-ring"
+      >
+        Przejdź do treści
+      </a>
       <Header/>
       {/* <EnsureAI/> */}
       <main className="flex-1">

@@ -296,7 +296,9 @@ def contact_sections(spec: FormSpec, make: MakeField) -> list[dict]:
     std("TEXT_FIELD", "numer_telefonu", "Numer telefonu", initial="MLPZ.phoneNumber"),
     std("TEXT_FIELD", "adres_e_mail", "Adres e-mail", validators=["EMAIL"], initial="MLPZ.email"),
   ], description=CONTACT_DESCRIPTION)
-  statements = [c.strip() for c in spec.consents if c.strip()] or [DEFAULT_CONSENT]
+  # The standard data-processing consent always stays; statements from the paper form are added next to it.
+  statements = [DEFAULT_CONSENT] + [c.strip() for c in spec.consents
+                                    if c.strip() and _plain(c) != _plain(DEFAULT_CONSENT)]
   consents = [{"description": html_text(text), "required": True} for text in statements]
   config = {"consents": consents, "required": any(c["required"] for c in consents), "files": []}
   if len(consents) > 1:

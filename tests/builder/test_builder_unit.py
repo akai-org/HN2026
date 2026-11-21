@@ -139,8 +139,16 @@ def test_consent_section_uses_spec_consents(settings):
   consent = form["tabs"][-2]["questions"][-1]["field"]["repeatingSectionGrid"][0]["field"]
   assert consent["type"] == "CONSENT_SECTION"
   consents = consent["consentSectionConfig"]["consents"]
-  assert len(consents) == 2 and all(c["required"] for c in consents)
-  assert "Oświadczam" in consents[0]["description"]
+  assert len(consents) == 3 and all(c["required"] for c in consents)
+  assert "klauzulą informacyjną" in consents[0]["description"]   # standard consent kept, statements added after it
+  assert "Oświadczam" in consents[1]["description"]
+
+
+def test_default_consent_is_not_duplicated(settings):
+  from hacknation_2026.builder.standard_sections import DEFAULT_CONSENT
+  form = build_form(minimal_spec(consents=[DEFAULT_CONSENT]), settings)
+  consent = form["tabs"][-2]["questions"][-1]["field"]["repeatingSectionGrid"][0]["field"]
+  assert len(consent["consentSectionConfig"]["consents"]) == 1
 
 
 def test_default_consent(settings):
@@ -247,6 +255,39 @@ def test_read_only_of_initial_data_depends_on_register_attribute(
 def test_editable_initial_data_is_a_subset_of_known_attributes():
   for source, attributes in initial_data.EDITABLE_INITIAL_DATA.items():
     assert attributes <= initial_data.INITIAL_DATA[source], source
+
+
+def test_enrichment_can_turn_text_field_into_select(settings, monkeypatch):
+  def enrich_field(label, field_type, required, applicant_data):
+    if field_type == "TEXT_FIELD":
+      return StubEnrichment(dictionary_name="Kraje", search_enabled=True, field_type="SELECT")
+    return StubEnrichment(field_type="DATEPICKER")  # ignored: only a TEXT_FIELD changes its type
+
+  monkeypatch.setattr(build, "enrich_field", enrich_field)
+  spec = minimal_spec(pages=[PageSpec(title="Sprawa", sections=[SectionSpec(key="s", title="Sekcja", fields=[
+    FieldSpec(key="kraj", label="Kraj", type="TEXT_FIELD", required=True),
+    FieldSpec(key="wybor", label="Wybór", type="RADIO", required=True, options=["A", "B"]),
+  ])])])
+  section = build_form(spec, settings)["tabs"][1]["questions"][0]["field"]["repeatingSectionGrid"]
+  kraj, wybor = (item["field"] for item in section)
+  assert kraj["type"] == "SELECT" and kraj["dictionaryName"] == "Kraje" and kraj["options"] == []
+  assert wybor["type"] == "RADIO"
+
+
+def test_enrichment_dictionary_skipped_when_field_has_own_options(settings, monkeypatch):
+  monkeypatch.setattr(build, "enrich_field", lambda *_: StubEnrichment(dictionary_name="Kraje", search_enabled=True))
+  kraj = build_form(subject_spec(options=["Polska", "Niemcy", "Inny"]), settings)["tabs"][1]["questions"][0]
+  kraj = kraj["field"]["repeatingSectionGrid"][1]["field"]
+  assert "dictionaryName" not in kraj, "the paper form's options win over a dictionary guessed from the label"
+  assert [option["name"] for option in kraj["options"]] == ["Polska", "Niemcy", "Inny"]
+
+
+def test_applicant_data_is_passed_to_enrichment(settings, stub_enrichment):
+  spec = minimal_spec(pages=[PageSpec(title="Sprawa", sections=[SectionSpec(key="s", title="Sekcja", fields=[
+    FieldSpec(key="data_urodzenia", label="Data urodzenia", type="DATEPICKER", required=True, applicant_data=True),
+  ])])])
+  build_form(spec, settings)
+  assert ("Data urodzenia", "DATEPICKER", True, True) in stub_enrichment
 
 
 def test_standard_fields_are_not_enriched(settings, stub_enrichment):

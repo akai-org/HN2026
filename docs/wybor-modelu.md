@@ -29,3 +29,19 @@ Pola: 4/4 zgodne ze wzorcem, wszystkie TEXT_FIELD jak we wzorcu (z PDF jedno wyc
 - **Etykiety dopisane i rozwlekłe.** „Ulica i numer budynku”, choć blankiet ma tylko „przy ulicy”; „Miejscowość, w której znajduje się budynek” zamiast „Miejscowość”. Prompt: etykieta ma być krótka i brać tylko słowa z blankietu.
 - **Tytuł sekcji to tytuł formularza**, a powinien być tematyczny (wzorzec: strona „Informacje o budynku”, sekcja „Lokalizacja budynku”).
 - **`authority_kind` pominięte** (domyślnie URZAD), a Wójt to ORGAN. Rozwiązuje blok J2 (reguły).
+
+## Gemma 4 31B przez EdenAI vs lokalna gemma-4-E4B (2026-11-21)
+
+Pomiar `scripts/prompt_eval.py` + `scripts/prompt_score.py`: formularze 1 i 5 (PDF i PNG), 2 przebiegi, ten sam prompt bloku C.
+
+| Model | Spełnione kryteria | Czas na formularz |
+|---|---|---|
+| lokalna gemma-4-E4B (Ollama) | 23/32 | 30–65 s |
+| **google/gemma-4-31b-it (EdenAI)** | **29/32** | **10–18 s** |
+
+31B naprawia to, czego mały model nie umiał mimo reguł w prompcie: flagi wnioskodawcy (inna osoba, firma, pełnomocnik), rodzaj adresata, pola zależne w formularzu 5 z PDF. Pozostałe „błędy”:
+- tytuł formularza 1 (2 z 3 braków): nagłówek blankietu brzmi „WNIOSEK O USTALENIE NUMERU PORZĄDKOWEGO”, słowo „nieruchomości” dopisuje tylko wzorzec, więc to wada miary;
+- formularz 1 ze skanu: ulica wymagana, bo OCR odczytał przypis „ulicy1)” jako „ulicy”” i model nie widzi znacznika;
+- zdarzyło się przekręcenie nazwy opcji w `show_if.equals` („wskazacheteur rachunek”), co psuje warunek w gotowym formularzu.
+
+Konfiguracja: `LLM_BASE_URL=https://api.edenai.run/v3` (może być też pełny adres z `/chat/completions`), `LLM_MODEL=google/gemma-4-31b-it`, klucz EdenAI w `LLM_API_KEY`. EdenAI zwraca JSON czasem z samym zamykającym ```, co obsługuje `_strip_fences` w `ai/analyze.py`.

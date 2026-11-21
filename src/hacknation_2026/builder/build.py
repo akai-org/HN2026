@@ -12,10 +12,7 @@ from hacknation_2026.config import Settings
 from hacknation_2026.contracts import Condition, FieldSpec, FormDefinition, FormSpec, PageSpec
 from hacknation_2026.initial_data import EXTERNAL_SYSTEM
 
-try:  # block E; until it lands, subject-matter fields are built without enrichment
-  from hacknation_2026.enrich.enrich import enrich_field
-except ImportError:  # pragma: no cover - depends on whether block E is merged
-  enrich_field = None
+from hacknation_2026.enrich.enrich import enrich_field
 
 MAX_TITLE_LENGTH = 255  # Reguły techniczne: title max 255 characters
 # Reguły techniczne: the list of validators
@@ -35,6 +32,7 @@ class _NoEnrichment:
   external: bool = False
   read_only: bool = False
   validators: list[str] = dc_field(default_factory=list)
+  field_type: str | None = None
 
 
 class FieldFactory:
@@ -43,6 +41,8 @@ class FieldFactory:
   - initial data (`defaultValueType: EXTERNAL_SYSTEM`) => read-only (Dane inicjalne), except the register attributes
     in `initial_data.EDITABLE_INITIAL_DATA` (domain experts: may be outdated), which are editable,
   - a dictionary only on SELECT/RADIO/CHECKBOX, and then `options` is empty (Reguły techniczne, Słowniki),
+  - block E may turn a TEXT_FIELD into a more specific type (country -> SELECT with Kraje, birth date -> DATEPICKER),
+  - block E's dictionary only for a field without options of its own: the paper form's options are kept,
   - validators only from the allowed list, REQUIRED for required fields, none for presentational types,
   - RADIO with more than 5 options becomes SELECT; SELECT with more than 15 options gets search (Standardy).
   """
@@ -71,6 +71,8 @@ class FieldFactory:
     if type_ == "RADIO" and len(option_names) > MAX_RADIO_OPTIONS:
       type_ = "SELECT"
     enrichment = self._enrich(title, type_, required, applicant_data) if enrich else _NoEnrichment()
+    if enrichment.field_type and type_ == "TEXT_FIELD":
+      type_ = enrichment.field_type
 
     optional: dict = {}
     if enrichment.default_value is not None:
@@ -79,7 +81,7 @@ class FieldFactory:
         optional["defaultValueType"] = EXTERNAL_SYSTEM
     if initial:
       optional.update(defaultValue=initial, defaultValueType=EXTERNAL_SYSTEM)
-    if enrichment.dictionary_name:
+    if enrichment.dictionary_name and not option_names:
       optional.update(
         dictionaryName=enrichment.dictionary_name,
         multiLevelTree=enrichment.multi_level_tree,
@@ -119,7 +121,7 @@ class FieldFactory:
     return [v for v in VALIDATORS if v in wanted]
 
   def _enrich(self, label: str, type_: str, required: bool, applicant_data: bool):
-    if enrich_field is None or type_ in NO_VALIDATION:
+    if type_ in NO_VALIDATION:
       return _NoEnrichment()
     return enrich_field(label, type_, required, applicant_data)
 
@@ -183,6 +185,7 @@ def _spec_field(make: FieldFactory, spec_field: FieldSpec, tech_name: str, addre
   return make(
     spec_field.type, tech_name, spec_field.label,
     required=spec_field.required,
+    applicant_data=spec_field.applicant_data,
     description=layout.html_text(spec_field.description) if spec_field.description.strip() else "",
     option_names=spec_field.options,
     states=states,

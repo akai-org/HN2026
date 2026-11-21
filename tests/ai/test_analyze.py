@@ -191,3 +191,33 @@ def test_empty_document_skips_llm(monkeypatch, settings):
 
   assert err.value.code == "EMPTY_DOCUMENT"
   assert requests == []
+
+
+def test_half_fenced_reply_is_parsed(monkeypatch, settings, doc):
+  # EdenAI's Gemma answers ' {...}\n```' (closing fence only)
+  half = " " + json.dumps(VALID_SPEC) + "\n```"
+  mock_llm(monkeypatch, lambda req, n: httpx.Response(200, json=completion(half)))
+  assert analyze(doc, settings).title == VALID_SPEC["title"]
+
+
+def test_full_endpoint_url_is_not_doubled(monkeypatch, settings, doc):
+  seen = []
+  settings.llm_base_url = "https://llm.test/v3/chat/completions"
+  mock_llm(monkeypatch, lambda req, n: seen.append(str(req.url)) or httpx.Response(200, json=completion(json.dumps(VALID_SPEC))))
+  analyze(doc, settings)
+  assert seen == ["https://llm.test/v3/chat/completions"]
+
+
+def test_garbled_condition_option_is_matched_to_the_real_option(monkeypatch, settings, doc):
+  spec = {"title": "Wniosek o zwrot", "pages": [{"title": "Zwrot", "sections": [{"key": "s", "title": "Sposób", "fields": [
+    {"key": "sposob", "label": "Sposób zwrotu", "type": "RADIO", "required": True,
+     "options": ["Zaliczyć na poczet zobowiązania", "Zwrócić przelewem na wskazany rachunek"]},
+    {"key": "rachunek", "label": "Numer rachunku", "type": "TEXT_FIELD", "required": True,
+     "show_if": [{"field": "sposob", "equals": "zwrócić przelewem na wskazacheteur rachunek"}]},
+    {"key": "inne", "label": "Inne", "type": "TEXT_FIELD", "required": False,
+     "show_if": [{"field": "sposob", "equals": "coś zupełnie innego"}]},
+  ]}]}]}
+  mock_llm(monkeypatch, lambda req, n: httpx.Response(200, json=completion(json.dumps(spec))))
+  fields = analyze(doc, settings).pages[0].sections[0].fields
+  assert fields[1].show_if[0].equals == "Zwrócić przelewem na wskazany rachunek"
+  assert fields[2].show_if[0].equals == "coś zupełnie innego"   # no close option: left as is

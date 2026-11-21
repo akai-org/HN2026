@@ -254,7 +254,7 @@ def test_subject_section_options(form):
 
 @pytest.mark.parametrize("consents, title", [
   ([], "Zgoda"),
-  (["Oświadczam, że dane są zgodne z prawdą."], "Oświadczenie"),
+  (["Oświadczam, że dane są zgodne z prawdą."], "Zgody i oświadczenia"),   # the standard consent is always there
   (["Oświadczam, że dane są zgodne z prawdą.", "Wyrażam zgodę na kontakt."], "Zgody i oświadczenia"),
 ])
 def test_consent_section_title(settings, consents, title):
@@ -263,4 +263,4 @@ def test_consent_section_title(settings, consents, title):
   section = form["tabs"][-2]["questions"][-1]["field"]
   assert section["title"] == title
   config = section["repeatingSectionGrid"][0]["field"]["consentSectionConfig"]
-  assert config.get("selectAllEnabled", False) is (len(consents) > 1)
+  assert config.get("selectAllEnabled", False) is (len(consents) > 0)
