@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FileText, Image, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,9 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 const ACCEPTED_FORMATS = ".pdf,.doc,.docx,.ods,.xlsx,.jpg,.jpeg,.png";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-function App() {
+function ImportForm() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   function handleFileChange(event) {
     const file = event.target.files?.[0];
@@ -27,6 +30,47 @@ function App() {
   function clearFile() {
     setSelectedFile(null);
     setError("");
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    if (!selectedFile || isSubmitting) return;
+
+    setError("");
+    setIsSubmitting(true);
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      const response = await fetch("/api/forms/convert", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        let message = "Nie udało się przesłać formularza.";
+        try {
+          const responseError = await response.json();
+          message = responseError.message || message;
+        } catch {
+          // Keep the default error message when the server returns no JSON.
+        }
+        throw new Error(message);
+      }
+
+      const convertedForm = await response.json();
+      navigate("/inspect/form", {
+        state: {
+          fileName: selectedFile.name,
+          convertedForm,
+        },
+      });
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : "Nie udało się przesłać formularza.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -53,6 +97,7 @@ function App() {
             </p>
           </CardHeader>
           <CardContent>
+            <form onSubmit={handleSubmit}>
             <label
               htmlFor="file-upload"
               className="flex cursor-pointer flex-col items-center rounded-xl border-2 border-dashed border-border bg-muted/30 px-6 py-10 text-center transition-colors hover:border-primary hover:bg-primary/5 focus-within:border-primary"
@@ -64,7 +109,7 @@ function App() {
                 Kliknij, aby wybrać plik
               </span>
               <span className="mt-2 text-sm text-muted-foreground">
-                PDF, DOC, DOCX, ODS, XLSX, JPG lub PNG · maks. 10 MB
+                PDF, DOC/DOCX, ODS, XLSX, JPG/JPEG, PNG · maks. 10 MB
               </span>
               <input
                 id="file-upload"
@@ -105,6 +150,13 @@ function App() {
                 </Button>
               </div>
             )}
+
+            {selectedFile && (
+              <Button type="submit" className="mt-4 w-full" disabled={isSubmitting}>
+                {isSubmitting ? "Przesyłanie..." : "Prześlij i przejrzyj formularz"}
+              </Button>
+            )}
+            </form>
           </CardContent>
         </Card>
 
@@ -116,4 +168,4 @@ function App() {
   );
 }
 
-export default App;
+export default ImportForm;
