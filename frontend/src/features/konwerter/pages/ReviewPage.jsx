@@ -7,7 +7,6 @@ import { BookOpenCheck, FilePlus2, FileUp, RotateCcw } from "lucide-react";
 import ErrorBoundary from "../components/ErrorBoundary.jsx";
 import { Button, Modal, Switch } from "../components/primitives.jsx";
 import { buttonClass } from "../components/buttonClass.js";
-import { EXAMPLES } from "../lib/constants.js";
 import { SourceViewer } from "../components/viewers.jsx";
 import { runChecks } from "../lib/checks.js";
 import { evaluateStates, techTitleMap } from "../lib/conditions.js";
@@ -59,17 +58,15 @@ function EmptyReview({ actions, missing }) {
       <p className="mt-3 text-slate-700">
         {missing
           ? "Wyniki rozpoznawania są przechowywane tylko w tej karcie i znikają po odświeżeniu strony."
-          : "Dodaj pliki i rozpoznaj je albo otwórz przykład z materiałów COI."}
+          : "Dodaj pliki i rozpoznaj je albo otwórz przykład do testu."}
       </p>
       <div className="mt-7 flex flex-wrap justify-center gap-2">
         <Link to="/konwerter" className={buttonClass({ variant: "primary" })}>
           <FilePlus2 aria-hidden="true" size={18} /> Dodaj pliki
         </Link>
-        {EXAMPLES.map((example) => (
-          <Button key={example.key} onClick={() => load(() => actions.loadExample(example.key))}>
-            Przykład: {example.label.replace(/^Wniosek o /, "")}
-          </Button>
-        ))}
+        <Button onClick={() => load(() => actions.loadExample())}>
+          <BookOpenCheck aria-hidden="true" size={17} /> Otwórz przykład
+        </Button>
         <Button variant="quiet" onClick={() => importRef.current?.click()}>
           <FileUp aria-hidden="true" size={17} /> Wczytaj JSON
         </Button>

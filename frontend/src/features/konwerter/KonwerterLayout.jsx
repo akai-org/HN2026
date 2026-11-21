@@ -43,7 +43,7 @@ function Shell() {
 
       <footer className="border-t border-slate-200 bg-white">
         <div className={`mx-auto flex flex-wrap items-center justify-between gap-2 px-4 py-4 text-sm text-slate-600 sm:px-6 ${isReview ? "max-w-[1800px]" : "max-w-6xl"}`}>
-          <p>© 2026 AKAI · HackNation · Cyfryzacja formularzy</p>
+          <p>Konwerter formularzy · papierowy wniosek → eUsługa</p>
           <button type="button" onClick={() => setHelpOpen(true)} className="font-semibold text-(--blue) underline-offset-2 hover:underline">
             Pomoc i deklaracja dostępności
           </button>

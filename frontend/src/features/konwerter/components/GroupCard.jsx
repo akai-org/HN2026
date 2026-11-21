@@ -174,7 +174,7 @@ export default function GroupCard({ group, index, items, problem, now, expanded,
           )}
           <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-slate-600">
             {group.origin === "example" ? (
-              <span>Przykład z materiałów COI</span>
+              <span>Przykład do testu</span>
             ) : group.origin === "import" ? (
               <span>Wczytany plik JSON</span>
             ) : (

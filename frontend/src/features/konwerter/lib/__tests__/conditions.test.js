@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { describeQuery, evaluateStates, referencedTechNames, techTitleMap } from "../conditions.js";
 import { indexForm, initialAnswers } from "../formModel.js";
 import { resolveRegistryValue } from "../registry.js";
-import { loadExample } from "./fixtures.js";
+import { loadExample, loadForm1 } from "./fixtures.js";
 
 const form = loadExample();
 const index = indexForm(form);
@@ -44,7 +44,7 @@ describe("evaluateStates", () => {
 
 describe("formularz 1 (niepełne pola)", () => {
   it("liczy warunki bez błędów", async () => {
-    const form1 = loadExample("wniosek-o-ustalenie-numeru-porzadkowego");
+    const form1 = loadForm1();
     const result = await evaluateStates(form1, initialAnswers(form1, resolveRegistryValue));
     expect(result.errors).toEqual([]);
     expect(Object.keys(result.states).length).toBeGreaterThan(50);

@@ -15,7 +15,7 @@ npm run lint     # oxlint
 npm run build    # build do ../src/hacknation_2026/static (serwuje go FastAPI)
 ```
 
-Bez działającego backendu da się obejrzeć wszystko na przykładach: na pierwszym ekranie kliknij „Wniosek o stwierdzenie nadpłaty podatku” albo „Wniosek o ustalenie numeru porządkowego nieruchomości”. To wzorcowe JSON-y i PDF-y z `dane_zadania` (kopie w `public/przyklady/`, pobierane dopiero po kliknięciu).
+Bez działającego backendu da się obejrzeć wszystko na przykładzie: na pierwszym ekranie kliknij „Otwórz przykład”. To PDF wniosku o stwierdzenie nadpłaty podatku i jego wzorcowy JSON z `dane_zadania` (kopie w `public/przyklady/`, pobierane dopiero po kliknięciu). Do testu rozpoznawania przez backend dodaj ten sam PDF: `dane_zadania/blankiety/5. Wniosek o stwierdzenie nadpłaty podatku/Wniosek o stwierdzenie nadpłaty podatku.PDF`.
 
 ## Jak to działa
 
@@ -64,10 +64,10 @@ src/features/konwerter/
   state/                     reducer (czysty) + ConverterProvider (kolejka, API, adresy blob:)
   lib/                       logika bez Reacta: formModel, conditions (JSONata), jsonPositions,
                              checks (reguły COI), grouping, files, folders, pdfMerge, api, doc (historia)
-  lib/__tests__/             testy vitest na wzorcowych JSON-ach COI
+  lib/__tests__/             testy vitest na wzorcowych JSON-ach COI (form1.json tylko do testów)
   components/                wspólne klocki UI, podgląd PDF/zdjęć, karty formularzy
   review/                    kolumny, podgląd eUsługi, edytor JSON, drzewo, opis pola
-public/przyklady/            wzorcowe JSON-y i PDF-y formularzy 1 i 5 z dane_zadania
+public/przyklady/            przykład do testu: PDF i wzorcowy JSON formularza 5 z dane_zadania
 ```
 
 Biblioteki (wszystkie MIT, Apache-2.0 lub BSD, bez zewnętrznych API): pdfjs-dist, pdf-lib, CodeMirror 6, jsonc-parser, jsonata, DOMPurify, lucide-react.

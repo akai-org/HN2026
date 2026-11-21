@@ -131,7 +131,7 @@ function ImportForm() {
       <div className="mx-auto max-w-3xl">
         <div className="mb-10 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-primary">
-            AKAI · HackNation 2026
+            Cyfryzacja formularzy
           </p>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             Zmień formularz w e-Formularz

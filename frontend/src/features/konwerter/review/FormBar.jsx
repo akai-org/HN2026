@@ -5,7 +5,7 @@ import { ArrowLeft, BadgeCheck, Download, Redo2, Undo2 } from "lucide-react";
 import { Badge, Button, IconButton } from "../components/primitives.jsx";
 
 function originText(group) {
-  if (group.origin === "example") return "Przykład z materiałów COI";
+  if (group.origin === "example") return "Przykład do testu: PDF i wzorcowy JSON z materiałów COI";
   if (group.origin === "import") return "Wczytany plik JSON";
   if (group.source?.merged) return `Rozpoznano z ${group.source.merged} plików połączonych w jeden PDF`;
   return group.source?.name ? `Rozpoznano z pliku ${group.source.name}` : "Rozpoznany formularz";

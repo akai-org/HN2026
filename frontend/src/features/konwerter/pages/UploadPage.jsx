@@ -24,7 +24,7 @@ import GroupCard from "../components/GroupCard.jsx";
 import PreviewDialog from "../components/PreviewDialog.jsx";
 import { Button, IconButton, Modal } from "../components/primitives.jsx";
 import { buttonClass } from "../components/buttonClass.js";
-import { EXAMPLES, STEPS } from "../lib/constants.js";
+import { EXAMPLE, STEPS } from "../lib/constants.js";
 import { FORMAT_SUMMARY, MAX_FILE_SIZE_MB } from "../lib/files.js";
 import { collectDropEntries, readDropEntries } from "../lib/folders.js";
 import { groupProblem, groupStats, isEditable } from "../lib/grouping.js";
@@ -135,16 +135,14 @@ function ExampleCard({ onExample, onImport, busy }) {
             Nie masz formularza pod ręką?
           </h2>
           <p className="text-sm text-slate-700">
-            Otwórz przykład z materiałów COI: zobaczysz oryginał, gotowy formularz i jego JSON, który zmienia się na żywo.
+            Otwórz przykład do testu: PDF papierowego wniosku, gotowy formularz i jego JSON, który zmienia się na żywo.
           </p>
         </div>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
-        {EXAMPLES.map((example) => (
-          <Button key={example.key} variant="soft" size="sm" disabled={busy} onClick={() => onExample(example.key)} className="bg-white">
-            {example.label}
-          </Button>
-        ))}
+        <Button variant="primary" size="sm" disabled={busy} onClick={onExample}>
+          <BookOpenCheck aria-hidden="true" size={16} /> Otwórz przykład<span className="sr-only">: {EXAMPLE.label}</span>
+        </Button>
         <Button variant="quiet" size="sm" disabled={busy} onClick={() => importRef.current?.click()}>
           <FileJson aria-hidden="true" size={16} /> Wczytaj własny JSON
         </Button>
@@ -447,7 +445,7 @@ export default function UploadPage() {
             </section>
             <ExampleCard
               busy={loading}
-              onExample={(key) => runLoader(() => actions.loadExample(key))}
+              onExample={() => runLoader(() => actions.loadExample())}
               onImport={(files) => runLoader(() => actions.importFiles(files))}
             />
           </>

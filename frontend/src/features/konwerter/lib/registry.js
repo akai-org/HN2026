@@ -22,7 +22,7 @@ const COUNTRIES = [
 
 export const TERYT_LEVELS = ["Województwo", "Powiat", "Gmina", "Miejscowość"];
 
-/** Nazwy słowników z materiałów COI (Hacknation – Słowniki) i ich opisy. */
+/** Nazwy słowników z materiału COI „Słowniki” i ich opisy. */
 const DICTIONARY_INFO = {
   Kraje: { label: "Kraje", values: COUNTRIES },
   TERYT_4G_DOWODOWY: { label: "TERYT (4 poziomy)", values: VOIVODESHIPS, tree: true },

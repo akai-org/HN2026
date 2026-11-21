@@ -7,7 +7,7 @@ import { groupProblem, isEditable } from "../lib/grouping.js";
 import { parseJson } from "../lib/jsonPositions.js";
 import { mergeToPdf } from "../lib/pdfMerge.js";
 import { FORMS, count, formatSize } from "../lib/text.js";
-import { EXAMPLES } from "../lib/constants.js";
+import { EXAMPLE } from "../lib/constants.js";
 import { initialState, reducer } from "./reducer.js";
 
 const ConverterContext = createContext(null);
@@ -235,8 +235,8 @@ export function ConverterProvider({ children }) {
   }, []);
 
   const loadExample = useCallback(
-    async (key = EXAMPLES[0].key) => {
-      const example = EXAMPLES.find((candidate) => candidate.key === key) ?? EXAMPLES[0];
+    async () => {
+      const example = EXAMPLE;
       const base = `${import.meta.env.BASE_URL ?? "/"}przyklady/${example.file}`;
       const [jsonResponse, pdfResponse] = await Promise.all([fetch(`${base}.json`), fetch(`${base}.pdf`)]);
       if (!jsonResponse.ok) throw new Error("Nie udało się wczytać przykładowego formularza.");

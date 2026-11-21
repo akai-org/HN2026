@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { runChecks } from "../checks.js";
 import { indexForm } from "../formModel.js";
-import { loadExample } from "./fixtures.js";
+import { loadExample, loadForm1 } from "./fixtures.js";
 
 const form = loadExample();
 
@@ -38,7 +38,7 @@ describe("runChecks", () => {
   });
 
   it("radzi sobie z niepełnymi danymi z prawdziwego JSON-a (validation: {}, brak states)", () => {
-    const form1 = loadExample("wniosek-o-ustalenie-numeru-porzadkowego");
+    const form1 = loadForm1();
     const { issues } = runChecks(form1);
     expect(issues.some((issue) => issue.title.includes("zamiast listy"))).toBe(true);
     expect(issues.filter((issue) => issue.level === "error")).toEqual([]);
