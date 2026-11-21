@@ -1,7 +1,9 @@
 export default function Footer() {
   return (
-    <footer className="bg-gray-800 text-white p-4">
-      <p className="text-sm">&copy; 2026 My Application. All rights reserved.</p>
+    <footer className="border-t bg-background px-4 py-5 sm:px-6">
+      <p className="mx-auto max-w-6xl text-center text-xs text-muted-foreground">
+        © 2026 AKAI · HackNation
+      </p>
     </footer>
   )
 }
