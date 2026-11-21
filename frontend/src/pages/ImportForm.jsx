@@ -60,7 +60,7 @@ function ImportForm() {
       }
 
       const convertedForm = await response.json();
-      navigate("/inspect/form", {
+      navigate("/identify", {
         state: {
           fileName: selectedFile.name,
           convertedForm,
@@ -81,23 +81,11 @@ function ImportForm() {
             AKAI · HackNation 2026
           </p>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Zmień formularz w e-usługę
+            Zmień formularz w e-Formularz
           </h1>
-          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-            Prześlij formularz, a przygotujemy jego cyfrową strukturę wraz z
-            polami, zależnościami i dozwolonymi wartościami.
-          </p>
         </div>
 
-        <Card className="mx-auto max-w-2xl shadow-lg shadow-foreground/5">
-          <CardHeader>
-            <CardTitle className="text-xl">Dodaj formularz źródłowy</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Obsługujemy dokumenty PDF, Word, arkusze oraz obrazy.
-            </p>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit}>
+            <form className="m-2"onSubmit={handleSubmit}>
             <label
               htmlFor="file-upload"
               className="flex cursor-pointer flex-col items-center rounded-xl border-2 border-dashed border-border bg-muted/30 px-6 py-10 text-center transition-colors hover:border-primary hover:bg-primary/5 focus-within:border-primary"
@@ -106,7 +94,7 @@ function ImportForm() {
                 <Upload aria-hidden="true" size={26} />
               </span>
               <span className="font-medium">
-                Kliknij, aby wybrać plik
+                Kliknij, aby przesłać formularz
               </span>
               <span className="mt-2 text-sm text-muted-foreground">
                 PDF, DOC/DOCX, ODS, XLSX, JPG/JPEG, PNG · maks. 10 MB
@@ -157,8 +145,6 @@ function ImportForm() {
               </Button>
             )}
             </form>
-          </CardContent>
-        </Card>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           Plik zostanie wykorzystany wyłącznie do przygotowania struktury formularza.
