@@ -6,7 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Rozwiązanie zadania COI na HackNation 2026 (drużyna AKAI): API do cyfryzacji formularzy. Zwraca JSON opisujący pola formularza (nazwy, format, dozwolone wartości); pola mogą wskazywać słowniki (zestawy dozwolonych wartości) i inne pola (zależności między polami).
 
-Materiały zadania leżą w `dane_zadania/` (PDF/DOCX tylko do odczytu). Kontrakt wyjściowy to `dane_zadania/materialy/importowanyPlikJsonSchemat (1).json` (JSON Schema `FormDefinition`: `title` → `tabs[]` → `questions[]` z pozycją `x/y/rows/cols` i obiektem `field`). Opis pól jest w `OpisImportowanegoPlikuJSON (1).docx`, reguły walidacji w `Reguły techniczne konfiguracji formularzy...docx`. Zanim zmienisz model danych, sprawdź go z tymi plikami.
+Plan implementacji backendu: `docs/plan-implementacji.md`. Zakres: tylko backend.
+
+Materiały zadania leżą w `dane_zadania/` (tylko do odczytu). `dane_zadania/blankiety/` zawiera 9 formularzy, każdy w wielu formatach. Formularze 1 i 5 mają oczekiwany JSON (`konfiguracja_form_*.json`) i to on jest wzorcem; tam gdzie przeczy schematowi (np. `repeatingSectionGrid`), wygrywa przykład. Kontrakt wyjściowy to `dane_zadania/materialy/importowanyPlikJsonSchemat (1).json` (JSON Schema `FormDefinition`: `title` → `tabs[]` → `questions[]` z pozycją `x/y/rows/cols` i obiektem `field`). Opis pól jest w `OpisImportowanegoPlikuJSON (1).docx`, reguły walidacji w `Reguły techniczne konfiguracji formularzy...docx`. Zanim zmienisz model danych, sprawdź go z tymi plikami.
 
 Stack: Python 3.14 + FastAPI (menedżer: **uv**), React + Vite (menedżer: **npm**), Docker / Docker Compose.
 
@@ -59,7 +61,7 @@ npm run build    # build do ../src/hacknation_2026/static
 npm run lint     # oxlint
 ```
 
-Całość: `docker compose up --build` (aplikacja na http://localhost:8000).
+Całość: `docker compose up --build` (aplikacja na http://localhost:3000).
 
 ## Konwencje
 
