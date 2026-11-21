@@ -4,6 +4,11 @@ Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i
 
 **Wymaga:** ukończonego bloku 0. Typy (`AppError`, `FileFormat`, `ExtractedDocument`, `FormSpec`, `FormDefinition`, `RuleViolation`, `ConvertResult`, `Settings`) importuj z `hacknation_2026.contracts` i `hacknation_2026.config`; ich pełna definicja jest w `docs/bloki/00-kontrakty.md`.
 
+> **Status: zrobione.** `extract/word.py`, testy w `tests/extract_word/`. Zależności: `python-docx` (dla lxml), `olefile`.
+> - DOCX: własne przejście po XML zamiast API python-docx, bo w danych (formularze 2 i 8) cały tekst siedzi w ramkach tekstowych, które python-docx pomija. Ramki czytane raz (`mc:Choice`, bez kopii `mc:Fallback`). Tabele jako bloki tabel. Punktory list Worda z `numbering`: kratka to checkbox, inny punktor to `- `. Strony liczone z `lastRenderedPageBreak` albo z jawnych podziałów stron.
+> - DOC: `.doc` z treścią DOCX idzie ścieżką DOCX. Binarny Word jest czytany bezpośrednio z tabeli fragmentów (`olefile`), bez konwersji: tekst główny i ramki, pola (FORMCHECKBOX to checkbox), tabele z znaczników komórek.
+> - Znane ograniczenia DOC: brak punktorów i numeracji list (formularze 3 i 9 w `.doc` mają mniej checkboxów niż DOCX/PDF); ramki tekstowe w kolejności zapisu w pliku, nie na stronie (formularz 8); dwa znaczniki komórki pod rząd są czytane jako koniec wiersza. DOCX skonwertowane z PDF mają checkboxy jako kształty graficzne, których nie odczytujemy.
+
 ## Zadanie
 
 **Pliki:** `src/hacknation_2026/extract/word.py`, `tests/extract_word/`
