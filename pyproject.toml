@@ -7,6 +7,7 @@ authors = [{ name = "zakhildev", email = "piotr.blecharski02@gmail.com" }]
 requires-python = ">=3.14"
 dependencies = [
     "fastapi>=0.165.0",
+    "httpx>=0.28.1",
     "olefile>=0.47",
     "openpyxl>=3.1.5",
     "pdfplumber>=0.11.11",
@@ -15,6 +16,7 @@ dependencies = [
     "pypdfium2>=5.15.2",
     "pytesseract>=0.3.13",
     "python-docx>=1.2.0",
+    "python-multipart>=0.0.34",
     "uvicorn[standard]>=0.54.0",
 ]
 

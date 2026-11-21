@@ -31,9 +31,6 @@ def test_form_spec_schema_and_roundtrip():
 
 
 def test_settings_from_env(monkeypatch):
-  monkeypatch.setenv("JWT_SECRET", "s3cret")
-  monkeypatch.setenv("AUTH_USERNAME", "anetka")
-  monkeypatch.setenv("AUTH_PASSWORD", "haslo")
   monkeypatch.setenv("LLM_API_KEY", "klucz")
   monkeypatch.setenv("LLM_MODEL", "model")
   monkeypatch.setenv("MAX_FILE_SIZE_MB", "2")
@@ -42,7 +39,7 @@ def test_settings_from_env(monkeypatch):
 
 
 def test_settings_require_secrets(monkeypatch):
-  for name in ("JWT_SECRET", "AUTH_USERNAME", "AUTH_PASSWORD", "LLM_API_KEY", "LLM_MODEL"):
+  for name in ("LLM_API_KEY", "LLM_MODEL"):
     monkeypatch.delenv(name, raising=False)
   with pytest.raises(ValidationError):
     Settings(_env_file=None)

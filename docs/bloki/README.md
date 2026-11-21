@@ -13,7 +13,7 @@ Każdy plik opisuje jeden blok do zrobienia przez niezależnego agenta. Agent do
 | [D](D-builder.md) | Builder FormDefinition |
 | [E](E-wzbogacanie-pol.md) | Wzbogacanie pól |
 | [F](F-kontrola-regul.md) | Kontrola reguł |
-| [G](G-api-pipeline.md) | API i pipeline |
+| [G](G-api-pipeline.md) | API i pipeline – **zrobione** (do podpięcia D i F) |
 | [H](H-docker-readme.md) | Docker, compose, README |
 | [I](I-ewaluacja.md) | Ewaluacja |
 | [J](J-poprawa-detekcji.md) | Poprawa detekcji: kolumny, metadane regułami, linie w OCR, kształty DOCX, listy DOC, konwersja (po B1/B2) |

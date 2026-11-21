@@ -18,7 +18,7 @@ Aplikacja czyta konfigurację ze zmiennych środowiskowych albo z pliku `.env` w
 
 ```bash
 cp .env.example .env
-# uzupełnij LLM_API_KEY, LLM_MODEL i JWT_SECRET
+# uzupełnij LLM_API_KEY i LLM_MODEL
 ```
 
 - `LLM_API_KEY` i `LLM_MODEL` ustawia się **tylko** w `.env`, bo kod nie ma dla nich wartości domyślnych. Bez nich aplikacja nie wystartuje i zgłosi brakującą zmienną.

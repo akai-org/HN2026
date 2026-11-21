@@ -6,6 +6,11 @@ Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i
 
 **Używa interfejsów innych bloków:** `validate_upload` (A: `A-walidacja-pliku.md`), `extract_*` (B1/B2/B3: `B1-…`, `B2-…`, `B3-…`), `analyze` (C: `C-analiza-llm.md`), `build_form` (D: `D-builder.md`), `check_form` (F: `F-kontrola-regul.md`). Wszystkie w `docs/bloki/`, sekcje Interfejs. Do czasu ich ukończenia mockuj je w swoich testach.
 
+> **Status: zrobione (częściowo, do czasu bloków D i F).** `pipeline.py`, `extract/__init__.py` (wybór ekstraktora), `api/__init__.py`, obsługa `AppError` w `app.py`, testy w `tests/api/`.
+> - `POST /api/forms/convert` (pole `file`) wykonuje A → B → C i na razie zwraca `ConvertResult` z `form` = `FormSpec` z modelu plus ostrzeżenie. Po bloku D trzeba podmienić to w `pipeline.convert` na `build_form()` + `check_form()`.
+> - `GET /api/health` zwraca `{"status": "ok", "llm": "ok"|"unavailable"}` (sprawdza `GET {LLM_BASE_URL}/models`).
+> - Bez JWT: mentorzy potwierdzili, że nie jest wymagane.
+
 ## Zadanie
 
 **Pliki:** `src/hacknation_2026/app.py`, `src/hacknation_2026/api/`, `src/hacknation_2026/pipeline.py`, `src/hacknation_2026/extract/__init__.py` (dispatcher), `tests/api/`

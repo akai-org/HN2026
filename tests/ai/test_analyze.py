@@ -29,8 +29,7 @@ VALID_SPEC = {
 @pytest.fixture
 def settings():
   return Settings(
-    _env_file=None, jwt_secret="x", auth_username="u", auth_password="p",
-    llm_api_key="test-key", llm_model="test-model", llm_base_url="https://llm.test/v1", llm_timeout_s=5,
+    _env_file=None, llm_api_key="test-key", llm_model="test-model", llm_base_url="https://llm.test/v1", llm_timeout_s=5,
   )
 
 
