@@ -144,7 +144,7 @@ function ImportForm() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-8 sm:px-6">
+    <main id="main-content" tabIndex="-1" className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-8 sm:px-6">
       <div className="mx-auto max-w-3xl">
         <div className="mb-10 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-primary">
