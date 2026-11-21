@@ -12,6 +12,7 @@ class Settings(BaseSettings):
   llm_base_url: str = "https://api.groq.com/openai/v1"  # any OpenAI-compatible /chat/completions API
   llm_api_key: str                                       # required, set in .env
   llm_model: str                                         # required, set in .env
+  llm_fallback_model: str = ""                           # same model at another provider, used when llm_model gets HTTP 429
   llm_timeout_s: int = 300
   ocr_lang: str = "pol"
   emit_validators: bool = True

@@ -2,6 +2,7 @@
 
 import io
 import math
+import re
 
 import numpy as np
 import pytesseract
@@ -13,6 +14,8 @@ from hacknation_2026.extract.fields import BOX as BOX_MARK, FIELD, Mark, detect_
 
 A4_RATIO = 297 / 210
 MIN_WORD_CONFIDENCE = 40   # below this a word without letters is OCR noise, usually misread fill-in dots
+_FOOTNOTE = re.compile(r"^(\d)\s?\)\s")                  # "1) Dane nieobowiązkowe."
+_STRAY_QUOTE = re.compile(r"(?<=[\w)])[”\"](?=\s|$)")    # "ulicy”": Tesseract reads a superscript "1)" as a quote
 
 
 def extract_image(data: bytes, fmt: FileFormat, lang: str = "pol") -> ExtractedDocument:
@@ -23,7 +26,23 @@ def extract_image(data: bytes, fmt: FileFormat, lang: str = "pol") -> ExtractedD
   blocks: list[Block] = []
   for number, page in enumerate(split_pages(image), start=1):
     blocks += ocr_blocks(page, number, lang)
-  return ExtractedDocument(format=fmt, blocks=blocks)
+  return ExtractedDocument(format=fmt, blocks=restore_footnote_marks(blocks))
+
+
+def restore_footnote_marks(blocks: list[Block]) -> list[Block]:
+  """Puts back footnote marks that OCR turned into a closing quote, so the LLM can link a label to its footnote."""
+  numbers = {m.group(1) for b in blocks if (m := _FOOTNOTE.match(b.text))}
+  # shortcut: only a form with a single footnote number is fixed; with several we cannot tell which mark is which.
+  # If OCR also lost the number of another footnote (form 1 loses "2)" of the signature), that mark becomes "1)" too;
+  # re-OCR of the superscript crop would fix it, but was unreliable in tests.
+  if len(numbers) != 1:
+    return blocks
+  mark = numbers.pop() + ")"
+  for block in blocks:
+    quotes = sum(block.text.count(q) for q in '"”“„')
+    if quotes == 1 and not _FOOTNOTE.match(block.text):
+      block.text = _STRAY_QUOTE.sub(mark, block.text)
+  return blocks
 
 
 def split_pages(image: Image.Image) -> list[Image.Image]:

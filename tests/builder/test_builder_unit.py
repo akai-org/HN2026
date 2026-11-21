@@ -212,10 +212,16 @@ def test_conditions_and_unknown_fields_dropped(settings):
   assert field["states"] == [{"type": "SHOW", "query": jsonata.equals("A", jsonata.answer_path("Sprawa", "s", "wybor"))}]
 
 
-def test_and_conditions(settings):
+def test_options_of_one_field_are_ored_and_different_fields_anded(settings):
   spec = subject_spec(show_if=[Condition(field="wybor", equals="A"), Condition(field="wybor", equals="B")])
   field = build_form(spec, settings)["tabs"][1]["questions"][0]["field"]["repeatingSectionGrid"][1]["field"]
-  assert field["states"][0]["query"].count(" and ") == 1
+  a, b = (jsonata.equals(v, jsonata.answer_path("Sprawa", "s", "wybor")) for v in "AB")
+  assert field["states"][0]["query"] == f"({a} or {b})"
+
+  spec.pages[0].sections[0].fields.insert(1, FieldSpec(key="tak_nie", label="Tak/nie", type="RADIO", required=True, options=["Tak", "Nie"]))
+  spec.pages[0].sections[0].fields[2].show_if.append(Condition(field="tak_nie", equals="Tak"))
+  query = build_form(spec, settings)["tabs"][1]["questions"][0]["field"]["repeatingSectionGrid"][2]["field"]["states"][0]["query"]
+  assert query.startswith(f"({a} or {b}) and ") and '"Tak"' in query
 
 
 def test_enrichment_is_applied_to_subject_fields(settings, monkeypatch):

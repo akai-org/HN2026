@@ -72,7 +72,7 @@ class FieldSpec(BaseModel):
   required: bool
   description: str = ""            # plain text; builder wraps it in HTML
   options: list[str] = []          # RADIO / CHECKBOX / SELECT
-  show_if: list[Condition] = []    # all conditions must hold (AND)
+  show_if: list[Condition] = []    # different fields: all must hold (AND); options of one field: any (OR)
   applicant_data: bool = False     # the applicant's own personal data; block E may feed it from a register
 
 

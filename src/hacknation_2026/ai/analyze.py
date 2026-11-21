@@ -27,10 +27,31 @@ def _fix_conditions(spec: FormSpec) -> FormSpec:
     choices = options.get(condition.field, [])
     if choices and condition.equals not in choices:
       by_case = {c.lower(): c for c in choices}
-      match = by_case.get(condition.equals.lower()) or next(iter(difflib.get_close_matches(condition.equals, choices, n=1, cutoff=0.6)), None)
+      match = (by_case.get(condition.equals.lower())
+               or next(iter(difflib.get_close_matches(condition.equals, choices, n=1, cutoff=0.6)), None)
+               or (choices[0] if len(choices) == 1 else None))   # "true" for a single box -> its only option
       if match:
         condition.equals = match
   return spec
+
+
+def _capitalize_options(spec: FormSpec) -> FormSpec:
+  """Standardy: options start with a capital letter; the model copies them lowercase from the paper ("zaliczyć …").
+  Conditions pointing at them are matched again by `_fix_conditions` (case-insensitive)."""
+  for page in spec.pages:
+    for section in page.sections:
+      for f in section.fields:
+        if f.type == "CHECKBOX" and not f.options:   # a single box ("[ ] Chodnik"): its one option is "Tak"
+          f.options = ["Tak"]
+        f.options = [_capitalize(o) for o in f.options]
+  return spec
+
+
+def _capitalize(option: str) -> str:
+  first_word = option.split()[0] if option.split() else ""
+  if any(ch.isupper() for ch in first_word[1:]):   # brand names keep their casing: "eDoręczenia", "ePUAP"
+    return option
+  return option[:1].upper() + option[1:]
 
 
 def analyze(doc: ExtractedDocument, settings: Settings) -> FormSpec:
@@ -48,7 +69,7 @@ def analyze(doc: ExtractedDocument, settings: Settings) -> FormSpec:
       raw, last_error = exc.output, str(exc)
     else:
       try:
-        return _fix_conditions(FormSpec.model_validate_json(_strip_fences(raw)))
+        return _fix_conditions(_capitalize_options(FormSpec.model_validate_json(_strip_fences(raw))))
       except ValidationError as exc:
         last_error = exc
     messages = [

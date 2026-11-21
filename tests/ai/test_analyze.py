@@ -166,6 +166,7 @@ def test_connection_error_raises_llm_unavailable(monkeypatch, settings, doc):
 
 @pytest.mark.parametrize("status", [429, 500, 503])
 def test_rate_limit_and_server_errors_raise_llm_unavailable(monkeypatch, settings, doc, status):
+  monkeypatch.setattr(client.time, "sleep", lambda _: None)
   mock_llm(monkeypatch, lambda req, n: httpx.Response(status, json={"error": {"message": "busy"}}))
 
   with pytest.raises(AppError) as err:
@@ -221,3 +222,50 @@ def test_garbled_condition_option_is_matched_to_the_real_option(monkeypatch, set
   fields = analyze(doc, settings).pages[0].sections[0].fields
   assert fields[1].show_if[0].equals == "Zwrócić przelewem na wskazany rachunek"
   assert fields[2].show_if[0].equals == "coś zupełnie innego"   # no close option: left as is
+
+
+def test_rate_limit_is_retried(monkeypatch, settings, doc):
+  waits = []
+  monkeypatch.setattr(client.time, "sleep", waits.append)
+  requests = mock_llm(monkeypatch, lambda req, n: httpx.Response(429) if n < 3 else
+                      httpx.Response(200, json=completion(json.dumps(VALID_SPEC))))
+
+  assert analyze(doc, settings).title == VALID_SPEC["title"]
+  assert len(requests) == 3 and waits == list(client.RATE_LIMIT_WAITS_S[:2])
+
+
+def test_options_are_capitalized_and_conditions_follow(monkeypatch, settings, doc):
+  spec = {**VALID_SPEC, "pages": [{"title": "S", "sections": [{"key": "s", "title": "S", "fields": [
+    {"key": "sposob", "label": "Wybierz sposób", "type": "RADIO", "required": True, "options": ["zwrócić przelewem", "zaliczyć"]},
+    {"key": "konto", "label": "Numer rachunku", "type": "TEXT_FIELD", "required": True,
+     "show_if": [{"field": "sposob", "equals": "zwrócić przelewem"}]},
+  ]}]}]}
+  mock_llm(monkeypatch, lambda req, n: httpx.Response(200, json=completion(json.dumps(spec))))
+
+  fields = analyze(doc, settings).pages[0].sections[0].fields
+  assert fields[0].options == ["Zwrócić przelewem", "Zaliczyć"]
+  assert fields[1].show_if[0].equals == "Zwrócić przelewem"
+
+
+def test_single_checkbox_gets_an_option_and_brand_names_keep_casing(monkeypatch, settings, doc):
+  spec = {**VALID_SPEC, "pages": [{"title": "S", "sections": [{"key": "s", "title": "S", "fields": [
+    {"key": "chodnik", "label": "Chodnik", "type": "CHECKBOX", "required": False},
+    {"key": "wymiary", "label": "Wymiary chodnika", "type": "TEXT_FIELD", "required": False,
+     "show_if": [{"field": "chodnik", "equals": "true"}]},
+    {"key": "kanal", "label": "Wybierz kanał", "type": "RADIO", "required": True, "options": ["eDoręczenia", "ePUAP"]},
+  ]}]}]}
+  mock_llm(monkeypatch, lambda req, n: httpx.Response(200, json=completion(json.dumps(spec))))
+
+  fields = analyze(doc, settings).pages[0].sections[0].fields
+  assert fields[0].options == ["Tak"] and fields[1].show_if[0].equals == "Tak"
+  assert fields[2].options == ["eDoręczenia", "ePUAP"]
+
+
+def test_rate_limit_switches_to_fallback_model(monkeypatch, settings, doc):
+  monkeypatch.setattr(client.time, "sleep", lambda _: pytest.fail("should not wait when a fallback model exists"))
+  fallback = settings.model_copy(update={"llm_fallback_model": "other/test-model"})
+  requests = mock_llm(monkeypatch, lambda req, n: httpx.Response(429) if json.loads(req.content)["model"] == "test-model"
+                      else httpx.Response(200, json=completion(json.dumps(VALID_SPEC))))
+
+  assert analyze(doc, fallback).title == VALID_SPEC["title"]
+  assert [r["body"]["model"] for r in requests] == ["test-model", "other/test-model"]

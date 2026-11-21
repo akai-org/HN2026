@@ -168,8 +168,17 @@ def _tech_names(pages: list[PageSpec]) -> tuple[list[list[str]], list[list[list[
 
 
 def condition_states(conditions: list[Condition], addresses: dict[str, Address]) -> list[dict]:
-  """AND of `show_if` conditions as a SHOW state; conditions pointing at unknown fields are dropped (block F reports them)."""
-  parts = [jsonata.equals(c.equals, addresses[c.field].answer()) for c in conditions if c.field in addresses]
+  """`show_if` as a SHOW state: conditions on different fields are ANDed, several options of the same field are ORed
+  (the model writes "Mikroprocesor" and "Tatuaż" for one field, and a single choice cannot hold both).
+  Conditions pointing at unknown fields are dropped (block F reports them)."""
+  by_field: dict[str, list[str]] = {}
+  for c in conditions:
+    if c.field in addresses:
+      by_field.setdefault(c.field, []).append(c.equals)
+  parts = []
+  for key, values in by_field.items():
+    exprs = [jsonata.equals(v, addresses[key].answer()) for v in dict.fromkeys(values)]
+    parts.append(exprs[0] if len(exprs) == 1 else jsonata.group(jsonata.or_(*exprs)))
   return jsonata.show(jsonata.and_(*parts))
 
 

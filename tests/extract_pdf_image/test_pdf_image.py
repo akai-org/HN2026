@@ -5,9 +5,9 @@ import shutil
 import pytest
 from PIL import Image
 
-from hacknation_2026.contracts import AppError, FileFormat
+from hacknation_2026.contracts import AppError, Block, FileFormat
 from hacknation_2026.extract._text import line_block, normalize
-from hacknation_2026.extract.image import extract_image, split_pages
+from hacknation_2026.extract.image import extract_image, restore_footnote_marks, split_pages
 from hacknation_2026.extract.pdf import extract_pdf
 
 BLANKIETY = pathlib.Path(__file__).parents[2] / "dane_zadania" / "blankiety"
@@ -95,3 +95,16 @@ def test_unreadable_file(call):
   with pytest.raises(AppError) as exc:
     call()
   assert exc.value.code == "UNREADABLE_FILE"
+
+
+def test_footnote_mark_read_as_quote_is_restored():
+  blocks = [Block(kind="text", text=t) for t in [
+    "w miejscowości ____ przy ulicy” ____", "kontakt (adres e-mail)\"", "tytuł „Wniosek”", "1) Dane nieobowiązkowe."]]
+  assert [b.text for b in restore_footnote_marks(blocks)] == [
+    "w miejscowości ____ przy ulicy1) ____", "kontakt (adres e-mail)1)", "tytuł „Wniosek”", "1) Dane nieobowiązkowe."]
+
+
+@needs_ocr
+def test_image_keeps_footnote_mark_of_optional_street():
+  # form 1: "przy ulicy¹⁾" with footnote "1) Dane nieobowiązkowe."; the scan reads the superscript as a quote
+  assert "ulicy1)" in extract_image(sample("1.", ".jpg").read_bytes(), FileFormat.JPEG).as_text()

@@ -11,4 +11,4 @@ services:
         required: false
     environment:
       LLM_BASE_URL: ${LLM_BASE_URL:-https://api.edenai.run/v3}
-      LLM_MODEL: ${LLM_MODEL:-google/gemma-4-31b-it}
+      LLM_MODEL: ${LLM_MODEL:-gemma-4-31b-it}

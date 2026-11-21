@@ -1,5 +1,6 @@
 """HTTP client for an OpenAI-compatible chat API (Groq, or local Ollama at /v1)."""
 
+import time
 from typing import Any
 
 import httpx
@@ -8,6 +9,7 @@ from hacknation_2026.config import Settings
 from hacknation_2026.contracts import AppError
 
 Message = dict[str, str]
+RATE_LIMIT_WAITS_S = (5, 15, 30)   # EdenAI answers 429 for short bursts; a later attempt usually passes
 
 
 class LLMOutputError(Exception):
@@ -45,8 +47,19 @@ def _post(client: httpx.Client, settings: Settings, payload: dict[str, Any]) -> 
   if not url.endswith("/chat/completions"):   # accept both a base URL and the full endpoint (EdenAI docs give the latter)
     url += "/chat/completions"
   headers = {"Authorization": f"Bearer {settings.llm_api_key}"}
+  fallback = settings.llm_fallback_model
+  waits = list(RATE_LIMIT_WAITS_S)
   try:
-    return client.post(url, json=payload, headers=headers)
+    while True:
+      response = client.post(url, json=payload, headers=headers)
+      if response.status_code != 429:
+        return response
+      if fallback and payload["model"] != fallback:   # rate limited: switch provider at once, it is the same model
+        payload["model"] = fallback
+        continue
+      if not waits:
+        return response
+      time.sleep(waits.pop(0))
   except httpx.TimeoutException as exc:
     raise AppError("LLM_UNAVAILABLE", f"Model językowy nie odpowiedział w czasie {settings.llm_timeout_s} s.", 503) from exc
   except httpx.HTTPError as exc:
