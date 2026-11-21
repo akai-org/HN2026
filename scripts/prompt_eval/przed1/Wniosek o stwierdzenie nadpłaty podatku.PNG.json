@@ -1,0 +1,126 @@
+{
+ "title": "Wniosek o stwierdzenie nadpłaty podatku",
+ "authority_name": "Urząd Gminy Ulan-Majorat",
+ "authority_kind": "URZAD",
+ "allows_other_person": false,
+ "allows_legal_entity": false,
+ "allows_proxy": false,
+ "pages": [
+  {
+   "title": "Wniosek o stwierdzenie nadpłaty podatku",
+   "sections": [
+    {
+     "key": "szczegoly_nadpłaty",
+     "title": "Szczegóły Nadpłaty",
+     "repeating": false,
+     "fields": [
+      {
+       "key": "rodzaj_podatku",
+       "label": "Rodzaj Podatku",
+       "type": "TEXT_FIELD",
+       "required": true,
+       "description": "Podatek, którego dotyczy nadpłata",
+       "options": [],
+       "show_if": []
+      },
+      {
+       "key": "kwota_nadpłaty",
+       "label": "Kwota Nadpłaty",
+       "type": "NUMBER",
+       "required": true,
+       "description": "Kwota, którą wnioskodawca uważa za nadpłatną",
+       "options": [],
+       "show_if": []
+      },
+      {
+       "key": "uzasadnienie",
+       "label": "Uzasadnienie",
+       "type": "TEXTAREA",
+       "required": true,
+       "description": "Szczegółowe uzasadnienie wniosku",
+       "options": [],
+       "show_if": []
+      },
+      {
+       "key": "typ_prośby",
+       "label": "Jak Proszę Rozpatrzyć Nadpłatę",
+       "type": "RADIO",
+       "required": true,
+       "description": "Wybierz jedną opcję",
+       "options": [
+        "Zaliczyć na poczet przyszłego zobowiązania podatkowego",
+        "Zwrócić przelewem na wskazany rachunek"
+       ],
+       "show_if": []
+      },
+      {
+       "key": "podatek_do_zaliczenia",
+       "label": "Rodzaj Podatku Do Zaliczenia",
+       "type": "TEXT_FIELD",
+       "required": false,
+       "description": "W przypadku wyboru zaliczenia",
+       "options": [],
+       "show_if": [
+        {
+         "field": "typ_prośby",
+         "equals": "Zaliczyć na poczet przyszłego zobowiązania podatkowego"
+        }
+       ]
+      },
+      {
+       "key": "rachunek_bankowy",
+       "label": "Numer Rachunku Bankowego",
+       "type": "TEXT_FIELD",
+       "required": false,
+       "description": "W przypadku wyboru zwrotu przelewem",
+       "options": [],
+       "show_if": [
+        {
+         "field": "typ_prośby",
+         "equals": "Zwrócić przelewem na wskazany rachunek"
+        }
+       ]
+      }
+     ],
+     "show_if": []
+    },
+    {
+     "key": "zalaczniki",
+     "title": "Załączniki",
+     "repeating": false,
+     "fields": [
+      {
+       "key": "korekta_deklaracji",
+       "label": "Korekta Deklaracji",
+       "type": "FILE_UPLOADER",
+       "required": true,
+       "description": "Załącznik wymagany do stwierdzenia nadpłaty",
+       "options": [],
+       "show_if": []
+      },
+      {
+       "key": "załącznik_2",
+       "label": "Załącznik 2",
+       "type": "FILE_UPLOADER",
+       "required": false,
+       "description": "Inny wymagany dokument",
+       "options": [],
+       "show_if": []
+      },
+      {
+       "key": "załącznik_3",
+       "label": "Załącznik 3",
+       "type": "FILE_UPLOADER",
+       "required": false,
+       "description": "Inny wymagany dokument",
+       "options": [],
+       "show_if": []
+      }
+     ],
+     "show_if": []
+    }
+   ]
+  }
+ ],
+ "consents": []
+}
