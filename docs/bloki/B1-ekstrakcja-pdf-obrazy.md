@@ -4,6 +4,14 @@ Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i
 
 **Wymaga:** ukończonego bloku 0. Typy (`AppError`, `FileFormat`, `ExtractedDocument`, `FormSpec`, `FormDefinition`, `RuleViolation`, `ConvertResult`, `Settings`) importuj z `hacknation_2026.contracts` i `hacknation_2026.config`; ich pełna definicja jest w `docs/bloki/00-kontrakty.md`.
 
+> **Status: zrobione.** `extract/pdf.py`, `extract/image.py`, wspólne pomocnicze `extract/_text.py` (do użycia w B2/B3), testy w `tests/extract_pdf_image/`.
+> - Interfejs ma dodatkowy parametr `lang: str = "pol"`, w który G przekazuje `Settings.ocr_lang`.
+> - Kropki i podkreślenia do wypełnienia są zamieniane na `____`. Checkbox na początku linii daje `Block(kind="checkbox")`, kilka checkboxów w linii (także w tabelach) daje `[ ]` w tekście.
+> - Glify z fontów symbolicznych: kratki (Wingdings o/¨/q, SymbolMT `\uf092`, ❑ ☐ □) to checkbox, strzałka Wingdings ⇨ (`\uf0f0`) to punktor `-`, pozostałe glify to `•`.
+> - OCR: Tesseract `--psm 11`, linie grupowane po pozycji, długie obrazy cięte na strony A4, słowa o pewności < 40 zamieniane na `____`.
+> - Znane ograniczenia: OCR gubi część drobnych podpisów pod liniami z kropek; checkboxy narysowane w komórkach tabel (formularz 8) nie są oznaczane. Wszystkie PDF-y w danych mają warstwę tekstu, więc ścieżkę skanu PDF testuje obraz zapisany jako PDF.
+> - Wymaga systemowego `tesseract` z językiem `pol` (lokalnie dograny `pol.traineddata` z `tessdata_fast`, w Dockerze pakiet `tesseract-ocr-pol`).
+
 ## Zadanie
 
 **Pliki:** `src/hacknation_2026/extract/pdf.py`, `src/hacknation_2026/extract/image.py`, `tests/extract_pdf_image/`

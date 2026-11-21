@@ -4,6 +4,11 @@ Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i
 
 **Wymaga:** ukończonego bloku 0. Typy (`AppError`, `FileFormat`, `ExtractedDocument`, `FormSpec`, `FormDefinition`, `RuleViolation`, `ConvertResult`, `Settings`) importuj z `hacknation_2026.contracts` i `hacknation_2026.config`; ich pełna definicja jest w `docs/bloki/00-kontrakty.md`.
 
+> **Status: zrobione.** `extract/sheet.py`, testy w `tests/extract_sheet/`. Zależność: `openpyxl`. ODS czytany z `content.xml` przez `lxml` (już w projekcie przez `python-docx`), więc `odfpy` okazał się zbędny.
+> - Pola do wpisania w arkuszu to puste komórki z ramką, a nie tekst. Pusta komórka lub scalony zakres z ramką daje `____`, ciąg kratek (np. NIP po cyfrze) daje jedno `____`, a pojedyncza komórka z pełną ramką tuż przed tekstem daje checkbox.
+> - Linie wizualne: komórki nachodzące na siebie w pionie tworzą jedną linię (podkreślenie scalone od wiersza wyżej niż etykieta trafia do tej samej linii). Każdy widoczny arkusz to osobna strona.
+> - Uproszczenia: siatki tabel wychodzą jako linie tekstu, a nie `Block(kind="table")`; `number-rows-repeated` w ODS traktowane jako puste wypełnienie.
+
 ## Zadanie
 
 **Pliki:** `src/hacknation_2026/extract/sheet.py`, `tests/extract_sheet/`

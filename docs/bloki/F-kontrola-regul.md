@@ -19,7 +19,7 @@ def check_form(form: FormDefinition) -> list[RuleViolation]
 - każda strona ma ≥ 1 pole,
 - na najwyższym poziomie strony tylko `SECTION`/`REPEATING_SECTION`, bez sekcji w sekcji,
 - na `FINISH` brak pól do wprowadzania danych (dozwolone `INFO_SECTION`, `TEXT_BLOCK`),
-- komplet wymaganych kluczy w każdym polu, unikalne `id`,
+- komplet wymaganych kluczy w każdym polu, unikalne `id`; `states` traktuj jako opcjonalny, bo we wzorcu 1 sekcja `organ_do_ktorego_jest_skladany_wniosek` go nie ma (wzorce muszą dawać 0 naruszeń),
 - `states[].type` ∈ {`SHOW`, `READ_ONLY`}, a `query` odwołuje się do istniejących strony, sekcji i pola (parsowanie regexem z wzorca jsonaty),
 - `dictionaryName` tylko w `SELECT`/`RADIO`/`CHECKBOX`, `CONSENT_SECTION` ma `consentSectionConfig`,
 - `flow.links` łączy wszystkie strony, a `source`/`target` istnieją.
