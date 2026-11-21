@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FileText, Image, Upload, X } from "lucide-react";
+import { ArrowUpAZ, FileText, Image, Trash2, Upload, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 
 const ACCEPTED_FORMATS = ".pdf,.doc,.docx,.ods,.xlsx,.jpg,.jpeg,.png";
@@ -67,6 +67,23 @@ function ImportForm() {
     });
   }
 
+  function clearAllFiles() {
+    setSelectedFiles([]);
+    setSplitBefore(new Set());
+    setError("");
+  }
+
+  function sortFilesAlphabetically() {
+    setSelectedFiles((currentFiles) =>
+      [...currentFiles].sort((firstFile, secondFile) =>
+        firstFile.name.localeCompare(secondFile.name, "pl", {
+          sensitivity: "base",
+        })
+      )
+    );
+    setSplitBefore(new Set());
+  }
+
   function getFileExtension(file) {
     const extension = file.name.split(".").pop();
     return extension && extension !== file.name ? extension.toUpperCase() : "PLIK";
@@ -127,14 +144,14 @@ function ImportForm() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-12 sm:px-6">
+    <main id="main-content" tabIndex="-1" className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-8 sm:px-6">
       <div className="mx-auto max-w-3xl">
         <div className="mb-10 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-[0.2em] text-primary">
             AKAI · HackNation 2026
           </p>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Zmień formularz w e-Formularz
+            Zamień formularz w e-Formularz
           </h1>
         </div>
 
@@ -143,20 +160,35 @@ function ImportForm() {
             htmlFor="file-upload"
             onDragOver={(event) => event.preventDefault()}
             onDrop={handleDrop}
-            className="flex min-h-64 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-background px-6 py-10 text-center transition-colors hover:border-primary hover:bg-primary/5 focus-within:border-primary"
+            className={`flex cursor-pointer rounded-xl border-2 border-dashed border-primary/60 bg-primary/5 px-6 text-center transition-colors hover:border-primary hover:bg-primary/10 focus-within:border-primary focus-within:ring-3 focus-within:ring-ring/50 ${
+              selectedFiles.length
+                ? "h-24 items-center justify-center gap-4"
+                : "h-64 flex-col items-center justify-center"
+            }`}
           >
-            <span className="mb-4 flex size-16 items-center justify-center text-primary">
-              <Upload aria-hidden="true" size={42} strokeWidth={1.5} />
-            </span>
-            <span className="text-lg font-semibold">
-              Przeciągnij pliki tutaj albo wybierz z dysku
-            </span>
-            <span className="mt-2 text-sm text-muted-foreground">
-              PDF, Word, Excel, OpenDocument albo zdjęcie (JPG, PNG). Każdy plik do 10 MB.
-            </span>
-            <span className="mt-5 inline-flex h-9 items-center rounded-md border border-primary px-4 text-sm font-medium text-primary">
-              Wybierz pliki
-            </span>
+            {selectedFiles.length ? (
+              <>
+                <Upload aria-hidden="true" size={32} strokeWidth={1.7} className="shrink-0 text-primary" />
+                <span className="text-left">
+                  <span className="block text-base font-semibold">
+                    Dodaj pliki
+                  </span>
+                  <span className="mt-1 block text-xs text-muted-foreground sm:text-sm">
+                    Przeciągnij tutaj albo wybierz z dysku · do 10 MB na plik
+                  </span>
+                </span>
+              </>
+            ) : (
+              <>
+                <Upload aria-hidden="true" size={42} strokeWidth={1.5} className="mb-4 text-primary" />
+                <span className="text-lg font-semibold">
+                  Przeciągnij pliki tutaj albo wybierz z dysku
+                </span>
+                <span className="mt-2 text-sm text-muted-foreground">
+                  PDF, Word, Excel, OpenDocument albo zdjęcie (JPG, PNG). Każdy plik do 10 MB.
+                </span>
+              </>
+            )}
             <input
               id="file-upload"
               className="sr-only"
@@ -167,46 +199,77 @@ function ImportForm() {
             />
           </label>
 
-          {error && (
-            <p className="mt-3 text-sm text-destructive" role="alert">
-              {error}
-            </p>
-          )}
-
           <div className="mt-6 rounded-lg border border-border bg-background px-5 py-5">
             <div className="text-center">
-              <p className="text-base font-semibold">Tu pojawią się dodane formularze</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Jeden plik może zawierać kilka formularzy lub kilka stron. Cyfryzowanie przygotuje każdy formularz osobno.
-              </p>
+              {selectedFiles.length ? (
+                <>
+                  <p className="text-base font-semibold">
+                    Przesłane pliki ({selectedFiles.length})
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Kliknij pomiędzy plikami, aby ustawić granicę kolejnego formularza. Kliknij ponownie, żeby ją usunąć.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-base font-semibold">Przesłane pliki</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Po dodaniu plików możesz ustawić granice pomiędzy formularzami. Kliknij ponownie, żeby ją usunąć.
+                  </p>
+                </>
+              )}
             </div>
 
             {selectedFiles.length > 0 && (
               <div className="mt-4 flex flex-wrap items-start gap-3">
+                <div className="flex basis-full justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={sortFilesAlphabetically}
+                  >
+                    <ArrowUpAZ aria-hidden="true" />
+                    Sortuj alfabetycznie
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={clearAllFiles}
+                  >
+                    <Trash2 aria-hidden="true" />
+                    Wyczyść wszystko
+                  </Button>
+                </div>
                 {selectedFiles.map((file, index) => (
                   <div key={`${file.name}-${file.size}-${file.lastModified}`} className="contents">
                     {index === 0 && (
-                      <div className="flex basis-full items-center gap-3 py-1 text-xs font-semibold text-primary">
+                      <div className="flex basis-full items-center gap-3 py-2 text-xs font-semibold text-primary">
                         <span className="h-px flex-1 bg-primary" />
-                        Formularz 1
+                        Granica — Formularz 1
                         <span className="h-px flex-1 bg-primary" />
                       </div>
                     )}
                     {index > 0 && (
                       <button
                         type="button"
-                        className="flex basis-full items-center gap-3 py-1 text-xs font-medium text-muted-foreground"
+                        className={`flex basis-full items-center gap-3 py-2 text-xs ${
+                          splitBefore.has(index)
+                            ? "font-semibold text-primary"
+                            : "font-semibold text-muted-foreground"
+                        }`}
                         aria-label={splitBefore.has(index)
-                          ? `Usuń podział przed plikiem ${file.name}`
-                          : `Dodaj podział przed plikiem ${file.name}`}
+                          ? `Usuń granicę przed plikiem ${file.name}`
+                          : `Dodaj granicę przed plikiem ${file.name}`}
                         onClick={() => toggleSplit(index)}
                       >
                         <span className={`h-px flex-1 ${
                           splitBefore.has(index) ? "bg-primary" : "bg-border"
                         }`} />
                         {splitBefore.has(index)
-                          ? `Formularz ${1 + [...splitBefore].filter((splitIndex) => splitIndex <= index).length}`
-                          : "Kliknij, aby dodać podział"}
+                          ? `Granica — Formularz ${1 + [...splitBefore].filter((splitIndex) => splitIndex <= index).length}`
+                          : "Kliknij, aby ustawić granicę"}
                         <span className={`h-px flex-1 ${
                           splitBefore.has(index) ? "bg-primary" : "bg-border"
                         }`} />
@@ -247,7 +310,15 @@ function ImportForm() {
               </div>
             )}
 
-            <div className="mt-4 flex justify-end">
+            <div className="mt-4 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end">
+              {error && (
+                <p
+                  className="text-sm text-destructive sm:mr-auto sm:max-w-md"
+                  role="alert"
+                >
+                  {error}
+                </p>
+              )}
               <Button type="submit" disabled={!selectedFiles.length || isSubmitting}>
                 {isSubmitting ? "Cyfryzowanie..." : "Cyfryzuj formularze"}
               </Button>

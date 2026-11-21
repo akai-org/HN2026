@@ -180,6 +180,49 @@
   }
 }
 
+html.a11y-font-smaller {
+  font-size: 87.5%;
+}
+
+html.a11y-font-larger {
+  font-size: 112.5%;
+}
+
+html.a11y-high-contrast {
+  --background: #ffffff;
+  --foreground: #000000;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+  --primary: #005fcc;
+  --primary-foreground: #ffffff;
+  --muted: #f2f2f2;
+  --muted-foreground: #1a1a1a;
+  --accent: #e6f0ff;
+  --accent-foreground: #000000;
+  --destructive: #b00020;
+  --destructive-foreground: #ffffff;
+  --border: #000000;
+  --input: #000000;
+  --ring: #005fcc;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #000000;
+  --sidebar-border: #000000;
+  --sidebar-ring: #005fcc;
+}
+
+html.a11y-wide-spacing body {
+  line-height: 1.8;
+  letter-spacing: 0.12em;
+  word-spacing: 0.16em;
+}
+
+html.a11y-wide-spacing p {
+  margin-bottom: 2em;
+}
+
+
 .loader {
   width: 50px;
   --b: 8px;
