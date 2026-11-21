@@ -13,5 +13,6 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY src/ ./src/
 COPY --from=frontend /app/src/hacknation_2026/static ./src/hacknation_2026/static
 RUN uv sync --frozen --no-dev
-EXPOSE 8000
+ENV HOST=0.0.0.0 PORT=3000
+EXPOSE 3000
 CMD ["uv", "run", "--no-sync", "hacknation-2026"]

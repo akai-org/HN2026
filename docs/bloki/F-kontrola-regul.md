@@ -1,0 +1,38 @@
+# Blok F – Kontrola reguł
+
+Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i zależności: `docs/bloki/README.md`.
+
+**Wymaga:** ukończonego bloku 0. Typy (`AppError`, `FileFormat`, `ExtractedDocument`, `FormSpec`, `FormDefinition`, `RuleViolation`, `ConvertResult`, `Settings`) importuj z `hacknation_2026.contracts` i `hacknation_2026.config`; ich pełna definicja jest w `docs/bloki/00-kontrakty.md`.
+
+## Zadanie
+
+**Pliki:** `src/hacknation_2026/rules/` (`check.py`), `tests/rules/`
+
+**Interfejs:**
+```python
+def check_form(form: FormDefinition) -> list[RuleViolation]
+```
+
+**Reguły** (z `dane_zadania/Reguły techniczne…pdf` i wzorców):
+- tytuł niepusty, ≤ 255 znaków,
+- ≥ 2 strony, dokładnie jedna `FINISH` i jest ostatnia, reszta `MAIN`,
+- każda strona ma ≥ 1 pole,
+- na najwyższym poziomie strony tylko `SECTION`/`REPEATING_SECTION`, bez sekcji w sekcji,
+- na `FINISH` brak pól do wprowadzania danych (dozwolone `INFO_SECTION`, `TEXT_BLOCK`),
+- komplet wymaganych kluczy w każdym polu, unikalne `id`,
+- `states[].type` ∈ {`SHOW`, `READ_ONLY`}, a `query` odwołuje się do istniejących strony, sekcji i pola (parsowanie regexem z wzorca jsonaty),
+- `dictionaryName` tylko w `SELECT`/`RADIO`/`CHECKBOX`, `CONSENT_SECTION` ma `consentSectionConfig`,
+- `flow.links` łączy wszystkie strony, a `source`/`target` istnieją.
+
+**Gotowe, gdy:** oba wzorcowe JSON-y dają **0 naruszeń**, a każda reguła ma test na celowo zepsutej kopii wzorca.
+
+## Zasady wspólne
+
+- **Najpierw blok 0** (kontrakty). Wszystkie inne bloki startują równolegle po nim i komunikują się **wyłącznie** przez typy z bloku 0.
+- Każdy blok **ma na wyłączność** wymienione pliki. Nie edytuj plików innego bloku. Jeśli kontrakt jest niewystarczający, zgłoś to, zamiast go zmieniać.
+- Brakującą zależność od innego bloku zastąp stubem we własnych testach (mock), a nie w cudzym pliku.
+- Python z wcięciem **2 spacjami**. Zależności dodawaj przez `uv add` (konflikt w `pyproject.toml`/`uv.lock` rozwiązuje się przez ponowne `uv add`).
+- Testy: `uv run pytest tests/<blok>/`. Blok jest skończony, gdy jego testy przechodzą.
+- **Nie rób `git commit`.** Commituje człowiek.
+- Licencje: tylko MIT, BSD, Apache 2.0 lub podobne. Żadnego GPL ani AGPL (np. PyMuPDF), żadnych zewnętrznych API.
+- Dane testowe: `dane_zadania/blankiety/` (9 formularzy w wielu formatach). Wzorce wyniku to `1.*/konfiguracja_form_*.json` i `5.*/konfiguracja_form_*.json`. **W kodzie aplikacji nie może być treści żadnego konkretnego formularza.**
