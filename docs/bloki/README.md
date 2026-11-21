@@ -13,7 +13,7 @@ Każdy plik opisuje jeden blok do zrobienia przez niezależnego agenta. Agent do
 | [D](D-builder.md) | Builder FormDefinition |
 | [E](E-wzbogacanie-pol.md) | Wzbogacanie pól |
 | [F](F-kontrola-regul.md) | Kontrola reguł |
-| [G](G-api-pipeline.md) | API, JWT i pipeline |
+| [G](G-api-pipeline.md) | API i pipeline |
 | [H](H-docker-readme.md) | Docker, compose, README |
 | [I](I-ewaluacja.md) | Ewaluacja |
 
@@ -28,7 +28,7 @@ Każdy plik opisuje jeden blok do zrobienia przez niezależnego agenta. Agent do
                    ├─ D  builder FormDefinition ◄── używa E (do czasu E: stub w D)
                    ├─ E  wzbogacanie pól (słowniki, dane inicjalne, walidatory)
                    ├─ F  kontrola reguł
-                   ├─ G  API, JWT, pipeline (spina A–F; do tego czasu stuby)
+                   ├─ G  API, pipeline (spina A–F; do tego czasu stuby)
                    ├─ H  Docker, compose z Ollamą, README
                    └─ I  skrypt ewaluacji (woła pipeline z G)
 ```

@@ -1,4 +1,4 @@
-# Blok G – API, JWT i pipeline
+# Blok G – API i pipeline
 
 Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i zależności: `docs/bloki/README.md`.
 
@@ -8,7 +8,7 @@ Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i
 
 ## Zadanie
 
-**Pliki:** `src/hacknation_2026/app.py`, `src/hacknation_2026/api/`, `src/hacknation_2026/auth.py`, `src/hacknation_2026/pipeline.py`, `src/hacknation_2026/extract/__init__.py` (dispatcher), `tests/api/`
+**Pliki:** `src/hacknation_2026/app.py`, `src/hacknation_2026/api/`, `src/hacknation_2026/pipeline.py`, `src/hacknation_2026/extract/__init__.py` (dispatcher), `tests/api/`
 
 **Interfejs:**
 ```python
@@ -18,13 +18,12 @@ def convert(filename: str, data: bytes, settings: Settings) -> ConvertResult
 ```
 
 **Wymagania:**
-- `POST /api/auth/token` (form `username`/`password` z `Settings`) → JWT (`PyJWT`, MIT).
-- `POST /api/forms/convert` (multipart, jeden plik, Bearer) → `ConvertResult`. Odczyt pliku z limitem rozmiaru, bez zapisu na dysk. Ciężką pracę uruchamiaj w `run_in_threadpool`.
+- `POST /api/forms/convert` (multipart, jeden plik) → `ConvertResult`. Odczyt pliku z limitem rozmiaru, bez zapisu na dysk. Ciężką pracę uruchamiaj w `run_in_threadpool`.
 - `GET /api/health` → dokłada stan LLM (`GET {llm_base_url}/api/tags`).
 - `AppError` → `JSONResponse(status, {"code", "message"})`.
 - Do czasu bloków A–F testy używają `monkeypatch` na funkcjach pipeline'u.
 
-**Gotowe, gdy:** testy API: brak tokenu → 401, zły plik → kod z bloku A, poprawny plik z zamockowanym pipeline'em → 200 z `form`.
+**Gotowe, gdy:** testy API: zły plik → kod z bloku A, poprawny plik z zamockowanym pipeline'em → 200 z `form`.
 
 ## Zasady wspólne
 
