@@ -26,6 +26,22 @@ def check_form(form: FormDefinition) -> list[RuleViolation]
 
 **Gotowe, gdy:** oba wzorcowe JSON-y dają **0 naruszeń**, a każda reguła ma test na celowo zepsutej kopii wzorca.
 
+## Ustalenia z ekspertami i znane naruszenia wzorców
+
+Specyfikacja wygrywa ze wzorcami (`CLAUDE.md`). Ustalenia z ekspertami domenowymi:
+- **Strona FINISH:** w sekcjach dozwolone są `INFO_SECTION` i `TEXT_BLOCK`. Inne pola są niedozwolone.
+- **Dane inicjalne:** pole z `defaultValueType: EXTERNAL_SYSTEM` musi mieć `readOnly: true`. Wyjątki to tylko `MLPZ.phoneNumber` i `MLPZ.email`, bo te dane mogą być nieaktualne; lista jest w stałej `EDITABLE_INITIAL_DATA` we wspólnym module `src/hacknation_2026/initial_data.py` (używa go też builder). `defaultValue` musi wskazywać źródło i atrybut z tabel „Dane inicjalne”.
+- **Identyfikatory:** `id` stron, pól i `flow.links` muszą być UUID i być unikalne.
+
+Dlatego wzorce dają kilka **znanych** naruszeń. Wypisuje je `KNOWN_REFERENCE_VIOLATIONS` w `tests/rules/test_check.py`, a każda inna pozycja byłaby fałszywym alarmem:
+- **Wzorzec 1 i 5:** adres z MLPZ (`kod_pocztowy`, `ulica`, `numer_budynku`, `numer_lokalu`) ma `readOnly: false`.
+- **Wzorzec 1:** trzy pola mają `validation: {}`, a według Opisu JSON to ma być tablica.
+- **Wzorzec 5:** opcja „Reprezentant” nie ma `techName`, a `flow.links[].id` to nie UUID.
+
+Wynik buildera (blok D) daje 0 naruszeń.
+
+Pełna lista kodów naruszeń jest w `rules/check.py`. Test `test_every_rule_has_a_broken_copy` pilnuje, żeby każdy kod miał test na zepsutej kopii wzorca.
+
 ## Zasady wspólne
 
 - **Najpierw blok 0** (kontrakty). Wszystkie inne bloki startują równolegle po nim i komunikują się **wyłącznie** przez typy z bloku 0.

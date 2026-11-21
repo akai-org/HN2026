@@ -6,13 +6,14 @@ Standardy, Słowniki, Dane inicjalne). Rules that hold for every field are enfor
 
 from dataclasses import dataclass, field as dc_field
 
+from hacknation_2026 import initial_data
 from hacknation_2026.builder import jsonata, layout, standard_sections as std
 from hacknation_2026.config import Settings
 from hacknation_2026.contracts import Condition, FieldSpec, FormDefinition, FormSpec, PageSpec
+from hacknation_2026.initial_data import EXTERNAL_SYSTEM
 
 from hacknation_2026.enrich.enrich import enrich_field
 
-EXTERNAL_SYSTEM = "EXTERNAL_SYSTEM"
 MAX_TITLE_LENGTH = 255  # Reguły techniczne: title max 255 characters
 # Reguły techniczne: the list of validators
 VALIDATORS = ("REQUIRED", "EMAIL", "PESEL", "NIP", "REGON", "ZIP_CODE", "EPUAP", "ADE", "SERIAL_NUMBER_ID_CARD")
@@ -37,7 +38,8 @@ class _NoEnrichment:
 class FieldFactory:
   """Builds a field node. Explicit arguments win over block E's enrichment; the technical rules win over both:
 
-  - initial data (`defaultValueType: EXTERNAL_SYSTEM`) => read-only (Dane inicjalne),
+  - initial data (`defaultValueType: EXTERNAL_SYSTEM`) => read-only (Dane inicjalne), except the register attributes
+    in `initial_data.EDITABLE_INITIAL_DATA` (domain experts: may be outdated), which are editable,
   - a dictionary only on SELECT/RADIO/CHECKBOX, and then `options` is empty (Reguły techniczne, Słowniki),
   - block E may turn a TEXT_FIELD into a more specific type (country -> SELECT with Kraje, birth date -> DATEPICKER),
   - block E's dictionary only for a field without options of its own: the paper form's options are kept,
@@ -98,7 +100,9 @@ class FieldFactory:
 
     is_read_only = enrichment.read_only if read_only is None else read_only
     if optional.get("defaultValueType") == EXTERNAL_SYSTEM:
-      is_read_only = True
+      # read-only, unless the register attribute may be outdated (then editable unless asked otherwise)
+      editable = initial_data.is_editable(str(optional.get("defaultValue", "")))
+      is_read_only = bool(read_only) if editable else True
 
     return layout.field(
       type_, tech_name, title,
