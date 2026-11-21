@@ -1,0 +1,303 @@
+/* Konwerter formularzy: wygląd w duchu serwisów administracji (czytelna typografia, granat,
+   wyraźny fokus), odświeżony jak na stronie /makieta. Kolory są zmiennymi, żeby tryb
+   wysokiego kontrastu mógł je podmienić w jednym miejscu. */
+
+.kv-app {
+  --blue: #0b4ea2;
+  --blue-hover: #093f86;
+  --blue-soft: #eaf1fb;
+  --blue-ring: #c9dbf3;
+  --kv-red: #d4213d;
+  --kv-focus: #0b4ea2;
+  --kv-focus-halo: #ffbf47;
+  --kv-highlight: #fff4cc;
+  --kv-highlight-edge: #f2b600;
+  --kv-paper: #ffffff;
+  font-family: "Atkinson Hyperlegible Next Variable", "Atkinson Hyperlegible Next", system-ui, sans-serif;
+  font-feature-settings: "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Wyraźny fokus (WCAG 2.4.7 / 2.4.11): granatowa obwódka z żółtą poświatą widoczna na każdym tle. */
+.kv-app :focus-visible {
+  outline: 3px solid var(--kv-focus);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--kv-focus-halo);
+}
+
+.kv-app .cm-editor.cm-focused,
+.kv-app .cm-content:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.kv-app .kv-editor-host:focus-within {
+  outline: 3px solid var(--kv-focus);
+  outline-offset: -3px;
+}
+
+.kv-skip {
+  position: fixed;
+  top: -6rem;
+  left: 0.5rem;
+  z-index: 100;
+  border-radius: 0.75rem;
+  background: var(--blue);
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  color: #fff;
+  transition: top 150ms ease-out;
+}
+
+.kv-skip:focus {
+  top: 0.5rem;
+}
+
+/* ---------- ustawienia dostępności (klasy na <html>) ---------- */
+
+html.kv-text-lg {
+  font-size: 112.5%;
+}
+
+html.kv-text-xl {
+  font-size: 125%;
+}
+
+html.kv-underline .kv-app a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+html.kv-hc .kv-app {
+  --blue: #00226b;
+  --blue-hover: #000000;
+  --blue-soft: #ffffff;
+  --blue-ring: #000000;
+  --kv-focus: #000000;
+  --kv-focus-halo: #ffd400;
+  --kv-highlight: #ffe766;
+  --kv-highlight-edge: #000000;
+  --color-slate-50: #ffffff;
+  --color-slate-100: #ffffff;
+  --color-slate-200: #1f2937;
+  --color-slate-300: #111827;
+  --color-slate-400: #111827;
+  --color-slate-500: #000000;
+  --color-slate-600: #000000;
+  --color-slate-700: #000000;
+  --color-emerald-600: #005a2b;
+  --color-emerald-700: #004d25;
+  --color-red-600: #9b0018;
+  --color-red-700: #8a0016;
+  --color-amber-600: #6b4500;
+  --color-amber-800: #4d3200;
+}
+
+html.kv-hc .kv-app [class*="shadow"] {
+  box-shadow: none !important;
+}
+
+html.kv-hc .kv-app [class*="border-slate"],
+html.kv-hc .kv-app [class*="ring-slate"] {
+  border-color: #000 !important;
+}
+
+html.kv-reduce-motion .kv-app *,
+html.kv-reduce-motion .kv-app *::before,
+html.kv-reduce-motion .kv-app *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kv-app *,
+  .kv-app *::before,
+  .kv-app *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- animacje ---------- */
+
+@keyframes kv-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes kv-rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes kv-pop-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes kv-slide-in {
+  from { transform: translateX(100%); }
+  to { transform: none; }
+}
+
+@keyframes kv-indeterminate {
+  from { transform: translateX(-110%); }
+  to { transform: translateX(330%); }
+}
+
+@keyframes kv-flash {
+  0% { box-shadow: 0 0 0 0 rgb(242 182 0 / 0.65); }
+  100% { box-shadow: 0 0 0 10px rgb(242 182 0 / 0); }
+}
+
+/* Okna dialogowe blokują przewijanie strony pod spodem. */
+html:has(dialog.kv-modal[open]) {
+  overflow: hidden;
+}
+
+dialog.kv-modal::backdrop {
+  background: rgb(15 23 42 / 0.45);
+  backdrop-filter: blur(3px);
+}
+
+/* ---------- podgląd eUsługi ---------- */
+
+.eu-rich {
+  line-height: 1.6;
+}
+
+.eu-rich p + p {
+  margin-top: 0.5rem;
+}
+
+.eu-rich a {
+  color: var(--blue);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.eu-rich img {
+  display: inline-block;
+  height: 0.9em;
+  width: auto;
+  margin-left: 0.2em;
+  vertical-align: baseline;
+}
+
+.eu-rich ul,
+.eu-rich ol {
+  margin: 0.4rem 0 0.4rem 1.25rem;
+  list-style: disc;
+}
+
+.eu-field[data-selected="true"] {
+  background: var(--kv-highlight);
+  box-shadow: inset 4px 0 0 var(--kv-highlight-edge);
+}
+
+.eu-field[data-flash="true"] {
+  animation: kv-flash 700ms ease-out;
+}
+
+.eu-field[data-hidden="true"] {
+  opacity: 0.6;
+  background-image: repeating-linear-gradient(-45deg, transparent 0 8px, rgb(148 163 184 / 0.12) 8px 16px);
+}
+
+/* ---------- edytor JSON (CodeMirror) ---------- */
+
+.kv-app .cm-editor {
+  height: 100%;
+  font-size: 0.8125rem;
+}
+
+.kv-app .cm-scroller {
+  font-family: "Cascadia Mono", "JetBrains Mono", Consolas, ui-monospace, monospace;
+  line-height: 1.6;
+}
+
+.kv-app .cm-kv-highlight {
+  background: var(--kv-highlight);
+}
+
+.kv-app .cm-kv-highlight-line {
+  background: var(--kv-highlight);
+  box-shadow: inset 3px 0 0 var(--kv-highlight-edge);
+}
+
+/* ---------- warstwa tekstu PDF (pdf.js): tekst do zaznaczania i dla czytników ekranu ---------- */
+
+.kv-textlayer {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  line-height: 1;
+  text-align: initial;
+  opacity: 1;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+  z-index: 1;
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+}
+
+.kv-textlayer :is(span, br) {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+
+.kv-textlayer > :not(.markedContent),
+.kv-textlayer .markedContent span:not(.markedContent) {
+  z-index: 1;
+  --font-height: 0;
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+  --scale-x: 1;
+  --rotate: 0deg;
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+}
+
+.kv-textlayer .markedContent {
+  display: contents;
+}
+
+.kv-textlayer ::selection {
+  background: rgb(11 78 162 / 0.28);
+}
+
+/* Paski przewijania w kolumnach: cieńsze, ale wciąż łatwe do chwycenia. */
+.kv-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 transparent;
+}
+
+/* Siatka formularza COI: 3 kolumny (x, cols z JSON-a); w wąskiej kolumnie wszystko na całą szerokość. */
+.eu-preview {
+  container-type: inline-size;
+}
+
+.eu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 1.25rem;
+  row-gap: 0.25rem;
+}
+
+.eu-grid > .eu-cell {
+  grid-column: var(--eu-col, 1 / -1);
+  min-width: 0;
+}
+
+@container (max-width: 540px) {
+  .eu-grid > .eu-cell {
+    grid-column: 1 / -1;
+  }
+}
