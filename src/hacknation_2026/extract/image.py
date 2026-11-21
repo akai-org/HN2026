@@ -3,14 +3,16 @@
 import io
 import math
 
+import numpy as np
 import pytesseract
 from PIL import Image, ImageOps
 
 from hacknation_2026.contracts import AppError, Block, ExtractedDocument, FileFormat
-from hacknation_2026.extract._text import line_block
+from hacknation_2026.extract._text import BOX, line_block
+from hacknation_2026.extract.fields import BOX as BOX_MARK, FIELD, Mark, detect_marks
 
 A4_RATIO = 297 / 210
-MIN_WORD_CONFIDENCE = 40   # below this a word is OCR noise, usually misread fill-in dots
+MIN_WORD_CONFIDENCE = 40   # below this a word without letters is OCR noise, usually misread fill-in dots
 
 
 def extract_image(data: bytes, fmt: FileFormat, lang: str = "pol") -> ExtractedDocument:
@@ -36,20 +38,35 @@ def split_pages(image: Image.Image) -> list[Image.Image]:
 def ocr_blocks(image: Image.Image, page: int, lang: str) -> list[Block]:
   # Sparse mode (psm 11) finds the most labels on forms full of dotted fill-in lines,
   # but loses line structure, so words are regrouped into lines by their position.
-  # shortcut: a few small labels are still missed; a vision LLM would read them better.
   data = pytesseract.image_to_data(image, lang=lang, config="--psm 11", output_type=pytesseract.Output.DICT)
-  words = [(top, left, height, word, float(conf))
-           for word, conf, top, left, height in zip(data["text"], data["conf"], data["top"], data["left"], data["height"])
+  words = [(top, left, height, word, float(conf), left + width)
+           for word, conf, top, left, height, width
+           in zip(data["text"], data["conf"], data["top"], data["left"], data["height"], data["width"])
            if word.strip()]
+  marks = detect_marks(np.array(image))
+  words = [w for w in words if not _is_noise(w, marks)]
+  # Fill-in lines and checkboxes come from the image itself (OCR reads text only) and join the words by position.
+  word_height = sorted(w[2] for w in words)[len(words) // 2] if words else 20
+  for mark in marks:
+    token = BOX if mark.kind == BOX_MARK else "____"
+    center = mark.cy - (0.35 * word_height if mark.kind == FIELD else 0)   # a blank line sits on the text baseline
+    words.append((round(center - word_height / 2), mark.x0, word_height, token, 100.0, mark.x1))
   blocks = []
   for line in _group_lines(words):
-    if all(conf < MIN_WORD_CONFIDENCE for *_, conf in line):
-      continue
-    # low-confidence words are almost always misread fill-in dots, so they become a blank marker
-    block = line_block(" ".join(word if conf >= MIN_WORD_CONFIDENCE else "...." for *_, word, conf in line), page)
+    block = line_block(" ".join(w[3] for w in line), page)
     if block:
       blocks.append(block)
   return blocks
+
+
+def _is_noise(word: tuple, marks: list[Mark]) -> bool:
+  """Misread fill-in dots: a low-confidence word without letters, or any word lying on a detected blank line."""
+  top, left, height, text, conf, right = word
+  if conf < MIN_WORD_CONFIDENCE and sum(ch.isalnum() for ch in text) < len(text) / 2:
+    return True
+  center_x, bottom = (left + right) / 2, top + height
+  return any(m.kind == FIELD and m.x0 <= center_x <= m.x1 and m.y0 - height <= bottom <= m.y1 + height / 2
+             and sum(ch.isalpha() for ch in text) < 2 for m in marks)
 
 
 def _group_lines(words: list[tuple[int, int, int, str, float]]) -> list[list[tuple]]:
