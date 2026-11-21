@@ -5,7 +5,7 @@ Każdy plik opisuje jeden blok do zrobienia przez niezależnego agenta. Agent do
 | Blok | Zakres |
 |---|---|
 | [0](00-kontrakty.md) | Kontrakty – **zrobione** |
-| [A](A-walidacja-pliku.md) | Walidacja pliku |
+| [A](A-walidacja-pliku.md) | Walidacja pliku – **zrobione** |
 | [B1](B1-ekstrakcja-pdf-obrazy.md) | Ekstrakcja: PDF i obrazy |
 | [B2](B2-ekstrakcja-word.md) | Ekstrakcja: DOCX i DOC |
 | [B3](B3-ekstrakcja-arkusze.md) | Ekstrakcja: XLSX i ODS |
