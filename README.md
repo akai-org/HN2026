@@ -47,7 +47,7 @@ Testy w `tests/ai/` nie łączą się z żadnym API. HTTP jest zamockowany (`htt
 
 ### Ręczny test analizy LLM na prawdziwym modelu
 
-Endpoint konwersji powstaje w bloku G. Do tego czasu `analyze()` wywołuje się bezpośrednio. Uzupełnij `.env` (klucz i model) i uruchom polecenie **z katalogu głównego repozytorium** (tam leży `.env`). Teksty formularzy do testów leżą w katalogu głównym: `formularz.txt` (formularz 5, nadpłata podatku) i `formularz_1.txt` (formularz 1, numer porządkowy). Własny formularz przetestujesz, wklejając tekst z blankietu `.docx` albo `.pdf` do pliku i podając jego nazwę zamiast `formularz.txt`.
+Samą analizę LLM, bez budowy formularza, sprawdzisz, wywołując `analyze()` bezpośrednio. Uzupełnij `.env` (klucz i model) i uruchom polecenie **z katalogu głównego repozytorium** (tam leży `.env`). Teksty formularzy do testów leżą w katalogu głównym: `formularz.txt` (formularz 5, nadpłata podatku) i `formularz_1.txt` (formularz 1, numer porządkowy). Własny formularz przetestujesz, wklejając tekst z blankietu `.docx` albo `.pdf` do pliku i podając jego nazwę zamiast `formularz.txt`.
 
 ```bash
 uv run python - formularz.txt <<'EOF'
@@ -70,3 +70,5 @@ Wynik to `FormSpec`: tytuł, urząd, flagi (`allows_other_person`, `allows_legal
 uv run hacknation-2026          # http://localhost:8000, sprawdzenie: GET /api/health
 docker compose up --build       # http://localhost:3000
 ```
+
+`POST /api/forms/convert` (plik w polu `file`) zwraca `form` (gotowy JSON formularza zgodny z `FormDefinition`), `warnings` oraz `proposed_dictionaries`, czyli propozycje nowych słowników z nazwą, przykładowymi wartościami i polami, które by ich używały.

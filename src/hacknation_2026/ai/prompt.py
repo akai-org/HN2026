@@ -40,6 +40,13 @@ Te części dokłada później system, więc POMIŃ je całkowicie:
 - podpis, data i miejscowość złożenia wniosku, pieczęć, pola "wypełnia urząd", adnotacje urzędowe, pouczenia.
 Zamiast tych sekcji ustaw odpowiednie flagi i "consents".
 
+## Dane wnioskodawcy, które zostają w "pages"
+- "applicant_data": true dla pola, w które wnioskodawca wpisuje SWOJE dane osobowe niewymienione wyżej, np. data urodzenia,
+  miejsce urodzenia, obywatelstwo, imię ojca, nazwisko rodowe, stan cywilny, adres zameldowania. System może wypełnić
+  takie pole danymi z rejestru.
+- "applicant_data": false dla wszystkich innych pól, także dla danych innej osoby (małżonka, dziecka, zmarłego,
+  właściciela) i danych przedmiotu sprawy.
+
 ## Strony i sekcje
 - Pogrupuj pola merytoryczne w tematyczne strony (zwykle 1–2), np. "Informacje o …", "Szczegóły …".
   Tytuł strony to krótki, naturalny opis tematu, a nie numer punktu z druku.

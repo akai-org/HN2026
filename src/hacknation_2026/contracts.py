@@ -73,6 +73,7 @@ class FieldSpec(BaseModel):
   description: str = ""            # plain text; builder wraps it in HTML
   options: list[str] = []          # RADIO / CHECKBOX / SELECT
   show_if: list[Condition] = []    # all conditions must hold (AND)
+  applicant_data: bool = False     # the applicant's own personal data; block E may feed it from a register
 
 
 class SectionSpec(BaseModel):
@@ -109,6 +110,14 @@ class RuleViolation(BaseModel):
   path: str = ""                               # e.g. "tabs[0].questions[2].field"
 
 
+class ProposedDictionary(BaseModel):
+  """A new dictionary suggested by block E (Słowniki: name, structure and use in the form; optional extension)."""
+  name: str                                    # e.g. "RODZAJ_POJAZDU"
+  values_example: list[str]                    # values found on the paper form
+  used_by: list[str]                           # labels of the fields that would use it
+
+
 class ConvertResult(BaseModel):
   form: FormDefinition
   warnings: list[str] = []
+  proposed_dictionaries: list[ProposedDictionary] = []

@@ -13,7 +13,7 @@ FIXTURES = pathlib.Path(__file__).parent / "fixtures"
 
 @dataclass
 class StubEnrichment:
-  """Same shape as block E's `Enrichment`; empty until block E lands."""
+  """Same shape as block E's `Enrichment`, so builder tests do not depend on E's catalog."""
   dictionary_name: str | None = None
   multi_level_tree: bool = False
   search_enabled: bool = False
@@ -21,6 +21,7 @@ class StubEnrichment:
   external: bool = False
   read_only: bool = False
   validators: list[str] = field(default_factory=list)
+  field_type: str | None = None
 
 
 @pytest.fixture(autouse=True)

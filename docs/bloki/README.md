@@ -9,11 +9,11 @@ Każdy plik opisuje jeden blok do zrobienia przez niezależnego agenta. Agent do
 | [B1](B1-ekstrakcja-pdf-obrazy.md) | Ekstrakcja: PDF i obrazy – **zrobione** |
 | [B2](B2-ekstrakcja-word.md) | Ekstrakcja: DOCX i DOC – **zrobione** |
 | [B3](B3-ekstrakcja-arkusze.md) | Ekstrakcja: XLSX i ODS – **zrobione** |
-| [C](C-analiza-llm.md) | Analiza LLM |
-| [D](D-builder.md) | Builder FormDefinition |
-| [E](E-wzbogacanie-pol.md) | Wzbogacanie pól |
+| [C](C-analiza-llm.md) | Analiza LLM – **zrobione** |
+| [D](D-builder.md) | Builder FormDefinition – **zrobione** |
+| [E](E-wzbogacanie-pol.md) | Wzbogacanie pól – **zrobione** |
 | [F](F-kontrola-regul.md) | Kontrola reguł |
-| [G](G-api-pipeline.md) | API i pipeline – **zrobione** (do podpięcia D i F) |
+| [G](G-api-pipeline.md) | API i pipeline – **zrobione** (D i E podpięte, F do podpięcia) |
 | [H](H-docker-readme.md) | Docker, compose, README |
 | [I](I-ewaluacja.md) | Ewaluacja |
 | [J](J-poprawa-detekcji.md) | Poprawa detekcji: kolumny, metadane regułami, linie w OCR, kształty DOCX, listy DOC, konwersja (po B1/B2) |

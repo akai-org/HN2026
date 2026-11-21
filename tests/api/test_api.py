@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from hacknation_2026 import pipeline
 from hacknation_2026.app import app
 from hacknation_2026.config import Settings, get_settings
-from hacknation_2026.contracts import AppError, FileFormat, FormSpec
+from hacknation_2026.contracts import AppError, FieldSpec, FileFormat, FormSpec, PageSpec, SectionSpec
 from hacknation_2026.extract import extract_document
 
 BLANKIETY = pathlib.Path(__file__).parents[2] / "dane_zadania" / "blankiety"
@@ -34,14 +34,39 @@ def upload(client, name: str, data: bytes):
   return client.post("/api/forms/convert", files={"file": (name, data)})
 
 
-def test_convert_runs_validation_extraction_and_llm(client):
+def form_fields(form: dict):
+  for tab in form["tabs"]:
+    for question in tab["questions"]:
+      yield question["field"]
+      for child in question["field"].get("repeatingSectionGrid") or []:
+        yield child["field"]
+
+
+def test_convert_runs_validation_extraction_llm_and_builder(client):
   http, calls = client
   response = upload(http, FORM5.name, FORM5.read_bytes())
   assert response.status_code == 200
   body = response.json()
   assert body["form"]["title"] == "Wniosek o test"
-  assert body["warnings"] == [pipeline.PARTIAL_RESULT_WARNING]
+  assert body["form"]["tabs"] and body["form"]["flow"]     # a FormDefinition from the builder, not the FormSpec
+  assert body["warnings"] == [] and body["proposed_dictionaries"] == []
   assert "nadpłaty podatku" in calls[0].as_text()          # the LLM got the extracted text
+
+
+def test_convert_enriches_fields_and_proposes_dictionaries(client, monkeypatch):
+  http, _ = client
+  vehicles = ["Samochód osobowy", "Samochód ciężarowy", "Motocykl", "Ciągnik rolniczy", "Przyczepa", "Autobus"]
+  spec = FormSpec(title="Wniosek o test", pages=[PageSpec(title="Sprawa", sections=[SectionSpec(key="s", title="S", fields=[
+    FieldSpec(key="kraj_urodzenia", label="Kraj urodzenia", type="TEXT_FIELD", required=True),
+    FieldSpec(key="rodzaj_pojazdu", label="Rodzaj pojazdu", type="SELECT", required=True, options=vehicles),
+  ])])])
+  monkeypatch.setattr(pipeline, "analyze", lambda *_: spec)
+  body = upload(http, FORM5.name, FORM5.read_bytes()).json()
+  kraj = next(f for f in form_fields(body["form"]) if f["title"] == "Kraj urodzenia")
+  assert kraj["type"] == "SELECT" and kraj["dictionaryName"] == "Kraje"
+  assert body["proposed_dictionaries"] == [
+    {"name": "RODZAJ_POJAZDU", "values_example": vehicles, "used_by": ["Rodzaj pojazdu"]},
+  ]
 
 
 @pytest.mark.parametrize("name,data,status,code", [

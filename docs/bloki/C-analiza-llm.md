@@ -18,6 +18,7 @@ def analyze(doc: ExtractedDocument, settings: Settings) -> FormSpec
 - Prompt po polsku, a w nim:
   - opis typów pól i kiedy którego użyć, zgodnie ze Standardami (dropdown > 5 opcji, zgody nie jako checkbox…),
   - polecenie, by **pominąć** dane wnioskodawcy, adres, kontakt, zgody i podpis, bo te sekcje dokłada builder; wystarczą flagi i `consents`,
+  - `applicant_data: true` tylko dla własnych danych osobowych wnioskodawcy, które zostają w `pages` (np. data urodzenia, obywatelstwo, adres zameldowania); blok E zasila je danymi inicjalnymi,
   - grupowanie pól merytorycznych w tematyczne strony i sekcje,
   - warunki `show_if` dla pól zależnych.
 - Wybór modelu: przetestuj 2–3 modele (np. Bielik 11B v2, Qwen2.5 7B/14B Instruct; licencje Apache 2.0) na tekstach formularzy 1 i 5. Kryterium to porównanie z merytorycznymi stronami wzorców (np. „Informacje o nadpłacie”). Wynik zapisz w `docs/wybor-modelu.md`.

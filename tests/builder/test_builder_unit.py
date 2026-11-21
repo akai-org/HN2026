@@ -227,6 +227,39 @@ def test_enrichment_is_applied_to_subject_fields(settings, monkeypatch):
   assert wybor["validation"] == ["REQUIRED", "EMAIL"], "only validators from Reguły techniczne"
 
 
+def test_enrichment_can_turn_text_field_into_select(settings, monkeypatch):
+  def enrich_field(label, field_type, required, applicant_data):
+    if field_type == "TEXT_FIELD":
+      return StubEnrichment(dictionary_name="Kraje", search_enabled=True, field_type="SELECT")
+    return StubEnrichment(field_type="DATEPICKER")  # ignored: only a TEXT_FIELD changes its type
+
+  monkeypatch.setattr(build, "enrich_field", enrich_field)
+  spec = minimal_spec(pages=[PageSpec(title="Sprawa", sections=[SectionSpec(key="s", title="Sekcja", fields=[
+    FieldSpec(key="kraj", label="Kraj", type="TEXT_FIELD", required=True),
+    FieldSpec(key="wybor", label="Wybór", type="RADIO", required=True, options=["A", "B"]),
+  ])])])
+  section = build_form(spec, settings)["tabs"][1]["questions"][0]["field"]["repeatingSectionGrid"]
+  kraj, wybor = (item["field"] for item in section)
+  assert kraj["type"] == "SELECT" and kraj["dictionaryName"] == "Kraje" and kraj["options"] == []
+  assert wybor["type"] == "RADIO"
+
+
+def test_enrichment_dictionary_skipped_when_field_has_own_options(settings, monkeypatch):
+  monkeypatch.setattr(build, "enrich_field", lambda *_: StubEnrichment(dictionary_name="Kraje", search_enabled=True))
+  kraj = build_form(subject_spec(options=["Polska", "Niemcy", "Inny"]), settings)["tabs"][1]["questions"][0]
+  kraj = kraj["field"]["repeatingSectionGrid"][1]["field"]
+  assert "dictionaryName" not in kraj, "the paper form's options win over a dictionary guessed from the label"
+  assert [option["name"] for option in kraj["options"]] == ["Polska", "Niemcy", "Inny"]
+
+
+def test_applicant_data_is_passed_to_enrichment(settings, stub_enrichment):
+  spec = minimal_spec(pages=[PageSpec(title="Sprawa", sections=[SectionSpec(key="s", title="Sekcja", fields=[
+    FieldSpec(key="data_urodzenia", label="Data urodzenia", type="DATEPICKER", required=True, applicant_data=True),
+  ])])])
+  build_form(spec, settings)
+  assert ("Data urodzenia", "DATEPICKER", True, True) in stub_enrichment
+
+
 def test_standard_fields_are_not_enriched(settings, stub_enrichment):
   build_form(load_spec("form5_spec.json"), settings)
   labels = {label for label, *_ in stub_enrichment}

@@ -2,7 +2,7 @@
 
 Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i zależności: `docs/bloki/README.md`.
 
-> **Status: zrobione.** Kod jest w `src/hacknation_2026/contracts.py` i `src/hacknation_2026/config.py` (testy: `tests/contracts/`) i to on jest źródłem prawdy. Dodatkowo `Settings.max_file_size_bytes` (wynik w bajtach) oraz czytanie `.env`.
+> **Status: zrobione.** Kod jest w `src/hacknation_2026/contracts.py` i `src/hacknation_2026/config.py` (testy: `tests/contracts/`) i to on jest źródłem prawdy. Dodatkowo `Settings.max_file_size_bytes` (wynik w bajtach) oraz czytanie `.env`. Później, razem z blokiem E, doszły `FieldSpec.applicant_data`, `ProposedDictionary` i `ConvertResult.proposed_dictionaries`.
 
 ## Zadanie
 
@@ -55,6 +55,7 @@ class FieldSpec(BaseModel):
   description: str = ""             # zwykły tekst (builder robi z niego HTML)
   options: list[str] = []           # dla RADIO/CHECKBOX/SELECT
   show_if: list[Condition] = []     # wszystkie warunki muszą być spełnione (AND)
+  applicant_data: bool = False      # własne dane osobowe wnioskodawcy; blok E może je zasilić z rejestru
 
 class SectionSpec(BaseModel):
   key: str
@@ -85,9 +86,15 @@ class RuleViolation(BaseModel):
   message: str
   path: str = ""                                # np. "tabs[0].questions[2].field"
 
+class ProposedDictionary(BaseModel):          # propozycja nowego słownika (Słowniki: nazwa, struktura, zastosowanie)
+  name: str                                     # np. "RODZAJ_POJAZDU"
+  values_example: list[str]                     # wartości z blankietu
+  used_by: list[str]                            # etykiety pól, które by go używały
+
 class ConvertResult(BaseModel):
   form: FormDefinition
   warnings: list[str] = []
+  proposed_dictionaries: list[ProposedDictionary] = []
 ```
 
 ```python

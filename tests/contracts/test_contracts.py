@@ -2,7 +2,7 @@ import pytest
 from pydantic import ValidationError
 
 from hacknation_2026.config import Settings
-from hacknation_2026.contracts import Block, ExtractedDocument, FileFormat, FormSpec
+from hacknation_2026.contracts import Block, ConvertResult, ExtractedDocument, FileFormat, FormSpec, ProposedDictionary
 
 
 def test_as_text_flattens_blocks_with_page_markers():
@@ -26,8 +26,16 @@ def test_form_spec_schema_and_roundtrip():
          '"show_if": [{"field": "g", "equals": "A"}]}]}]}]}')
   spec = FormSpec.model_validate_json(raw)
   assert spec.pages[0].sections[0].fields[0].show_if[0].equals == "A"
+  assert spec.pages[0].sections[0].fields[0].applicant_data is False   # optional for the LLM, off by default
   with pytest.raises(ValidationError):
     FormSpec.model_validate_json(raw.replace('"RADIO"', '"WRONG"'))
+
+
+def test_convert_result_defaults():
+  result = ConvertResult(form={"title": "Wniosek o test"})
+  assert result.warnings == [] and result.proposed_dictionaries == []
+  proposal = ProposedDictionary(name="RODZAJ_POJAZDU", values_example=["Motocykl"], used_by=["Rodzaj pojazdu"])
+  assert ConvertResult(form={}, proposed_dictionaries=[proposal]).model_dump()["proposed_dictionaries"][0]["name"] == "RODZAJ_POJAZDU"
 
 
 def test_settings_from_env(monkeypatch):
