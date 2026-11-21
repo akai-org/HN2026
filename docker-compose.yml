@@ -1,29 +1,4 @@
 services:
-  ollama:
-    image: ollama/ollama:0.6.8
-    restart: unless-stopped
-    volumes:
-      - ollama_data:/root/.ollama
-    environment:
-      LLM_MODEL: ${LLM_MODEL:-hf.co/unsloth/gemma-4-E4B-it-GGUF:UD-Q8_K_XL}
-    entrypoint:
-      - /bin/sh
-      - -c
-      - |
-        ollama serve &
-        pid=$$!
-        until ollama list >/dev/null 2>&1; do
-          sleep 1
-        done
-        ollama pull "$$LLM_MODEL"
-        wait $$pid
-    healthcheck:
-      test: ["CMD", "ollama", "list"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
-
   app:
     build:
       context: .
@@ -35,12 +10,5 @@ services:
       - path: .env
         required: false
     environment:
-      LLM_BASE_URL: http://ollama:11434/v1
-      LLM_API_KEY: ${LLM_API_KEY:-ollama}
-      LLM_MODEL: ${LLM_MODEL:-hf.co/unsloth/gemma-4-E4B-it-GGUF:UD-Q8_K_XL}
-    depends_on:
-      ollama:
-        condition: service_healthy
-
-volumes:
-  ollama_data:
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://api.edenai.run/v3}
+      LLM_MODEL: ${LLM_MODEL:-google/gemma-4-31b-it}
