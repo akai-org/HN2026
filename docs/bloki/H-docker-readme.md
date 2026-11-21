@@ -12,7 +12,6 @@ Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i
 - Obrazy z przypiętymi wersjami (bez `latest`), użytkownik bez uprawnień roota, w obrazie `tesseract-ocr` z `tesseract-ocr-pol` (i ewentualnie to, czego wymaga blok B2).
 - Aplikacja na porcie **3000** (`HOST=0.0.0.0`, `PORT=3000` już są w Dockerfile).
 - `docker-compose.yml`: serwis `app` (port 3000, `env_file: .env`) i serwis `ollama` z przypiętą wersją, wolumenem na modele i portem tylko w sieci compose, `LLM_BASE_URL=http://ollama:11434`. Model pobierany przy starcie (entrypoint z `ollama pull`).
-- Sekrety (`JWT_SECRET`, hasło) tylko z env, w `.env.example` placeholdery.
 - README (wymóg zadania): build obrazu, uruchomienie, opis konfiguracji (tabela zmiennych z `Settings`), opis REST API z przykładami `curl`, skrót architektury (diagram pipeline'u z `plan-implementacji.md`).
 
 **Gotowe, gdy:** `docker compose up --build` startuje oba serwisy, a `curl localhost:3000/api/health` zwraca `ok`.

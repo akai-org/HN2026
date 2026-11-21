@@ -94,11 +94,6 @@ class ConvertResult(BaseModel):
 # config.py – pydantic-settings, zmienne środowiskowe
 class Settings(BaseSettings):
   max_file_size_mb: int = 10
-  jwt_secret: str                    # wymagany
-  jwt_algorithm: str = "HS256"
-  jwt_expire_minutes: int = 60
-  auth_username: str
-  auth_password: str
   llm_base_url: str = "http://127.0.0.1:11434"
   llm_model: str = "bielik"          # finalna nazwa po wyborze w bloku C
   llm_timeout_s: int = 300

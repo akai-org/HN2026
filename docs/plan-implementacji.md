@@ -15,7 +15,7 @@ W kodzie nie ma treści żadnego konkretnego formularza. Wszystko, co zależy od
   - nazwa ≤ 250 znaków i bez `; : > < / \ | ' * % $`,
   - limit rozmiaru konfigurowalny.
 - Plik tylko w pamięci, nic nie zapisujemy na dysku.
-- JWT, konfiguracja przez zmienne środowiskowe.
+- Konfiguracja przez zmienne środowiskowe.
 - Docker: przypięte wersje obrazów, użytkownik bez uprawnień roota.
 - README: build, uruchomienie, konfiguracja, API.
 
@@ -65,7 +65,6 @@ Wzorcem są 2 dostarczone JSON-y (`dane_zadania/blankiety/1.*` i `5.*`). Tam, gd
 
 | | |
 |---|---|
-| `POST /api/auth/token` | login → JWT |
 | `POST /api/forms/convert` | plik → JSON formularza |
 | `GET /api/health` | stan aplikacji i LLM |
 
@@ -73,7 +72,7 @@ Opis API generuje FastAPI (`/docs`).
 
 ## Kolejność prac
 
-1. **Kontrakt:** modele Pydantic wyniku według wzorców, konfiguracja, JWT, walidacja pliku, endpoint `convert`.
+1. **Kontrakt:** modele Pydantic wyniku według wzorców, konfiguracja, walidacja pliku, endpoint `convert`.
 2. **Builder i kontrola reguł:** test na ręcznie spisanym opisie formularza 5 → wynik zbliżony do wzorca 5.
 3. **Ekstrakcja tekstu** dla wszystkich formatów.
 4. **LLM:** prompt, wybór modelu na formularzach 1 i 5, spięcie całego pipeline'u.
