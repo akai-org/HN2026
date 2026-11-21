@@ -47,10 +47,11 @@ STAMP_DUTY_TEXT = (
   "W tytule przelewu wpisz „{title} – opłata skarbowa za pełnomocnictwo”.\n"
   "Dodaj plik z potwierdzeniem przelewu. Znajdziesz go na stronie lub w aplikacji swojego banku."
 )
-# "Możesz je zmienić lub usunąć." from Standardy is left out: initial data fields are read-only (Dane inicjalne).
+# verbatim from Standardy; phone and e-mail from MLPZ are editable (initial_data.EDITABLE_INITIAL_DATA)
 CONTACT_DESCRIPTION = (
   "Wpisanie danych do kontaktu może przyspieszyć załatwienie sprawy. Urzędnik będzie mógł skontaktować się z Tobą "
-  "w przypadku pytań lub wątpliwości.\nJeśli widzisz uzupełnione dane, sprawdź, czy są poprawne."
+  "w przypadku pytań lub wątpliwości.\nJeśli widzisz uzupełnione dane, sprawdź, czy są poprawne. "
+  "Możesz je zmienić lub usunąć."
 )
 
 # document kind (first word of the title) -> (verb "wnioskujesz", participle "składany")

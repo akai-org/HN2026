@@ -45,14 +45,14 @@ To samo dla formularza 1.
 Źródłem prawdy są dokumenty z `dane_zadania/materialy/`: Reguły techniczne, Opis JSON, Standardy, Słowniki i Dane inicjalne. Wzorce JSON mogą zawierać błędy i służą tylko do porównania tam, gdzie specyfikacja milczy. Testy: `tests/builder/test_builder_rules.py` (specyfikacja) i `test_builder_reference.py` (wzorce, lista `SPEC_OVERRIDES`).
 
 - **Strona końcowa**: sekcja „Podgląd” z polem `INFO_SECTION`, a nie `TEXT_BLOCK`. Reguły techniczne dopuszczają na stronie FINISH tylko `INFO_SECTION`.
-- **Dane inicjalne**: każde pole z `defaultValueType: EXTERNAL_SYSTEM` ma `readOnly: true`, także adres i kontakt (Dane inicjalne). „Twoje dane” biorą wartości z `MLPZ.*` (Standardy).
+- **Dane inicjalne**: każde pole z `defaultValueType: EXTERNAL_SYSTEM` ma `readOnly: true`, także adres z MLPZ (Dane inicjalne). Wyjątkiem są atrybuty rejestrów z `EDITABLE_INITIAL_DATA` w `src/hacknation_2026/initial_data.py`, obecnie `MLPZ.phoneNumber` i `MLPZ.email`. Eksperci uznali, że mogą być nieaktualne, więc mają `readOnly: false`, chyba że wywołujący jawnie poda `read_only=True`. Tej samej listy używa kontrola reguł (blok F). Opis „Dane do kontaktu” jest dosłownie ze Standardów („Możesz je zmienić lub usunąć.”). „Twoje dane” biorą wartości z `MLPZ.*` (Standardy).
 - **Walidacja**: `REQUIRED` oraz `PESEL`, `NIP`, `REGON`, `ZIP_CODE`, `EMAIL` według Standardów; wzorce mają `validation: []`. W adresie pola, które według Standardów mają checkbox „Brak …” (ulica, zagraniczny kod pocztowy, numer lokalu), są opcjonalne, bo kontrakt JSON nie przewiduje tego checkboxa.
 - **Adres**: numer budynku i lokalu są zawsze widoczne, bo Standardy wymieniają je dla adresu w Polsce i za granicą. Pole TERYT ma czytelną etykietę zamiast nazwy słownika.
 - **Dane innej osoby**: mają pole Numer PESEL. Obie opłaty skarbowe mają tytuł „Opłata skarbowa”.
 - **Słownik**: gdy pole ma `dictionaryName`, `options` jest puste. RADIO z więcej niż 5 opcjami staje się SELECT; SELECT z więcej niż 15 opcjami dostaje `searchEnabled`.
 - **Sekcja powtarzająca**: warunki odwołujące się do jej pól używają ścieżki `__userAnswer[$repeatingSectionIndex][...].answers` z Reguł technicznych.
 - **Do zgłoszenia** (cudze pliki):
-  - `E-wzbogacanie-pol.md` zakłada `readOnly: false` dla adresu i kontaktu z MLPZ, co jest sprzeczne z „Dane inicjalne”. Builder i tak wymusza readOnly.
+  - `E-wzbogacanie-pol.md` zakłada `readOnly: false` dla adresu i kontaktu z MLPZ. Według ustaleń z ekspertami edytowalne są tylko telefon i e-mail (`initial_data.EDITABLE_INITIAL_DATA`). Builder rozstrzyga to sam, niezależnie od tego, co zwróci blok E.
   - Do `FormSpec` warto dodać `contact_page_title`, bo wzorzec 1 ma tu „Kontakt z urzędem”.
 
 ## Zasady wspólne
