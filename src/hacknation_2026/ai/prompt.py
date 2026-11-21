@@ -55,6 +55,13 @@ Te części dokłada później system, więc POMIŃ je całkowicie:
 - miejscowość i data SPORZĄDZENIA wniosku z nagłówka ("X, dnia ____"), podpis, pieczęć, pola "wypełnia urząd".
 Miejscowość, ulica czy adres, KTÓREGO DOTYCZY SPRAWA (np. położenie budynku lub działki), to pola merytoryczne – zostają.
 
+## Dane wnioskodawcy, które zostają w "pages"
+- "applicant_data": true dla pola, w które wnioskodawca wpisuje SWOJE dane osobowe niewymienione wyżej, np. data urodzenia,
+  miejsce urodzenia, obywatelstwo, imię ojca, nazwisko rodowe, stan cywilny, adres zameldowania. System może wypełnić
+  takie pole danymi z rejestru.
+- "applicant_data": false dla wszystkich innych pól, także dla danych innej osoby (małżonka, dziecka, zmarłego,
+  właściciela) i danych przedmiotu sprawy.
+
 ## Strony i sekcje
 - Pogrupuj pola merytoryczne w tematyczne strony (zwykle 1–2), np. "Informacje o …", "Szczegóły …".
   Tytuł strony i sekcji to krótki opis tematu (np. "Lokalizacja budynku"), nie tytuł formularza i nie numer punktu.

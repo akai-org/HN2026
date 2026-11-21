@@ -51,10 +51,10 @@ To samo dla formularza 1.
 - **Walidacja**: `REQUIRED` oraz `PESEL`, `NIP`, `REGON`, `ZIP_CODE`, `EMAIL` według Standardów; wzorce mają `validation: []`. W adresie pola, które według Standardów mają checkbox „Brak …” (ulica, zagraniczny kod pocztowy, numer lokalu), są opcjonalne, bo kontrakt JSON nie przewiduje tego checkboxa.
 - **Adres**: numer budynku i lokalu są zawsze widoczne, bo Standardy wymieniają je dla adresu w Polsce i za granicą. Pole TERYT ma czytelną etykietę zamiast nazwy słownika.
 - **Dane innej osoby**: mają pole Numer PESEL. Obie opłaty skarbowe mają tytuł „Opłata skarbowa”.
-- **Słownik**: gdy pole ma `dictionaryName`, `options` jest puste. RADIO z więcej niż 5 opcjami staje się SELECT; SELECT z więcej niż 15 opcjami dostaje `searchEnabled`.
+- **Słownik**: gdy pole ma `dictionaryName`, `options` jest puste. RADIO z więcej niż 5 opcjami staje się SELECT; SELECT z więcej niż 15 opcjami dostaje `searchEnabled`. Słownik z bloku E trafia tylko do pola bez własnych opcji, bo opcje z blankietu wygrywają.
+- **Blok E**: builder przekazuje `FieldSpec.applicant_data` do `enrich_field`. E może zmienić typ `TEXT_FIELD` (kraj → `SELECT` ze słownikiem `Kraje`, data urodzenia z PESEL → `DATEPICKER`); innych typów nie zmienia. E jest importowany wprost, więc błąd importu E przerywa start zamiast cicho wyłączać wzbogacanie.
 - **Sekcja powtarzająca**: warunki odwołujące się do jej pól używają ścieżki `__userAnswer[$repeatingSectionIndex][...].answers` z Reguł technicznych.
 - **Do zgłoszenia** (cudze pliki):
-  - `E-wzbogacanie-pol.md` zakłada `readOnly: false` dla adresu i kontaktu z MLPZ, co jest sprzeczne z „Dane inicjalne”. Builder i tak wymusza readOnly.
   - Do `FormSpec` warto dodać `contact_page_title`, bo wzorzec 1 ma tu „Kontakt z urzędem”.
 
 ## Zasady wspólne

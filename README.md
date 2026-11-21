@@ -164,7 +164,7 @@ Testy w `tests/ai/` nie łączą się z żadnym API. HTTP jest zamockowany (`htt
 
 ### Ręczny test analizy LLM na prawdziwym modelu
 
-Uzupełnij `.env` i uruchom polecenie **z katalogu głównego repozytorium**:
+Samą analizę LLM, bez budowy formularza, sprawdzisz, wywołując `analyze()` bezpośrednio. Uzupełnij `.env` (klucz i model) i uruchom polecenie **z katalogu głównego repozytorium** (tam leży `.env`). Teksty formularzy do testów leżą w katalogu głównym: `formularz.txt` (formularz 5, nadpłata podatku) i `formularz_1.txt` (formularz 1, numer porządkowy). Własny formularz przetestujesz, wklejając tekst z blankietu `.docx` albo `.pdf` do pliku i podając jego nazwę zamiast `formularz.txt`.
 
 ```bash
 uv run python - formularz.txt <<'EOF'
@@ -179,4 +179,13 @@ print(analyze(doc, get_settings()).model_dump_json(indent=2))
 EOF
 ```
 
-Wynik to `FormSpec`: tytuł, urząd, flagi (`allows_other_person`, `allows_legal_entity`, `allows_proxy`), zgody i strony z polami merytorycznymi. Sekcje standardowe (dane wnioskodawcy, adres, kontakt, zgody, strona końcowa) dokłada builder (blok D).
+Wynik to `FormSpec`: tytuł, urząd, flagi (`allows_other_person`, `allows_legal_entity`, `allows_proxy`), zgody i strony z polami merytorycznymi. Porównaj go ze stronami merytorycznymi wzorców, np. „Informacje o nadpłacie” w `dane_zadania/blankiety/5.*/konfiguracja_form_*.json`. W wyniku **nie powinno** być danych wnioskodawcy, adresu, kontaktu, zgód ani podpisu, bo te sekcje dokłada builder (blok D). Inny model sprawdzisz, zmieniając `LLM_MODEL` w `.env`.
+
+### Aplikacja
+
+```bash
+uv run hacknation-2026          # http://localhost:8000, sprawdzenie: GET /api/health
+docker compose up --build       # http://localhost:3000
+```
+
+`POST /api/forms/convert` (plik w polu `file`) zwraca `form` (gotowy JSON formularza zgodny z `FormDefinition`), `warnings` oraz `proposed_dictionaries`, czyli propozycje nowych słowników z nazwą, przykładowymi wartościami i polami, które by ich używały.
