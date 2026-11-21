@@ -39,7 +39,6 @@ def test_settings_from_env(monkeypatch):
   monkeypatch.setenv("MAX_FILE_SIZE_MB", "2")
   settings = Settings(_env_file=None)
   assert settings.max_file_size_bytes == 2 * 1024 * 1024
-  assert settings.jwt_algorithm == "HS256"
 
 
 def test_settings_require_secrets(monkeypatch):

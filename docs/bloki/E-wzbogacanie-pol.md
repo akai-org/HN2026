@@ -15,7 +15,8 @@ class Enrichment(BaseModel):
   multi_level_tree: bool = False
   search_enabled: bool = False
   default_value: str | None = None         # np. "MLPZ.email"
-  external: bool = False                    # → defaultValueType="EXTERNAL_SYSTEM", readOnly=True
+  external: bool = False                    # → defaultValueType="EXTERNAL_SYSTEM"
+  read_only: bool = False                   # tylko identyfikacja wnioskodawcy (imię, nazwisko, PESEL); adres i kontakt z MLPZ zostają edytowalne, jak we wzorcach
   validators: list[str] = []                # REQUIRED, EMAIL, PESEL, NIP, REGON, ZIP_CODE, EPUAP, ADE, SERIAL_NUMBER_ID_CARD
 
 def enrich_field(label: str, field_type: str, required: bool, applicant_data: bool) -> Enrichment
@@ -24,7 +25,7 @@ def proposed_dictionaries(spec: FormSpec) -> list[dict]   # rozszerzenie: propoz
 
 **Wymagania:**
 - `catalog.py`: katalog źródeł danych inicjalnych `PESEL.*`, `PESEL_ADDRESS.*`, `MLPZ.*` przepisany z `dane_zadania/materialy/Dane inicjalne…pdf` (atrybut + polska nazwa) oraz listy słowników `Kraje`, `TERYT_4G_DOWODOWY`, `TERYT_DOWODOWY` i numerów kierunkowych.
-- Dane inicjalne tylko gdy `applicant_data=True` (dane osoby wypełniającej, nigdy „innej osoby”).
+- Dane inicjalne tylko gdy `applicant_data=True` (dane osoby wypełniającej, nigdy „innej osoby”). Wzorce: imię/nazwisko/PESEL → `readOnly: true` (wzorzec 1 `MLPZ.*`, wzorzec 5 `PESEL.*`); kod pocztowy, ulica, nr budynku, nr lokalu, telefon, e-mail → `MLPZ.*` z `readOnly: false`.
 - Słownik tylko dla `SELECT`/`RADIO`/`CHECKBOX`.
 - Walidatory według etykiety, np. „PESEL” → `PESEL`, „e-mail” → `EMAIL`, „kod pocztowy” → `ZIP_CODE`. `REQUIRED` dokładamy, gdy `required`.
 - Dopasowanie po znormalizowanej etykiecie (małe litery, bez polskich znaków), bez LLM.

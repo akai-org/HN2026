@@ -8,7 +8,9 @@ from hacknation_2026.contracts import AppError, FileFormat
 from hacknation_2026.ingest.validation import validate_upload
 
 BLANKIETY = pathlib.Path(__file__).parents[2] / "dane_zadania" / "blankiety"
-SAMPLES = sorted(p for p in BLANKIETY.rglob("*") if p.is_file() and p.suffix.lower() != ".json")
+# Skip OS/editor artifacts: .DS_Store (Finder) and ~$* lock files Word creates while a document is open.
+SAMPLES = sorted(p for p in BLANKIETY.rglob("*")
+                 if p.is_file() and p.suffix.lower() != ".json" and not p.name.startswith((".", "~$")))
 LIMIT = 50 * 1024 * 1024
 PDF = b"%PDF-1.7\n..."
 
