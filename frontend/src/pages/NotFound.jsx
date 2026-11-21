@@ -1,4 +1,4 @@
-import { ArrowLeft, FileQuestion } from "lucide-react";
+import { ArrowLeft, FileQuestion } from "@/components/icons";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 

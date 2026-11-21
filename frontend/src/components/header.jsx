@@ -1,14 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import {
-  Accessibility,
-  Eye,
-  FileText,
-  Minus,
-  Plus,
-  RotateCcw,
-  X,
-} from "lucide-react";
+import { Accessibility, Eye, FileText, Minus, Plus, RotateCcw, X } from "@/components/icons";
 
 const STORAGE_KEY = "uniform-accessibility";
 const DEFAULT_SETTINGS = {
@@ -123,7 +115,7 @@ export default function Header() {
         title="Dostępność"
         onClick={() => setIsAccessibilityOpen((open) => !open)}
       >
-        <Accessibility aria-hidden="true" size={27} strokeWidth={2} />
+        <Accessibility aria-hidden="true" size={32} />
       </button>
 
       {isAccessibilityOpen && (
