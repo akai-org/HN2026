@@ -1,2 +1,5 @@
 .DS_Store
 .venv
+src/hacknation_2026/static/
+frontend/node_modules/
+__pycache__/
