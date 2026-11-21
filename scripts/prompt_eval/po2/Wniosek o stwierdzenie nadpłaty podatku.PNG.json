@@ -1,0 +1,134 @@
+{
+ "title": "Wniosek o stwierdzenie nadpłaty podatku",
+ "authority_name": "Urząd Gminy Ulan-Majorat",
+ "authority_kind": "URZAD",
+ "allows_other_person": false,
+ "allows_legal_entity": false,
+ "allows_proxy": false,
+ "pages": [
+  {
+   "title": "Wniosek o stwierdzenie nadpłaty podatku",
+   "sections": [
+    {
+     "key": "dane_nadpłaty",
+     "title": "Szczegóły nadpłaty",
+     "repeating": false,
+     "fields": [
+      {
+       "key": "rodzaj_podatku",
+       "label": "Rodzaj podatku",
+       "type": "TEXT_FIELD",
+       "required": true,
+       "description": "",
+       "options": [],
+       "show_if": []
+      },
+      {
+       "key": "kwota_nadpłaty",
+       "label": "Kwota nadpłaty",
+       "type": "NUMBER",
+       "required": true,
+       "description": "",
+       "options": [],
+       "show_if": []
+      },
+      {
+       "key": "uzasadnienie",
+       "label": "Uzasadnienie",
+       "type": "TEXTAREA",
+       "required": true,
+       "description": "",
+       "options": [],
+       "show_if": []
+      }
+     ],
+     "show_if": []
+    },
+    {
+     "key": "metoda_zwrotu",
+     "title": "Metoda zwrotu",
+     "repeating": false,
+     "fields": [
+      {
+       "key": "preferencja_zwrotu",
+       "label": "Preferencja zwrotu",
+       "type": "RADIO",
+       "required": true,
+       "description": "",
+       "options": [
+        "Zaliczyć na poczet przyszłego zobowiązania podatkowego",
+        "Zwrócić przelewem na wskazany rachunek"
+       ],
+       "show_if": []
+      },
+      {
+       "key": "rodzaj_podatku_zaliczka",
+       "label": "Rodzaj podatku",
+       "type": "TEXT_FIELD",
+       "required": true,
+       "description": "",
+       "options": [],
+       "show_if": [
+        {
+         "field": "preferencja_zwrotu",
+         "equals": "Zaliczyć na poczet przyszłego zobowiązania podatkowego"
+        }
+       ]
+      },
+      {
+       "key": "rachunek_bankowy",
+       "label": "Rachunek bankowy",
+       "type": "TEXT_FIELD",
+       "required": true,
+       "description": "",
+       "options": [],
+       "show_if": [
+        {
+         "field": "preferencja_zwrotu",
+         "equals": "Zwrócić przelewem na wskazany rachunek"
+        }
+       ]
+      }
+     ],
+     "show_if": []
+    },
+    {
+     "key": "zalaczniki",
+     "title": "Załączniki",
+     "repeating": false,
+     "fields": [
+      {
+       "key": "korekta_deklaracji",
+       "label": "Korekta deklaracji",
+       "type": "FILE_UPLOADER",
+       "required": true,
+       "description": "",
+       "options": [],
+       "show_if": []
+      },
+      {
+       "key": "zal_2",
+       "label": "Załącznik 2",
+       "type": "FILE_UPLOADER",
+       "required": false,
+       "description": "",
+       "options": [],
+       "show_if": []
+      },
+      {
+       "key": "zal_3",
+       "label": "Załącznik 3",
+       "type": "FILE_UPLOADER",
+       "required": false,
+       "description": "",
+       "options": [],
+       "show_if": []
+      }
+     ],
+     "show_if": []
+    }
+   ]
+  }
+ ],
+ "consents": []
+}
