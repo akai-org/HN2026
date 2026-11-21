@@ -1,0 +1,29 @@
+@keyframes mk-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes mk-rise-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mk-pop-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes mk-slide-in {
+  from { transform: translateX(100%); }
+  to { transform: none; }
+}
+
+@keyframes mk-indeterminate {
+  from { transform: translateX(-110%); }
+  to { transform: translateX(330%); }
+}
+
+/* Panel pomocy jest modalny: blokujemy przewijanie strony pod spodem. */
+html:has(dialog.mk-help[open]) {
+  overflow: hidden;
+}
