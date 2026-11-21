@@ -7,6 +7,9 @@ export default function IdentifyForm() {
   const location = useLocation();
   const fileName = location.state?.fileName;
   const convertedForm = location.state?.convertedForm;
+  const convertedForms = location.state?.convertedForms || (
+    convertedForm ? [{ fileName, convertedForm }] : []
+  );
 
   return (
     <main className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-12 sm:px-6">
@@ -26,27 +29,39 @@ export default function IdentifyForm() {
               </span>
               <div>
                 <CardTitle className="text-xl">Przegląd formularza</CardTitle>
-                {fileName && (
-                  <p className="mt-1 text-sm text-muted-foreground">{fileName}</p>
-                )}
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {convertedForms.length
+                    ? `${convertedForms.length} ${convertedForms.length === 1 ? "formularz" : "formularze"}`
+                    : "Brak plików"}
+                </p>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            {convertedForm ? (
-              <>
-                <pre className="max-h-[65vh] overflow-auto rounded-lg border border-border bg-background p-4 text-sm">
-                  {JSON.stringify(convertedForm, null, 2)}
-                </pre>
-                <Button asChild className="mt-4 w-full">
+            {convertedForms.length ? (
+              <div className="space-y-4">
+                {convertedForms.map((item, index) => (
+                  <div key={`${item.fileName}-${index}`} className="rounded-lg border border-border">
+                    <div className="border-b border-border px-4 py-3">
+                      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
+                        Formularz {item.formNumber || 1}
+                      </p>
+                      <p className="truncate text-sm font-medium">{item.fileName}</p>
+                    </div>
+                    <pre className="max-h-80 overflow-auto bg-background p-4 text-sm">
+                      {JSON.stringify(item.convertedForm, null, 2)}
+                    </pre>
+                  </div>
+                ))}
+                <Button asChild className="mt-2 w-full">
                   <Link
                     to="/verify"
-                    state={{ fileName, convertedForm }}
+                    state={{ fileName, convertedForm, convertedForms }}
                   >
                     Sprawdź i zatwierdź
                   </Link>
                 </Button>
-              </>
+              </div>
             ) : (
               <p className="text-muted-foreground">
                 Formularz nie został przekazany do przeglądu.

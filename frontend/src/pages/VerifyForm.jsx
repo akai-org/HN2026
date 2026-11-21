@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function VerifyForm() {
   const location = useLocation();
   const fileName = location.state?.fileName;
+  const convertedForms = location.state?.convertedForms || [];
 
   return (
     <main className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-12 sm:px-6">
@@ -28,9 +29,11 @@ export default function VerifyForm() {
               </span>
               <div>
                 <CardTitle className="text-xl">Sprawdź i zatwierdź</CardTitle>
-                {fileName && (
-                  <p className="mt-1 text-sm text-muted-foreground">{fileName}</p>
-                )}
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {convertedForms.length
+                    ? convertedForms.map((item) => item.fileName).join(", ")
+                    : fileName || "Brak nazwy pliku"}
+                </p>
               </div>
             </div>
           </CardHeader>

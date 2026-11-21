@@ -2,72 +2,125 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText, Image, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const ACCEPTED_FORMATS = ".pdf,.doc,.docx,.ods,.xlsx,.jpg,.jpeg,.png";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 function ImportForm() {
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [splitBefore, setSplitBefore] = useState(new Set());
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  function handleFileChange(event) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > MAX_FILE_SIZE) {
-      setSelectedFile(null);
-      setError("Plik jest za duży. Maksymalny rozmiar to 10 MB.");
+  function addFiles(files) {
+    const incomingFiles = Array.from(files);
+    const tooLarge = incomingFiles.find((file) => file.size > MAX_FILE_SIZE);
+    if (tooLarge) {
+      setError(`Plik „${tooLarge.name}” przekracza limit 10 MB.`);
       return;
     }
 
-    setSelectedFile(file);
+    setSelectedFiles((currentFiles) => {
+      const uniqueIncoming = incomingFiles.filter((incoming) =>
+        !currentFiles.some((current) =>
+          current.name === incoming.name &&
+          current.size === incoming.size &&
+          current.lastModified === incoming.lastModified
+        )
+      );
+      return [...currentFiles, ...uniqueIncoming];
+    });
     setError("");
   }
 
-  function clearFile() {
-    setSelectedFile(null);
-    setError("");
+  function handleFileChange(event) {
+    if (event.target.files?.length) addFiles(event.target.files);
+    event.target.value = "";
+  }
+
+  function handleDrop(event) {
+    event.preventDefault();
+    if (event.dataTransfer.files?.length) addFiles(event.dataTransfer.files);
+  }
+
+  function clearFile(index) {
+    setSelectedFiles((currentFiles) =>
+      currentFiles.filter((_, fileIndex) => fileIndex !== index)
+    );
+    setSplitBefore((currentSplits) => {
+      const nextSplits = new Set();
+      currentSplits.forEach((splitIndex) => {
+        if (splitIndex < index) nextSplits.add(splitIndex);
+        if (splitIndex > index) nextSplits.add(splitIndex - 1);
+      });
+      return nextSplits;
+    });
+  }
+
+  function toggleSplit(index) {
+    setSplitBefore((currentSplits) => {
+      const nextSplits = new Set(currentSplits);
+      if (nextSplits.has(index)) nextSplits.delete(index);
+      else nextSplits.add(index);
+      return nextSplits;
+    });
+  }
+
+  function getFileExtension(file) {
+    const extension = file.name.split(".").pop();
+    return extension && extension !== file.name ? extension.toUpperCase() : "PLIK";
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (!selectedFile || isSubmitting) return;
+    if (!selectedFiles.length || isSubmitting) return;
 
     setError("");
     setIsSubmitting(true);
 
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-
     try {
-      const response = await fetch("/api/forms/convert", {
-        method: "POST",
-        body: formData,
-      });
+      const convertedForms = [];
 
-      if (!response.ok) {
-        let message = "Nie udało się przesłać formularza.";
-        try {
-          const responseError = await response.json();
-          message = responseError.message || message;
-        } catch {
-          // Keep the default error message when the server returns no JSON.
+      for (let fileIndex = 0; fileIndex < selectedFiles.length; fileIndex += 1) {
+        const selectedFile = selectedFiles[fileIndex];
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        const response = await fetch("/api/forms/convert", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          let message = `Nie udało się przesłać pliku „${selectedFile.name}”.`;
+          try {
+            const responseError = await response.json();
+            message = responseError.message || message;
+          } catch {
+            // Keep the default error message when the server returns no JSON.
+          }
+          throw new Error(message);
         }
-        throw new Error(message);
+
+        convertedForms.push({
+          fileName: selectedFile.name,
+          convertedForm: await response.json(),
+          formNumber: 1 + [...splitBefore].filter((index) =>
+            fileIndex >= index
+          ).length,
+        });
       }
 
-      const convertedForm = await response.json();
       navigate("/identify", {
         state: {
-          fileName: selectedFile.name,
-          convertedForm,
+          convertedForms,
+          fileName: convertedForms[0]?.fileName,
+          convertedForm: convertedForms[0]?.convertedForm,
         },
       });
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Nie udało się przesłać formularza.");
+      setError(submitError instanceof Error ? submitError.message : "Nie udało się przesłać formularzy.");
     } finally {
       setIsSubmitting(false);
     }
@@ -85,69 +138,125 @@ function ImportForm() {
           </h1>
         </div>
 
-            <form className="m-2"onSubmit={handleSubmit}>
-            <label
-              htmlFor="file-upload"
-              className="flex cursor-pointer flex-col items-center rounded-xl border-2 border-dashed border-border bg-muted/30 px-6 py-10 text-center transition-colors hover:border-primary hover:bg-primary/5 focus-within:border-primary"
-            >
-              <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <Upload aria-hidden="true" size={26} />
-              </span>
-              <span className="font-medium">
-                Kliknij, aby przesłać formularz
-              </span>
-              <span className="mt-2 text-sm text-muted-foreground">
-                PDF, DOC/DOCX, ODS, XLSX, JPG/JPEG, PNG · maks. 10 MB
-              </span>
-              <input
-                id="file-upload"
-                className="sr-only"
-                type="file"
-                accept={ACCEPTED_FORMATS}
-                onChange={handleFileChange}
-              />
-            </label>
+        <form onSubmit={handleSubmit}>
+          <label
+            htmlFor="file-upload"
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={handleDrop}
+            className="flex min-h-64 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-border bg-background px-6 py-10 text-center transition-colors hover:border-primary hover:bg-primary/5 focus-within:border-primary"
+          >
+            <span className="mb-4 flex size-16 items-center justify-center text-primary">
+              <Upload aria-hidden="true" size={42} strokeWidth={1.5} />
+            </span>
+            <span className="text-lg font-semibold">
+              Przeciągnij pliki tutaj albo wybierz z dysku
+            </span>
+            <span className="mt-2 text-sm text-muted-foreground">
+              PDF, Word, Excel, OpenDocument albo zdjęcie (JPG, PNG). Każdy plik do 10 MB.
+            </span>
+            <span className="mt-5 inline-flex h-9 items-center rounded-md border border-primary px-4 text-sm font-medium text-primary">
+              Wybierz pliki
+            </span>
+            <input
+              id="file-upload"
+              className="sr-only"
+              type="file"
+              accept={ACCEPTED_FORMATS}
+              multiple
+              onChange={handleFileChange}
+            />
+          </label>
 
-            {error && (
-              <p className="mt-3 text-sm text-destructive" role="alert">
-                {error}
+          {error && (
+            <p className="mt-3 text-sm text-destructive" role="alert">
+              {error}
+            </p>
+          )}
+
+          <div className="mt-6 rounded-lg border border-border bg-background px-5 py-5">
+            <div className="text-center">
+              <p className="text-base font-semibold">Tu pojawią się dodane formularze</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Jeden plik może zawierać kilka formularzy lub kilka stron. Rozpoznawanie przygotuje każdy formularz osobno.
               </p>
-            )}
+            </div>
 
-            {selectedFile && (
-              <div className="mt-4 flex items-center gap-3 rounded-lg border border-border bg-background p-3">
-                {selectedFile.type.startsWith("image/") ? (
-                  <Image className="shrink-0 text-primary" aria-hidden="true" size={20} />
-                ) : (
-                  <FileText className="shrink-0 text-primary" aria-hidden="true" size={20} />
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{selectedFile.name}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {(selectedFile.size / 1024 / 1024).toFixed(2)} MB · plik gotowy do analizy
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-sm"
-                  aria-label="Usuń wybrany plik"
-                  onClick={clearFile}
-                >
-                  <X aria-hidden="true" />
-                </Button>
+            {selectedFiles.length > 0 && (
+              <div className="mt-4 flex flex-wrap items-start gap-3">
+                {selectedFiles.map((file, index) => (
+                  <div key={`${file.name}-${file.size}-${file.lastModified}`} className="contents">
+                    {index === 0 && (
+                      <div className="flex basis-full items-center gap-3 py-1 text-xs font-semibold text-primary">
+                        <span className="h-px flex-1 bg-primary" />
+                        Formularz 1
+                        <span className="h-px flex-1 bg-primary" />
+                      </div>
+                    )}
+                    {index > 0 && (
+                      <button
+                        type="button"
+                        className="flex basis-full items-center gap-3 py-1 text-xs font-medium text-muted-foreground"
+                        aria-label={splitBefore.has(index)
+                          ? `Usuń podział przed plikiem ${file.name}`
+                          : `Dodaj podział przed plikiem ${file.name}`}
+                        onClick={() => toggleSplit(index)}
+                      >
+                        <span className={`h-px flex-1 ${
+                          splitBefore.has(index) ? "bg-primary" : "bg-border"
+                        }`} />
+                        {splitBefore.has(index)
+                          ? `Formularz ${1 + [...splitBefore].filter((splitIndex) => splitIndex <= index).length}`
+                          : "Kliknij, aby dodać podział"}
+                        <span className={`h-px flex-1 ${
+                          splitBefore.has(index) ? "bg-primary" : "bg-border"
+                        }`} />
+                      </button>
+                    )}
+                    <div className="relative flex h-24 w-full items-center gap-3 rounded-lg border border-border bg-muted/20 p-3 pr-10">
+                      <span className="relative flex size-12 shrink-0 items-center justify-center rounded-md border border-border bg-background text-primary">
+                        {file.type.startsWith("image/") ? (
+                          <Image aria-hidden="true" size={24} />
+                        ) : (
+                          <FileText aria-hidden="true" size={24} />
+                        )}
+                        <span className="absolute -bottom-1 right-1 rounded-sm bg-primary px-1 py-0.5 text-[9px] font-bold leading-none text-primary-foreground">
+                          {getFileExtension(file)}
+                        </span>
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium" title={file.name}>
+                          {file.name}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {(file.size / 1024 / 1024).toFixed(2)} MB
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        className="absolute right-2 top-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        aria-label={`Usuń plik ${file.name}`}
+                        onClick={() => clearFile(index)}
+                      >
+                        <X aria-hidden="true" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
 
-            {selectedFile && (
-              <Button type="submit" className="mt-4 w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Przesyłanie..." : "Prześlij i przejrzyj formularz"}
+            <div className="mt-4 flex justify-end">
+              <Button type="submit" disabled={!selectedFiles.length || isSubmitting}>
+                {isSubmitting ? "Rozpoznawanie..." : "Rozpoznaj formularze"}
               </Button>
-            )}
-            </form>
+            </div>
+          </div>
+        </form>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Plik zostanie wykorzystany wyłącznie do przygotowania struktury formularza.
+          Pliki zostaną wykorzystane wyłącznie do przygotowania struktury formularzy.
         </p>
       </div>
     </main>
