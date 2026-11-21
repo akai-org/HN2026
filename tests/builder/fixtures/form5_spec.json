@@ -1,0 +1,59 @@
+{
+  "title": "Wniosek o stwierdzenie nadpłaty podatku",
+  "authority_name": "Urząd Gminy Ulan-Majorat",
+  "authority_kind": "URZAD",
+  "allows_other_person": true,
+  "allows_legal_entity": true,
+  "allows_proxy": true,
+  "pages": [
+    {
+      "title": "Informacje o nadpłacie",
+      "sections": [
+        {
+          "key": "informacje_o_nadplacie",
+          "title": "Informacje o nadpłacie",
+          "fields": [
+            {"key": "podatek_ktorego_dotyczy_nadplata", "label": "Podatek, którego dotyczy nadpłata", "type": "TEXT_FIELD", "required": true},
+            {"key": "kwota", "label": "Kwota", "type": "NUMBER", "required": true},
+            {"key": "uzasadnienie", "label": "Uzasadnienie", "type": "TEXTAREA", "required": true}
+          ]
+        },
+        {
+          "key": "rozliczenie_nadplaty",
+          "title": "Rozliczenie nadpłaty",
+          "fields": [
+            {
+              "key": "wybierz_co_mamy_zrobic_z_nadplata",
+              "label": "Wybierz, co mamy zrobić z nadpłatą",
+              "type": "RADIO",
+              "required": true,
+              "options": ["Zaliczyć na poczet przyszłego zobowiązania podatkowego", "Zwrócić przelewem na rachunek bankowy"]
+            },
+            {
+              "key": "nazwa_podatku",
+              "label": "Nazwa podatku",
+              "type": "TEXT_FIELD",
+              "required": true,
+              "show_if": [{"field": "wybierz_co_mamy_zrobic_z_nadplata", "equals": "Zaliczyć na poczet przyszłego zobowiązania podatkowego"}]
+            },
+            {
+              "key": "numer_rachunku",
+              "label": "Numer rachunku",
+              "type": "TEXT_FIELD",
+              "required": true,
+              "show_if": [{"field": "wybierz_co_mamy_zrobic_z_nadplata", "equals": "Zwrócić przelewem na rachunek bankowy"}]
+            }
+          ]
+        },
+        {
+          "key": "korekta_deklaracji",
+          "title": "Korekta deklaracji",
+          "fields": [
+            {"key": "plik_deklaracji_podatkowej", "label": "Plik deklaracji podatkowej", "type": "FILE_UPLOADER", "required": false}
+          ]
+        }
+      ]
+    }
+  ],
+  "consents": []
+}
