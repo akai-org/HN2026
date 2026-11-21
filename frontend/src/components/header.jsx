@@ -5,12 +5,12 @@ export default function Header() {
   const { pathname } = useLocation();
   const activeStep =
     pathname === "/" ? 1 :
-    pathname === "/identify" ? 2 :
+    pathname === "/digitalize" ? 2 :
     pathname === "/verify" ? 3 :
     null;
   const stepLabels = [
     "Dodawanie formularza",
-    "Rozpoznawanie",
+    "Cyfryzowanie",
     "Sprawdź i zatwierdź",
   ];
 

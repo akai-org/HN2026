@@ -18,7 +18,7 @@ createRoot(document.getElementById('root')).render(
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<ImportForm />} />
-          <Route path="/identify" element={<IdentifyForm />} />
+          <Route path="/digitalize" element={<IdentifyForm />} />
           <Route path="/verify" element={<VerifyForm />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

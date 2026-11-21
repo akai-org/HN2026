@@ -112,7 +112,7 @@ function ImportForm() {
         });
       }
 
-      navigate("/identify", {
+      navigate("/digitalize", {
         state: {
           convertedForms,
           fileName: convertedForms[0]?.fileName,
@@ -177,7 +177,7 @@ function ImportForm() {
             <div className="text-center">
               <p className="text-base font-semibold">Tu pojawią się dodane formularze</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Jeden plik może zawierać kilka formularzy lub kilka stron. Rozpoznawanie przygotuje każdy formularz osobno.
+                Jeden plik może zawierać kilka formularzy lub kilka stron. Cyfryzowanie przygotuje każdy formularz osobno.
               </p>
             </div>
 
@@ -249,7 +249,7 @@ function ImportForm() {
 
             <div className="mt-4 flex justify-end">
               <Button type="submit" disabled={!selectedFiles.length || isSubmitting}>
-                {isSubmitting ? "Rozpoznawanie..." : "Rozpoznaj formularze"}
+                {isSubmitting ? "Cyfryzowanie..." : "Cyfryzuj formularze"}
               </Button>
             </div>
           </div>

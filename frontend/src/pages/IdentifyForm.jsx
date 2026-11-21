@@ -28,7 +28,7 @@ export default function IdentifyForm() {
                 <FileText aria-hidden="true" size={20} />
               </span>
               <div>
-                <CardTitle className="text-xl">Przegląd formularza</CardTitle>
+                <CardTitle className="text-xl">Cyfryzacja formularza</CardTitle>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {convertedForms.length
                     ? `${convertedForms.length} ${convertedForms.length === 1 ? "formularz" : "formularze"}`

@@ -13,11 +13,11 @@ export default function VerifyForm() {
       <div className="mx-auto max-w-5xl">
         <Button asChild variant="ghost" className="mb-6">
           <Link
-            to="/identify"
+            to="/digitalize"
             state={location.state}
           >
             <ArrowLeft aria-hidden="true" />
-            Wróć do rozpoznawania
+            Wróć do cyfryzowania
           </Link>
         </Button>
 
