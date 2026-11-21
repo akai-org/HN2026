@@ -99,8 +99,9 @@ class Settings(BaseSettings):
   jwt_expire_minutes: int = 60
   auth_username: str
   auth_password: str
-  llm_base_url: str = "http://127.0.0.1:11434"
-  llm_model: str = "bielik"          # finalna nazwa po wyborze w bloku C
+  llm_base_url: str = "https://api.groq.com/openai/v1"  # API zgodne z OpenAI /chat/completions
+  llm_api_key: str                   # wymagany, tylko w .env
+  llm_model: str                     # wymagany, tylko w .env (wybór: docs/wybor-modelu.md)
   llm_timeout_s: int = 300
   ocr_lang: str = "pol"
   emit_validators: bool = True
