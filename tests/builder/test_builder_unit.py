@@ -4,6 +4,7 @@ import uuid
 
 import pytest
 
+from hacknation_2026 import initial_data
 from hacknation_2026.builder import build, build_form, jsonata
 from hacknation_2026.builder.layout import html_text, slug, unique
 from hacknation_2026.contracts import Condition, FieldSpec, FormSpec, PageSpec, SectionSpec
@@ -223,16 +224,37 @@ def test_enrichment_is_applied_to_subject_fields(settings, monkeypatch):
     if label == "Kraj pochodzenia":
       return StubEnrichment(dictionary_name="Kraje", search_enabled=True)
     if label == "Wybór":
-      return StubEnrichment(default_value="MLPZ.email", external=True, validators=["EMAIL", "PATTERN"])
+      return StubEnrichment(default_value="MLPZ.surname", external=True, validators=["EMAIL", "PATTERN"])
     return StubEnrichment()
 
   monkeypatch.setattr(build, "enrich_field", enrich_field)
   section = build_form(subject_spec(), settings)["tabs"][1]["questions"][0]["field"]["repeatingSectionGrid"]
   wybor, kraj = (item["field"] for item in section)
   assert kraj["dictionaryName"] == "Kraje" and kraj["searchEnabled"] is True
-  assert wybor["defaultValue"] == "MLPZ.email" and wybor["defaultValueType"] == "EXTERNAL_SYSTEM"
+  assert wybor["defaultValue"] == "MLPZ.surname" and wybor["defaultValueType"] == "EXTERNAL_SYSTEM"
   assert wybor["readOnly"] is True, "initial data => read-only (Dane inicjalne)"
   assert wybor["validation"] == ["REQUIRED", "EMAIL"], "only validators from Reguły techniczne"
+
+
+@pytest.mark.parametrize(("initial", "enriched_read_only", "explicit", "expected"), [
+  ("MLPZ.email", True, None, False),       # editable attribute: editable even if enrichment says read-only
+  ("MLPZ.phoneNumber", False, None, False),
+  ("MLPZ.email", False, True, True),       # ...unless the caller asks for read-only explicitly
+  ("MLPZ.postCode", False, False, True),   # not on the list: always read-only (Dane inicjalne)
+  ("PESEL.name", False, None, True),
+])
+def test_read_only_of_initial_data_depends_on_register_attribute(
+  settings, monkeypatch, initial, enriched_read_only, explicit, expected,
+):
+  monkeypatch.setattr(build, "enrich_field", lambda *_: StubEnrichment(read_only=enriched_read_only))
+  make = build.FieldFactory(settings)
+  field = make("TEXT_FIELD", "pole", "Pole", initial=initial, read_only=explicit)
+  assert (field["defaultValueType"], field["readOnly"]) == ("EXTERNAL_SYSTEM", expected)
+
+
+def test_editable_initial_data_is_a_subset_of_known_attributes():
+  for source, attributes in initial_data.EDITABLE_INITIAL_DATA.items():
+    assert attributes <= initial_data.INITIAL_DATA[source], source
 
 
 def test_enrichment_can_turn_text_field_into_select(settings, monkeypatch):

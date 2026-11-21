@@ -8,7 +8,22 @@ Rozwiązanie zadania COI na HackNation 2026 (drużyna AKAI): API do cyfryzacji f
 
 Plan implementacji backendu: `docs/plan-implementacji.md`. Zadania do równoległej pracy agentów, jeden plik na blok: `docs/bloki/` (indeks w `docs/bloki/README.md`). Zakres: tylko backend.
 
-Materiały zadania leżą w `dane_zadania/` (tylko do odczytu). `dane_zadania/blankiety/` zawiera 9 formularzy, każdy w wielu formatach. Źródłem prawdy są dokumenty z `dane_zadania/materialy/`: Reguły techniczne, Opis JSON, Standardy, Słowniki i Dane inicjalne. Formularze 1 i 5 mają przykładowy JSON (`konfiguracja_form_*.json`), ale przykłady mogą zawierać błędy, więc służą tylko do porównania tam, gdzie dokumenty milczą (np. przykłady mają `readOnly: false` dla danych z `MLPZ`, a „Dane inicjalne” wymagają `readOnly: true`). Kontrakt wyjściowy to `dane_zadania/materialy/importowanyPlikJsonSchemat (1).json` (JSON Schema `FormDefinition`: `title` → `tabs[]` → `questions[]` z pozycją `x/y/rows/cols` i obiektem `field`). Schemat bywa niepełny: `repeatingSectionGrid` opisują Reguły techniczne i przykłady, a schemat go nie ma. Opis pól jest w `OpisImportowanegoPlikuJSON (1).docx`, reguły walidacji w `Reguły techniczne konfiguracji formularzy...docx`. Zanim zmienisz model danych, sprawdź go z tymi plikami.
+Materiały zadania leżą w `dane_zadania/` (tylko do odczytu). `dane_zadania/blankiety/` zawiera 9 formularzy, każdy w wielu formatach. Kontrakt wyjściowy to `dane_zadania/materialy/importowanyPlikJsonSchemat (1).json` (JSON Schema `FormDefinition`: `title` → `tabs[]` → `questions[]` z pozycją `x/y/rows/cols` i obiektem `field`). Opis pól jest w `OpisImportowanegoPlikuJSON (1).docx`, reguły walidacji w `Reguły techniczne konfiguracji formularzy...docx`. Zanim zmienisz model danych, sprawdź go z tymi plikami.
+
+### Źródło prawdy: specyfikacja, nie przykłady
+
+Gdy dokumenty się różnią, decyduje specyfikacja z `dane_zadania/materialy/`:
+- Reguły techniczne konfiguracji formularzy,
+- Opis importowanego pliku JSON i schemat `importowanyPlikJsonSchemat`,
+- Standardy,
+- Słowniki,
+- Dane inicjalne.
+
+Oczekiwane JSON-y formularzy 1 i 5 (`konfiguracja_form_*.json`) są tylko **przykładami**. Mogą zawierać błędy (np. mają `readOnly: false` dla adresu z `MLPZ`, a „Dane inicjalne” wymagają `readOnly: true`), więc nie zmieniaj kontraktu ani kodu, żeby się do nich dopasować. Służą do porównania tylko tam, gdzie specyfikacja milczy, np. w kształcie siatki czy techName sekcji. Testy porównujące wynik z przykładem wymieniają każde odstępstwo razem z uzasadnieniem ze specyfikacji (np. `SPEC_OVERRIDES` w `tests/builder/test_builder_reference.py`). Jeśli sprzeczne są same dokumenty specyfikacji, nie zgaduj, tylko zapytaj człowieka.
+
+Schemat bywa niepełny: `repeatingSectionGrid` opisują Reguły techniczne i przykłady, a schemat go nie ma (ma literówkę `repetingSectionGrid`). Pisownia `repeatingSectionGrid` zostaje, bo używają jej też wyrażenia JSONata w Regułach technicznych.
+
+Ustalenia z ekspertami domenowymi uzupełniają specyfikację: na stronie FINISH dozwolone są `INFO_SECTION` i `TEXT_BLOCK`; dane inicjalne (`EXTERNAL_SYSTEM`) są tylko do odczytu, z wyjątkiem atrybutów z `EDITABLE_INITIAL_DATA` w `src/hacknation_2026/initial_data.py` (obecnie `MLPZ.phoneNumber`, `MLPZ.email`); `id` stron, pól i przejść to UUID. Szczegóły: `docs/bloki/F-kontrola-regul.md`.
 
 Stack: Python 3.14 + FastAPI (menedżer: **uv**), React + Vite (menedżer: **npm**), Docker / Docker Compose.
 

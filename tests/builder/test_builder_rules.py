@@ -6,6 +6,7 @@ Dane inicjalne (DI).
 
 import pytest
 
+from hacknation_2026 import initial_data
 from hacknation_2026.builder import build_form, jsonata
 from hacknation_2026.builder.build import VALIDATORS
 from hacknation_2026.contracts import Condition, FieldSpec, FormSpec, PageSpec, SectionSpec
@@ -70,13 +71,16 @@ def test_validators_and_required_attribute(form):
 
 
 def test_initial_data_is_read_only(form):
-  """DI: a field fed with initial data is read-only, with defaultValueType EXTERNAL_SYSTEM and 'SOURCE.attribute'."""
+  """DI: a field fed with initial data is read-only, with defaultValueType EXTERNAL_SYSTEM and 'SOURCE.attribute';
+  domain experts: attributes that may be outdated in the register (EDITABLE_INITIAL_DATA) are editable."""
   external = [f for _, _, f in fields(form) if f.get("defaultValueType") == "EXTERNAL_SYSTEM"]
   assert external
   for field in external:
-    assert field["readOnly"] is True, field["techName"]
-    source, attribute = field["defaultValue"].split(".")
-    assert source in {"PESEL", "PESEL_ADDRESS", "MLPZ"} and attribute
+    assert initial_data.is_known(field["defaultValue"]), field["defaultValue"]
+    assert field["readOnly"] is not initial_data.is_editable(field["defaultValue"]), field["techName"]
+  read_only = {f["defaultValue"]: f["readOnly"] for f in external}
+  assert read_only["MLPZ.phoneNumber"] is False and read_only["MLPZ.email"] is False
+  assert read_only["MLPZ.name"] is True and read_only["MLPZ.postCode"] is True
 
 
 def test_dictionaries(form):

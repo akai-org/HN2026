@@ -21,7 +21,8 @@ RENAMED_FIELDS_1 = {
 # Where the references contradict the specification, the specification wins (checked in test_builder_rules.py):
 SPEC_OVERRIDES = {
   "FINISH page": "INFO_SECTION instead of TEXT_BLOCK (Reguły techniczne)",
-  "initial data": "fields with EXTERNAL_SYSTEM are readOnly, also address and contact (Dane inicjalne)",
+  "initial data": "EXTERNAL_SYSTEM => readOnly, also the MLPZ address (Dane inicjalne); only the attributes in "
+                  "initial_data.EDITABLE_INITIAL_DATA (MLPZ phone, e-mail; domain experts) are editable",
   "Twoje dane": "MLPZ.* as source and PESEL validator (Standardy), reference 5 uses PESEL.*",
   "Dane innej osoby": "has Numer PESEL (Standardy)",
   "Opłata skarbowa (wersja 2)": "title 'Opłata skarbowa' (Standardy), reference: 'Opłata skarbowa za pełnomonictwo'",
