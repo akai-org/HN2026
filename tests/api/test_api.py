@@ -34,13 +34,14 @@ def upload(client, name: str, data: bytes):
   return client.post("/api/forms/convert", files={"file": (name, data)})
 
 
-def test_convert_runs_validation_extraction_and_llm(client):
+def test_convert_runs_validation_extraction_llm_and_builder(client):
   http, calls = client
   response = upload(http, FORM5.name, FORM5.read_bytes())
   assert response.status_code == 200
-  body = response.json()
-  assert body["form"]["title"] == "Wniosek o test"
-  assert body["warnings"] == [pipeline.PARTIAL_RESULT_WARNING]
+  form = response.json()["form"]
+  assert form["title"] == "Wniosek o test"
+  assert form["tabs"][-1]["type"] == "FINISH" and form["flow"]["links"]   # a built FormDefinition, not the FormSpec
+  assert response.json()["warnings"] == []
   assert "nadpłaty podatku" in calls[0].as_text()          # the LLM got the extracted text
 
 
