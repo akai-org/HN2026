@@ -24,7 +24,7 @@ export default function Header() {
             </span>
             <div>
               <p className="text-sm font-semibold tracking-tight">UniForm</p>
-              <p className="text-xs text-muted-foreground">Konwersja formularzy — e-usługi</p>
+              <p className="text-xs text-muted-foreground">Konwersja formularzy — e-formularze</p>
             </div>
           </div>
           <nav aria-label="Postęp" className="flex items-center gap-4">
