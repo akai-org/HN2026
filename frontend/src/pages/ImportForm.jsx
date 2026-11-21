@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowUpAZ, FileText, Image, Trash2, Upload, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+import { convertFormFile } from "@/lib/api";
 
 const ACCEPTED_FORMATS = ".pdf,.doc,.docx,.ods,.xlsx,.jpg,.jpeg,.png";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -101,28 +102,11 @@ function ImportForm() {
 
       for (let fileIndex = 0; fileIndex < selectedFiles.length; fileIndex += 1) {
         const selectedFile = selectedFiles[fileIndex];
-        const formData = new FormData();
-        formData.append("file", selectedFile);
-
-        const response = await fetch("/api/forms/convert", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) {
-          let message = `Nie udało się przesłać pliku „${selectedFile.name}”.`;
-          try {
-            const responseError = await response.json();
-            message = responseError.message || message;
-          } catch {
-            // Keep the default error message when the server returns no JSON.
-          }
-          throw new Error(message);
-        }
+        const convertedForm = await convertFormFile(selectedFile);
 
         convertedForms.push({
           fileName: selectedFile.name,
-          convertedForm: await response.json(),
+          convertedForm,
           formNumber: 1 + [...splitBefore].filter((index) =>
             fileIndex >= index
           ).length,

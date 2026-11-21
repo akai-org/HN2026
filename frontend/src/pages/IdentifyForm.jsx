@@ -3,6 +3,43 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+function FormSummary({ result }) {
+  const form = result?.form;
+  const sections = form?.tabs?.flatMap((tab) =>
+    (tab.questions || []).filter((question) => question.field)
+  ) || [];
+  const warnings = result?.warnings || [];
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-lg border border-border bg-muted/20 p-3">
+          <p className="text-xs text-muted-foreground">Tytuł</p>
+          <p className="mt-1 font-medium">{form?.title || "Nieznany formularz"}</p>
+        </div>
+        <div className="rounded-lg border border-border bg-muted/20 p-3">
+          <p className="text-xs text-muted-foreground">Zakładki</p>
+          <p className="mt-1 text-2xl font-semibold">{form?.tabs?.length || 0}</p>
+        </div>
+        <div className="rounded-lg border border-border bg-muted/20 p-3">
+          <p className="text-xs text-muted-foreground">Pola</p>
+          <p className="mt-1 text-2xl font-semibold">{sections.length}</p>
+        </div>
+      </div>
+      {warnings.length > 0 && (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+          <p className="font-semibold">Ostrzeżenia</p>
+          <ul className="mt-1 list-inside list-disc">
+            {warnings.map((warning, index) => (
+              <li key={`${warning}-${index}`}>{warning}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function IdentifyForm() {
   const location = useLocation();
   const fileName = location.state?.fileName;
@@ -48,9 +85,17 @@ export default function IdentifyForm() {
                       </p>
                       <p className="truncate text-sm font-medium">{item.fileName}</p>
                     </div>
-                    <pre className="max-h-80 overflow-auto bg-background p-4 text-sm">
-                      {JSON.stringify(item.convertedForm, null, 2)}
-                    </pre>
+                    <div className="p-4">
+                      <FormSummary result={item.convertedForm} />
+                      <details className="mt-4 rounded-lg border border-border">
+                        <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
+                          Pokaż pełny JSON
+                        </summary>
+                        <pre className="max-h-80 overflow-auto border-t border-border bg-background p-4 text-sm">
+                          {JSON.stringify(item.convertedForm, null, 2)}
+                        </pre>
+                      </details>
+                    </div>
                   </div>
                 ))}
                 <Button asChild className="mt-2 w-full">
