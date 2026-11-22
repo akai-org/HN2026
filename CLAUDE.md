@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Rozwiązanie zadania COI na HackNation 2026 (drużyna AKAI): API do cyfryzacji formularzy. Zwraca JSON opisujący pola formularza (nazwy, format, dozwolone wartości); pola mogą wskazywać słowniki (zestawy dozwolonych wartości) i inne pola (zależności między polami).
 
-Plan implementacji backendu: `docs/plan-implementacji.md`. Zadania do równoległej pracy agentów, jeden plik na blok: `docs/bloki/` (indeks w `docs/bloki/README.md`). Zakres: tylko backend.
+Zakres: tylko backend. Przepływ: `pipeline.py` (walidacja `ingest/` → ekstrakcja `extract/` → LLM `ai/` → builder `builder/` z wzbogacaniem `enrich/` → kontrola reguł `rules/`).
 
 Materiały zadania leżą w `dane_zadania/` (tylko do odczytu). `dane_zadania/blankiety/` zawiera 9 formularzy, każdy w wielu formatach. Kontrakt wyjściowy to `dane_zadania/materialy/importowanyPlikJsonSchemat (1).json` (JSON Schema `FormDefinition`: `title` → `tabs[]` → `questions[]` z pozycją `x/y/rows/cols` i obiektem `field`). Opis pól jest w `OpisImportowanegoPlikuJSON (1).docx`, reguły walidacji w `Reguły techniczne konfiguracji formularzy...docx`. Zanim zmienisz model danych, sprawdź go z tymi plikami.
 
@@ -23,7 +23,7 @@ Oczekiwane JSON-y formularzy 1 i 5 (`konfiguracja_form_*.json`) są tylko **przy
 
 Schemat bywa niepełny: `repeatingSectionGrid` opisują Reguły techniczne i przykłady, a schemat go nie ma (ma literówkę `repetingSectionGrid`). Pisownia `repeatingSectionGrid` zostaje, bo używają jej też wyrażenia JSONata w Regułach technicznych.
 
-Ustalenia z ekspertami domenowymi uzupełniają specyfikację: na stronie FINISH dozwolone są `INFO_SECTION` i `TEXT_BLOCK`; dane inicjalne (`EXTERNAL_SYSTEM`) są tylko do odczytu, z wyjątkiem atrybutów z `EDITABLE_INITIAL_DATA` w `src/hacknation_2026/initial_data.py` (obecnie `MLPZ.phoneNumber`, `MLPZ.email`); `id` stron, pól i przejść to UUID. Szczegóły: `docs/bloki/F-kontrola-regul.md`.
+Ustalenia z ekspertami domenowymi uzupełniają specyfikację: na stronie FINISH dozwolone są `INFO_SECTION` i `TEXT_BLOCK`; dane inicjalne (`EXTERNAL_SYSTEM`) są tylko do odczytu, z wyjątkiem atrybutów z `EDITABLE_INITIAL_DATA` w `src/hacknation_2026/initial_data.py` (obecnie `MLPZ.phoneNumber`, `MLPZ.email`); `id` stron, pól i przejść to UUID. Znane naruszenia przykładowych JSON-ów wylicza `KNOWN_REFERENCE_VIOLATIONS` w `tests/rules/test_check.py`.
 
 Stack: Python 3.14 + FastAPI (menedżer: **uv**), React + Vite (menedżer: **npm**), Docker / Docker Compose.
 
@@ -45,7 +45,7 @@ src/hacknation_2026/
   __init__.py                 # main(): uruchamia uvicorn (port z $PORT, domyślnie 3000; host z $HOST, domyślnie 127.0.0.1, w Dockerze 0.0.0.0)
   app.py                      # FastAPI(), include_router(api, prefix="/api"), mount static (tylko gdy katalog istnieje)
   api/                        # routery
-  models/                     # (do utworzenia) modele Pydantic odpowiadające FormDefinition
+  contracts.py                # typy wspólne dla etapów pipeline (FormSpec, ExtractedDocument, ConvertResult…)
   static/                     # output vite build (gitignored)
 tests/                        # pytest
 frontend/                     # Vite + React (JavaScript), lint: oxlint
