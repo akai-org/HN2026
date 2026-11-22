@@ -1,56 +1,133 @@
-import { ArrowLeft, FileText } from "@/components/icons";
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, CircleCheck, FileText, Image, X } from "@/components/icons";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { convertFormFile } from "@/lib/api";
 
-function FormSummary({ result }) {
-  const form = result?.form;
-  const sections = form?.tabs?.flatMap((tab) =>
-    (tab.questions || []).filter((question) => question.field)
-  ) || [];
-  const warnings = result?.warnings || [];
-
-  return (
-    <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-3">
-        <div className="rounded-lg border border-border bg-muted/20 p-3">
-          <p className="text-xs text-muted-foreground">Tytuł</p>
-          <p className="mt-1 font-medium">{form?.title || "Nieznany formularz"}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-muted/20 p-3">
-          <p className="text-xs text-muted-foreground">Zakładki</p>
-          <p className="mt-1 text-2xl font-semibold">{form?.tabs?.length || 0}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-muted/20 p-3">
-          <p className="text-xs text-muted-foreground">Pola</p>
-          <p className="mt-1 text-2xl font-semibold">{sections.length}</p>
-        </div>
-      </div>
-      {warnings.length > 0 && (
-        <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-          <p className="font-semibold">Ostrzeżenia</p>
-          <ul className="mt-1 list-inside list-disc">
-            {warnings.map((warning, index) => (
-              <li key={`${warning}-${index}`}>{warning}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
-  );
+function getFileExtension(file) {
+  const extension = file.name.split(".").pop();
+  return extension && extension !== file.name ? extension.toUpperCase() : "PLIK";
 }
 
 export default function IdentifyForm() {
   const location = useLocation();
-  const fileName = location.state?.fileName;
-  const convertedForm = location.state?.convertedForm;
-  const convertedForms = location.state?.convertedForms || (
-    convertedForm ? [{ fileName, convertedForm }] : []
+  const navigate = useNavigate();
+  const selectedFiles = location.state?.selectedFiles || [];
+  const splitBefore = location.state?.splitBefore || [];
+  const existingConvertedForms = location.state?.convertedForms || [];
+  const startedRef = useRef(false);
+  const [convertedForms, setConvertedForms] = useState(existingConvertedForms);
+  const [statuses, setStatuses] = useState(() =>
+    selectedFiles.length
+      ? selectedFiles.map(() => ({ state: "idle", message: "" }))
+      : existingConvertedForms.map(() => ({ state: "success", message: "" }))
   );
 
+  async function processFiles(files) {
+    setStatuses(files.map(() => ({ state: "idle", message: "" })));
+    setConvertedForms([]);
+    const results = [];
+
+    for (let fileIndex = 0; fileIndex < files.length; fileIndex += 1) {
+      const selectedFile = files[fileIndex];
+      setStatuses((current) =>
+        current.map((status, index) =>
+          index === fileIndex
+            ? { state: "loading", message: "" }
+            : status
+        )
+      );
+
+      try {
+        const convertedForm = await convertFormFile(selectedFile);
+        const result = {
+          fileName: selectedFile.name,
+          convertedForm,
+          formNumber: 1 + splitBefore.filter((index) => fileIndex >= index).length,
+        };
+        results.push(result);
+        setConvertedForms([...results]);
+        setStatuses((current) =>
+          current.map((status, index) =>
+            index === fileIndex
+              ? { state: "success", message: "" }
+              : status
+          )
+        );
+      } catch (submitError) {
+        const message =
+          submitError instanceof Error
+            ? submitError.message
+            : "Nie udało się przekonwertować formularza.";
+        setStatuses((current) =>
+          current.map((status, index) =>
+            index === fileIndex
+              ? { state: "error", message }
+              : status
+          )
+        );
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (selectedFiles.length && !startedRef.current) {
+      startedRef.current = true;
+      processFiles(selectedFiles);
+    }
+  }, [selectedFiles]);
+
+  const formSections = selectedFiles.reduce((sections, file, index) => {
+    const formNumber = 1 + splitBefore.filter((splitIndex) => index >= splitIndex).length;
+    const section = sections.find((item) => item.formNumber === formNumber);
+    if (section) section.files.push({ file, index });
+    else sections.push({ formNumber, files: [{ file, index }] });
+    return sections;
+  }, []);
+  const allFinished =
+    selectedFiles.length > 0 &&
+    statuses.length === selectedFiles.length &&
+    statuses.every((status) =>
+      status.state === "success" || status.state === "error"
+    );
+  const successfulFormSections = formSections.filter((section) =>
+    section.files.every(({ index }) => statuses[index]?.state === "success")
+  );
+  const successfulFormNumbers = new Set(
+    successfulFormSections.map((section) => section.formNumber)
+  );
+  const successfulConvertedForms = convertedForms.filter(
+    (item) => successfulFormNumbers.has(item.formNumber)
+  );
+  const hasErrors = statuses.some((status) => status.state === "error");
+  const canOpenVerify =
+    (allFinished && successfulConvertedForms.length > 0) ||
+    (selectedFiles.length === 0 && existingConvertedForms.length > 0);
+
+  function openVerify() {
+    if (!canOpenVerify) return;
+    const formsToVerify =
+      selectedFiles.length ? successfulConvertedForms : existingConvertedForms;
+    navigate("/verify", {
+      state: {
+        fileName: formsToVerify[0]?.fileName,
+        convertedForm: formsToVerify[0]?.convertedForm,
+        convertedForms: formsToVerify,
+      },
+    });
+  }
+  const existingFormSections = existingConvertedForms.reduce((sections, item) => {
+    const formNumber = item.formNumber || 1;
+    const section = sections.find((existing) => existing.formNumber === formNumber);
+    if (section) section.items.push(item);
+    else sections.push({ formNumber, items: [item] });
+    return sections;
+  }, []);
+
   return (
-    <main className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-12 sm:px-6">
-      <div className="mx-auto max-w-5xl">
+    <main className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-8 sm:px-6">
+      <div className="mx-auto max-w-3xl">
         <Button asChild variant="ghost" className="mb-6">
           <Link to="/">
             <ArrowLeft aria-hidden="true" />
@@ -61,56 +138,145 @@ export default function IdentifyForm() {
         <Card className="shadow-lg shadow-foreground/5">
           <CardHeader>
             <div className="flex items-center gap-3">
-              <span className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <FileText aria-hidden="true" size={20} />
+              <span className="flex size-11 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <FileText aria-hidden="true" size={22} />
               </span>
               <div>
-                <CardTitle className="text-xl">Cyfryzacja formularza</CardTitle>
+                <CardTitle className="text-xl">Cyfryzowanie formularzy</CardTitle>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {convertedForms.length
-                    ? `${convertedForms.length} ${convertedForms.length === 1 ? "formularz" : "formularze"}`
-                    : "Brak plików"}
+                  Formularze są przetwarzane kolejno przez API
                 </p>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            {convertedForms.length ? (
+            {selectedFiles.length ? (
               <div className="space-y-4">
-                {convertedForms.map((item, index) => (
-                  <div key={`${item.fileName}-${index}`} className="rounded-lg border border-border">
-                    <div className="border-b border-border px-4 py-3">
-                      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-primary">
-                        Formularz {item.formNumber || 1}
-                      </p>
-                      <p className="truncate text-sm font-medium">{item.fileName}</p>
+                {formSections.map((section) => {
+                  const sectionFinished = section.files.every(({ index }) =>
+                    statuses[index]?.state === "success" || statuses[index]?.state === "error"
+                  );
+                  const sectionSuccessful = section.files.every(({ index }) =>
+                    statuses[index]?.state === "success"
+                  );
+                  return (
+                    <section
+                      key={section.formNumber}
+                      aria-label={`Formularz ${section.formNumber}`}
+                      className="space-y-3"
+                    >
+                    <div className={`flex items-center gap-3 text-sm font-semibold ${
+                      sectionSuccessful ? "text-emerald-700" : sectionFinished ? "text-destructive" : "text-primary"
+                    }`}>
+                      <span className={`h-px flex-1 ${
+                        sectionSuccessful ? "bg-emerald-300" : sectionFinished ? "bg-destructive/40" : "bg-primary/30"
+                      }`} />
+                      Formularz {section.formNumber}
+                      {sectionSuccessful
+                        ? " — OK"
+                        : sectionFinished
+                          ? " — nieprzekonwertowany"
+                          : " — w trakcie"}
+                      <span className={`h-px flex-1 ${
+                        sectionSuccessful ? "bg-emerald-300" : sectionFinished ? "bg-destructive/40" : "bg-primary/30"
+                      }`} />
                     </div>
-                    <div className="p-4">
-                      <FormSummary result={item.convertedForm} />
-                      <details className="mt-4 rounded-lg border border-border">
-                        <summary className="cursor-pointer px-4 py-3 text-sm font-medium">
-                          Pokaż pełny JSON
-                        </summary>
-                        <pre className="max-h-80 overflow-auto border-t border-border bg-background p-4 text-sm">
-                          {JSON.stringify(item.convertedForm, null, 2)}
-                        </pre>
-                      </details>
+                    {section.files.map(({ file, index }) => {
+                      const status = statuses[index] || { state: "idle", message: "" };
+                      return (
+                        <div
+                          key={`${file.name}-${file.size}-${file.lastModified}`}
+                          className={`flex min-h-32 items-center gap-4 rounded-xl border p-4 sm:p-5 ${
+                            status.state === "error"
+                              ? "border-destructive/60 bg-destructive/5"
+                              : status.state === "success"
+                                ? "border-emerald-300 bg-emerald-50/40"
+                                : "border-border bg-background"
+                          }`}
+                        >
+                          <span className="relative flex size-16 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/30 text-primary">
+                            {file.type.startsWith("image/") ? (
+                              <Image aria-hidden="true" size={30} />
+                            ) : (
+                              <FileText aria-hidden="true" size={30} />
+                            )}
+                            <span className="absolute -bottom-1 right-1 rounded-sm bg-primary px-1.5 py-0.5 text-[9px] font-bold text-primary-foreground">
+                              {getFileExtension(file)}
+                            </span>
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-base font-semibold" title={file.name}>
+                              {file.name}
+                            </p>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                              {(file.size / 1024 / 1024).toFixed(2)} MB
+                            </p>
+                            {status.state === "error" && (
+                              <p className="mt-2 text-sm font-medium text-destructive" role="alert">
+                                {status.message}
+                              </p>
+                            )}
+                            {status.state === "success" && (
+                              <p className="mt-2 text-sm font-medium text-emerald-700">
+                                Cyfryzacja zakończona
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex size-12 shrink-0 items-center justify-center">
+                            {status.state === "loading" && (
+                              <div className="loader" role="status" aria-label={`Cyfryzowanie pliku ${file.name}`} />
+                            )}
+                            {status.state === "success" && (
+                              <CircleCheck aria-label="Powodzenie" className="text-emerald-600" size={38} />
+                            )}
+                            {status.state === "error" && (
+                              <X aria-label="Niepowodzenie" className="text-destructive" size={38} />
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    </section>
+                  );
+                })}
+
+                {hasErrors && (
+                  <Button type="button" variant="outline" className="w-full" onClick={() => processFiles(selectedFiles)}>
+                    Spróbuj ponownie
+                  </Button>
+                )}
+                <Button type="button" className="w-full" disabled={!canOpenVerify} onClick={openVerify}>
+                  {canOpenVerify
+                    ? "Przejdź do sprawdzenia i zatwierdzenia"
+                    : "Oczekiwanie na zakończenie przetwarzania"}
+                </Button>
+              </div>
+            ) : existingConvertedForms.length ? (
+              <div className="space-y-4">
+                {existingFormSections.map((section) => (
+                  <section key={section.formNumber} className="space-y-3" aria-label={`Formularz ${section.formNumber}`}>
+                    <div className="flex items-center gap-3 text-sm font-semibold text-primary">
+                      <span className="h-px flex-1 bg-primary/30" />
+                      Formularz {section.formNumber}
+                      <span className="h-px flex-1 bg-primary/30" />
                     </div>
-                  </div>
+                    {section.items.map((item, index) => (
+                      <div key={`${item.fileName}-${index}`} className="flex min-h-32 items-center gap-4 rounded-xl border border-emerald-300 bg-emerald-50/40 p-5">
+                        <CircleCheck className="text-emerald-600" size={38} />
+                        <div className="min-w-0">
+                          <p className="truncate font-semibold">{item.fileName}</p>
+                          <p className="mt-1 text-sm text-emerald-700">Cyfryzacja zakończona</p>
+                        </div>
+                      </div>
+                    ))}
+                  </section>
                 ))}
-                <Button asChild className="mt-2 w-full">
-                  <Link
-                    to="/verify"
-                    state={{ fileName, convertedForm, convertedForms }}
-                  >
-                    Sprawdź i zatwierdź
-                  </Link>
+                <Button type="button" className="w-full" onClick={openVerify}>
+                  Przejdź do sprawdzenia i zatwierdzenia
                 </Button>
               </div>
             ) : (
-              <p className="text-muted-foreground">
-                Formularz nie został przekazany do przeglądu.
-              </p>
+              <p className="text-muted-foreground">Nie przekazano plików do cyfryzowania.</p>
             )}
           </CardContent>
         </Card>
