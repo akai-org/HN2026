@@ -269,3 +269,21 @@ def retry_prompt(error: ValidationError | str) -> str:
     f"{details}\n"
     "Zwróć ponownie CAŁY obiekt JSON, poprawiając te błędy. Tylko JSON."
   )
+
+
+MAX_LISTED_LINES = 40
+
+
+def completion_prompt(lines: list[str]) -> str:
+  """Asks for the parts of a long form the first answer left out (see analyze.uncovered_lines)."""
+  listing = "\n".join(f"- {line[:200]}" for line in lines[:MAX_LISTED_LINES])
+  return (
+    "W Twojej odpowiedzi brakuje części formularza. Te linie z miejscem do wpisania albo z kratką nie mają "
+    "odpowiednika w żadnym polu:\n"
+    f"{listing}\n\n"
+    "Opisz brakujące części merytoryczne jako DODATKOWE strony z sekcjami i polami, według tych samych zasad co wcześniej "
+    "(typy pól, wymagalność, show_if, sekcje powtarzalne). Pomiń linie z części pomijanych (dane wnioskodawcy, jego adres "
+    "i kontakt, data i miejsce sporządzenia, podpis, pola wypełniane przez urząd) oraz pola, które już są w Twojej "
+    "odpowiedzi. Klucze nowych pól i sekcji muszą być inne niż już użyte; show_if może wskazywać pola z Twojej odpowiedzi.\n"
+    'Zwróć TYLKO obiekt JSON {"pages": [...]} z nowymi stronami. Gdy niczego merytorycznego nie brakuje: {"pages": []}.'
+  )
