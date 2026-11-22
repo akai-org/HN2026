@@ -239,7 +239,19 @@ def test_enrichment_is_applied_to_subject_fields(settings, monkeypatch):
   assert kraj["dictionaryName"] == "Kraje" and kraj["searchEnabled"] is True
   assert wybor["defaultValue"] == "MLPZ.surname" and wybor["defaultValueType"] == "EXTERNAL_SYSTEM"
   assert wybor["readOnly"] is True, "initial data => read-only (Dane inicjalne)"
-  assert wybor["validation"] == ["REQUIRED", "EMAIL"], "only validators from Reguły techniczne"
+  assert wybor["validation"] == ["REQUIRED"], "RADIO takes only REQUIRED (Reguły techniczne)"
+
+
+def test_format_validators_kept_on_text_field(settings, monkeypatch):
+  def enrich_field(label, field_type, required, applicant_data):
+    return StubEnrichment(validators=["EMAIL", "PATTERN"])
+
+  monkeypatch.setattr(build, "enrich_field", enrich_field)
+  spec = minimal_spec(pages=[PageSpec(title="Sprawa", sections=[SectionSpec(key="s", title="Sekcja", fields=[
+    FieldSpec(key="mail", label="Adres poczty", type="TEXT_FIELD", required=True),
+  ])])])
+  field = build_form(spec, settings)["tabs"][1]["questions"][0]["field"]["repeatingSectionGrid"][0]["field"]
+  assert field["validation"] == ["REQUIRED", "EMAIL"], "only validators from Reguły techniczne"
 
 
 @pytest.mark.parametrize(("initial", "enriched_read_only", "explicit", "expected"), [
