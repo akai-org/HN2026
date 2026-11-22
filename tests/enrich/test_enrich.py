@@ -52,7 +52,7 @@ def test_spec_example():
   ("Seria i numer dowodu osobistego", "TEXT_FIELD", False, ["SERIAL_NUMBER_ID_CARD"]),
   ("Organ wydający dowód osobisty", "TEXT_FIELD", False, []),       # not the card's number
   ("NIP lub PESEL", "TEXT_FIELD", False, []),                       # alternatives: no single format fits
-  ("Numer PESEL", "NUMBER", False, ["PESEL"]),
+  ("Numer PESEL", "NUMBER", False, []),  # Reguły techniczne: NUMBER takes only REQUIRED
   ("Czy posiadasz numer PESEL?", "RADIO", True, ["REQUIRED"]),      # format validators only for typed text
   ("Numer KRS", "TEXT_FIELD", False, []),                           # Standardy want a regex, not an allowed validator
   ("Opis sprawy", "TEXTAREA", True, ["REQUIRED"]),

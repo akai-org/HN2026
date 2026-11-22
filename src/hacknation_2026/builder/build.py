@@ -11,6 +11,7 @@ from hacknation_2026.builder import jsonata, layout, standard_sections as std
 from hacknation_2026.config import Settings
 from hacknation_2026.contracts import Condition, FieldSpec, FormDefinition, FormSpec, PageSpec
 from hacknation_2026.initial_data import EXTERNAL_SYSTEM
+from hacknation_2026.rules.check import allowed_validators
 
 from hacknation_2026.enrich.enrich import enrich_field
 
@@ -43,7 +44,8 @@ class FieldFactory:
   - a dictionary only on SELECT/RADIO/CHECKBOX, and then `options` is empty (Reguły techniczne, Słowniki),
   - block E may turn a TEXT_FIELD into a more specific type (country -> SELECT with Kraje, birth date -> DATEPICKER),
   - block E's dictionary only for a field without options of its own: the paper form's options are kept,
-  - validators only from the allowed list, REQUIRED for required fields, none for presentational types,
+  - validators only those allowed for the type (`rules.check.allowed_validators`: any on TEXT_FIELD, only REQUIRED
+    on other inputs, none on presentational types), REQUIRED for required fields,
   - RADIO with more than 5 options becomes SELECT; SELECT with more than 15 options gets search (Standardy).
   """
 
@@ -117,7 +119,7 @@ class FieldFactory:
   def _validation(self, type_: str, required: bool, validators: list[str]) -> list[str]:
     if type_ in NO_VALIDATION or not self.settings.emit_validators:
       return []
-    wanted = (["REQUIRED"] if required else []) + validators
+    wanted = set((["REQUIRED"] if required else []) + validators) & allowed_validators(type_)
     return [v for v in VALIDATORS if v in wanted]
 
   def _enrich(self, label: str, type_: str, required: bool, applicant_data: bool):

@@ -5,6 +5,7 @@ plus clarifications from the domain experts (see docs/bloki/F-kontrola-regul.md)
 - the FINISH page may hold INFO_SECTION and TEXT_BLOCK,
 - initial data (EXTERNAL_SYSTEM) is read-only, except the attributes in `initial_data.EDITABLE_INITIAL_DATA`,
 - page, field and flow link ids are UUIDs.
+Validators per field type follow the component tables in Reguły techniczne (see `allowed_validators`).
 """
 
 import re
@@ -24,6 +25,10 @@ INPUT_TYPES = CHOICE_TYPES | {"TEXT_FIELD", "NUMBER", "TEXTAREA", "FILE_UPLOADER
 FIELD_TYPES = INPUT_TYPES | {"CONSENT_SECTION", "TEXT_BLOCK", "INFO_SECTION"}
 FINISH_FIELD_TYPES = {"INFO_SECTION", "TEXT_BLOCK"}
 VALIDATORS = {"REQUIRED", "EMAIL", "PESEL", "NIP", "REGON", "ZIP_CODE", "EPUAP", "ADE", "SERIAL_NUMBER_ID_CARD"}
+# Reguły techniczne, component tables: TEXT_FIELD may have any validator, the other inputs only REQUIRED,
+# presentational components (TEXT_BLOCK, INFO_SECTION, CONSENT_SECTION) and sections none
+FORMAT_VALIDATOR_TYPES = {"TEXT_FIELD"}
+REQUIRED_ONLY_TYPES = INPUT_TYPES - FORMAT_VALIDATOR_TYPES
 FIELD_STATES = {"SHOW", "READ_ONLY"}
 SECTION_STATES = {"SHOW"}
 # Słowniki: countries and address dictionaries (TERYT: voivodeship/district/commune/place) only on a dropdown
@@ -52,6 +57,15 @@ _GRID_KEYS = ("x", "y", "rows", "cols")
 
 def check_form(form: FormDefinition) -> list[RuleViolation]:
   return _Checker(form).run()
+
+
+def allowed_validators(kind: Any) -> set[str]:
+  """Validators a field of this type may have (Reguły techniczne, component tables)."""
+  if kind in FORMAT_VALIDATOR_TYPES:
+    return set(VALIDATORS)
+  if kind in REQUIRED_ONLY_TYPES:
+    return {"REQUIRED"}
+  return set()
 
 
 def _is_number(value: Any) -> bool:
@@ -254,9 +268,14 @@ class _Checker:
       taken.add(name)
 
   def check_validation(self, node: dict, path: str) -> None:
+    kind = node.get("type")
+    allowed = allowed_validators(kind)
     for value in _list(node.get("validation")):
       if value not in VALIDATORS:
         self.add("validation.unknown", f"Walidator {value!r} spoza listy dozwolonych.", path)
+      elif kind in FIELD_TYPES | SECTION_TYPES and value not in allowed:
+        hint = f"dozwolone: {sorted(allowed)}" if allowed else "pole tego typu nie ma walidatorów"
+        self.add("validation.not_allowed_for_type", f"Walidator {value!r} niedozwolony w polu typu {kind!r} ({hint}).", path)
 
   def check_options(self, node: dict, path: str) -> None:
     kind = node.get("type")
