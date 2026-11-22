@@ -44,6 +44,7 @@ export function plural(count, one, few, many) {
  */
 export function indexForm(form) {
   const byId = new Map();
+  const fieldIds = new Set();
   const titles = new Map();
   let fieldCount = 0;
 
@@ -56,13 +57,14 @@ export function indexForm(form) {
         const field = item?.field;
         if (!field) return;
         byId.set(field.id, { node: field, tabIndex, kind: "field" });
+        fieldIds.add(field.id);
         titles.set(`${section.techName}|${field.techName}`, field.title);
         if (!["TEXT_BLOCK", "INFO_SECTION"].includes(field.type)) fieldCount += 1;
       });
     });
   });
 
-  return { byId, titles, fieldCount };
+  return { byId, fieldIds, titles, fieldCount };
 }
 
 // `("Opcja" in tabs['Strona' in title].questions['sekcja' in field.techName].field.repeatingSectionGrid['pole' in field.techName].field.__userAnswer)`

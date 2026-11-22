@@ -23,7 +23,7 @@ function objectRange(lines, id) {
   return [start, end];
 }
 
-export default function JsonPanel({ form, selectedId, onSelect }) {
+export default function JsonPanel({ form, selectedId, fieldIds, onSelect }) {
   const text = useMemo(() => JSON.stringify(form, null, 2), [form]);
   const lines = useMemo(() => text.split("\n"), [text]);
   const range = useMemo(() => objectRange(lines, selectedId), [lines, selectedId]);
@@ -86,15 +86,16 @@ export default function JsonPanel({ form, selectedId, onSelect }) {
           const isHighlighted = range && index >= range[0] && index <= range[1];
           const idMatch = line.match(idPattern);
           const lineId = idMatch ? idMatch[1].replace(/\\(.)/g, "$1") : null;
+          const isFieldId = Boolean(lineId && fieldIds?.has(lineId));
           return (
             <div
               key={index}
               ref={range && index === range[0] ? startRef : undefined}
-              role={lineId && onSelect ? "button" : undefined}
-              tabIndex={lineId && onSelect ? 0 : undefined}
-              aria-label={lineId && onSelect ? `Zaznacz element ${lineId} w formularzu` : undefined}
-              onClick={lineId && onSelect ? () => onSelect(lineId) : undefined}
-              onKeyDown={lineId && onSelect ? (event) => {
+              role={isFieldId && onSelect ? "button" : undefined}
+              tabIndex={isFieldId && onSelect ? 0 : undefined}
+              aria-label={isFieldId && onSelect ? `Zaznacz pole ${lineId} w formularzu` : undefined}
+              onClick={isFieldId && onSelect ? () => onSelect(lineId) : undefined}
+              onKeyDown={isFieldId && onSelect ? (event) => {
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
                   onSelect(lineId);
@@ -103,7 +104,7 @@ export default function JsonPanel({ form, selectedId, onSelect }) {
               className={cn(
                 "flex pr-4",
                 isHighlighted && "bg-amber-100",
-                lineId && onSelect && "cursor-pointer hover:bg-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                isFieldId && onSelect && "cursor-pointer hover:bg-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
               )}
             >
               <span
