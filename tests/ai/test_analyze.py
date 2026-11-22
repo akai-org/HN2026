@@ -314,3 +314,41 @@ def test_covered_form_needs_no_completion(monkeypatch, settings):
   requests = mock_llm(monkeypatch, lambda req, n: httpx.Response(200, json=completion(json.dumps(covering))))
   analyze(LONG_DOC, settings)
   assert len(requests) == 1
+
+
+def test_model_verdict_not_a_form_is_rejected_without_completion(monkeypatch, settings):
+  menu = {"is_form": False, "not_form_reason": "menu restauracji.", "title": "Karta menu", "pages": [], "consents": []}
+  requests = mock_llm(monkeypatch, lambda req, n: httpx.Response(200, json=completion(json.dumps(menu))))
+  with pytest.raises(AppError) as err:
+    analyze(LONG_DOC, settings)   # LONG_DOC would otherwise trigger the completion request
+  assert (err.value.code, err.value.status) == ("NOT_A_FORM", 422)
+  assert err.value.message == "Plik nie wygląda na formularz do wypełnienia (menu restauracji)."
+  assert len(requests) == 1
+
+
+@pytest.mark.parametrize("title,rejected", [
+  ("Program konferencji", True),             # not the title of a form
+  ("OFERTA", True),                          # a price list, even though the model found fields in it
+  ("", True),                                # no title at all
+  ("Wniosek o wydanie zaświadczenia", False),  # a real form may hold only applicant data, which the builder adds
+  ("DEKLARACJA o wysokości opłaty", False),
+  ("Formularz ofertowy – dostawa sprzętu", False),
+])
+def test_answer_is_rejected_unless_titled_as_a_form(monkeypatch, settings, doc, title, rejected):
+  spec = {**VALID_SPEC, "title": title}
+  mock_llm(monkeypatch, lambda req, n: httpx.Response(200, json=completion(json.dumps(spec))))
+  if rejected:
+    with pytest.raises(AppError) as err:
+      analyze(doc, settings)
+    assert err.value.code == "NOT_A_FORM" and err.value.status == 422
+  else:
+    assert analyze(doc, settings).title == title
+
+
+def test_very_long_document_is_rejected_before_the_llm(monkeypatch, settings):
+  requests = mock_llm(monkeypatch, lambda req, n: httpx.Response(500))
+  manual = ExtractedDocument(format=FileFormat.PDF, blocks=[Block(kind="text", text="Instrukcja obsługi pralki. " * 3000)])
+  with pytest.raises(AppError) as err:
+    analyze(manual, settings)
+  assert err.value.code == "NOT_A_FORM" and "tys. znaków" in err.value.message
+  assert not requests

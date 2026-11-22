@@ -14,3 +14,4 @@ tests/
 scripts/
 frontend/node_modules
 frontend/dist
+src/hacknation_2026/static

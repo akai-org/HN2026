@@ -14,7 +14,7 @@ Każdy plik opisuje jeden blok do zrobienia przez niezależnego agenta. Agent do
 | [E](E-wzbogacanie-pol.md) | Wzbogacanie pól – **zrobione** |
 | [F](F-kontrola-regul.md) | Kontrola reguł – **zrobione** (podpięte w pipeline, naruszenia w `warnings`) |
 | [G](G-api-pipeline.md) | API i pipeline – **zrobione** (A–F podpięte) |
-| [H](H-docker-readme.md) | Docker, compose, README |
+| [H](H-docker-readme.md) | Docker, compose, README – **zrobione** (compose bez Ollamy: LLM przez EdenAI) |
 | [I](I-ewaluacja.md) | Ewaluacja |
 | [J](J-poprawa-detekcji.md) | Poprawa detekcji – **częściowo**: J3 i J4 częściowo, J1, J2, J5 do zrobienia, J6 odrzucone |
 

@@ -26,6 +26,13 @@ Bez komentarzy i bez Markdownu.
   np. "(imię i nazwisko) Wójt Gminy X" to podpis pola z lewej kolumny i adresat z prawej.
 
 ## Co zwrócić
+- "is_form": najpierw oceń, czy dokument jest FORMULARZEM do wypełnienia i złożenia: wniosek, podanie, zgłoszenie,
+  deklaracja, oświadczenie albo formularz (np. ofertowy) składany do urzędu, instytucji lub pracodawcy, po polsku.
+  "is_form": false, gdy to coś innego, np. menu, cennik, oferta handlowa, plan lekcji, rozkład jazdy, program wydarzenia,
+  instrukcja obsługi lub wypełniania, artykuł, uchwała, klauzula informacyjna, wzór umowy, ankieta, test lub egzamin,
+  paragon, wykres, karta postaci z gry, formularz w innym języku niż polski. Wtedy "not_form_reason" to krótki opis,
+  czym jest dokument (np. "menu restauracji"), "pages": [] i "consents": [], a "title" przepisz z dokumentu.
+  Gdy to formularz: "is_form": true i "not_form_reason": "".
 - "title": pełny tytuł z nagłówka formularza (linia zaczynająca się od WNIOSEK, ZGŁOSZENIE, DEKLARACJA
   albo OŚWIADCZENIE, razem z jej ciągiem dalszym w kolejnej linii). Niczego nie skracaj ani nie dopisuj;
   zapisz zwykłą polską pisownią ("Wniosek o ustalenie …"), bez numeru druku i podstawy prawnej. Maks. 255 znaków.
@@ -170,6 +177,8 @@ ____
 """
 
 EXAMPLE_OUTPUT = {
+  "is_form": True,
+  "not_form_reason": "",
   "title": "Wniosek o wydanie zezwolenia na usunięcie drzewa",
   "authority_name": "Burmistrz Miasta Przykładowo",
   "authority_kind": "ORGAN",

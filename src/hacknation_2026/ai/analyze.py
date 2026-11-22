@@ -19,6 +19,28 @@ MIN_UNCOVERED_SHARE = 0.3
 LINE_COVERED_AT = 0.5   # share of a line's words that must appear in the answer
 
 
+# The title names the kind of document; anything else (OFERTA, Program konferencji, Karta menu) is not a form.
+FORM_TITLE = re.compile(
+  r"^\s*(wniosek|podanie|zgłoszenie|deklaracja|oświadczenie|formularz|zawiadomienie|informacja\b|kwestionariusz|karta\s+zgłoszenia)",
+  re.IGNORECASE)
+# The longest real form in the samples has ~23k characters of text; price lists and manuals have 75k–270k.
+MAX_FORM_CHARS = 60_000
+
+
+def _not_a_form(detail: str) -> AppError:
+  return AppError("NOT_A_FORM", f"Plik nie wygląda na formularz do wypełnienia{detail}.", 422)
+
+
+def _reject_if_not_a_form(spec: FormSpec, after_analysis: bool) -> None:
+  """422 NOT_A_FORM when the model says the file is not a form, or (after the analysis) when its title is not
+  the title of a form (no title, "OFERTA", "Program konferencji") or nothing fillable was found."""
+  if not spec.is_form:
+    reason = spec.not_form_reason.strip().rstrip(".")
+    raise _not_a_form(f" ({reason})" if reason else "")
+  if after_analysis and not FORM_TITLE.match(spec.title):
+    raise _not_a_form(": jego tytuł nie wskazuje na wniosek, zgłoszenie, deklarację ani inny formularz")
+
+
 class _MissingPages(BaseModel):
   """Answer to the completion request: only the pages the first answer left out."""
   pages: list[PageSpec] = []
@@ -144,6 +166,9 @@ def analyze(doc: ExtractedDocument, settings: Settings) -> FormSpec:
   if not doc.as_text().strip() or not doc.blocks:
     raise AppError("EMPTY_DOCUMENT", "Nie udało się odczytać tekstu z pliku.", 422)
 
+  if len(doc.as_text()) > MAX_FORM_CHARS:   # before the LLM: a 60-page manual would take minutes to analyse
+    raise _not_a_form(f": ma {len(doc.as_text()) // 1000} tys. znaków tekstu, a formularze mają do kilkudziesięciu tysięcy")
+
   messages = build_messages(doc)
   schema = FormSpec.model_json_schema()
   last_error: ValidationError | str = ""
@@ -159,7 +184,10 @@ def analyze(doc: ExtractedDocument, settings: Settings) -> FormSpec:
       except ValidationError as exc:
         last_error = exc
       else:
-        return _fix_conditions(_capitalize_options(_complete(doc, spec, messages, raw, settings)))
+        _reject_if_not_a_form(spec, after_analysis=False)   # before the completion request: no extra call for a menu
+        spec = _fix_conditions(_capitalize_options(_complete(doc, spec, messages, raw, settings)))
+        _reject_if_not_a_form(spec, after_analysis=True)
+        return spec
     messages = [
       *messages,
       {"role": "assistant", "content": raw or "(brak poprawnej odpowiedzi)"},

@@ -4,6 +4,10 @@ Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i
 
 **Wymaga:** ukończonego bloku 0. Typy (`AppError`, `FileFormat`, `ExtractedDocument`, `FormSpec`, `FormDefinition`, `RuleViolation`, `ConvertResult`, `Settings`) importuj z `hacknation_2026.contracts` i `hacknation_2026.config`; ich pełna definicja jest w `docs/bloki/00-kontrakty.md`.
 
+> **Status: zrobione** (sprawdzone 2026-11-22). `docker compose up --build` buduje obraz (frontend + Python, Tesseract 5.3 z `pol`, OpenCV 5.1, użytkownik `appuser` bez roota) i uruchamia serwis `app`. Healthcheck daje `healthy`, a `curl localhost:3000/api/health` zwraca `{"status":"ok","llm":"ok"}`. W kontenerze przechodzi ekstrakcja wszystkich 69 plików z 9 blankietów, a konwersja formularza 5 (PDF, PNG, DOCX) zwraca formularz bez ostrzeżeń.
+>
+> **Zmiana względem wymagań:** zamiast serwisu `ollama` compose łączy się z EdenAI (Gemma 4 31B, model open source, ustalenie z mentorami). Domyślnie `LLM_MODEL=google/gemma-4-31b-it` i `LLM_FALLBACK_MODEL=deepinfra/google/gemma-4-31B-it`; klucz `LLM_API_KEY` z `.env`. Lokalną Ollamę nadal można wskazać przez `LLM_BASE_URL`. Obrazy bazowe są przypięte do wersji głównej (`node:24-alpine`, `uv:python3.14-bookworm-slim`), a nie do skrótu. Obraz ma ok. 1,6 GB.
+
 ## Zadanie
 
 **Pliki:** `Dockerfile`, `docker-compose.yml`, `.dockerignore`, `.env.example`, `README.md`
