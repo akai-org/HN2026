@@ -53,10 +53,33 @@ function saveVerifyItems(items) {
   }
 }
 
+function replaceNodeById(value, id, replacement) {
+  if (Array.isArray(value)) {
+    let changed = false;
+    const next = value.map((entry) => {
+      const result = replaceNodeById(entry, id, replacement);
+      if (result !== entry) changed = true;
+      return result;
+    });
+    return changed ? next : value;
+  }
+  if (!value || typeof value !== "object") return value;
+  if (value.id === id) return { ...replacement };
+
+  let changed = false;
+  const next = {};
+  for (const [key, entry] of Object.entries(value)) {
+    const result = replaceNodeById(entry, id, replacement);
+    if (result !== entry) changed = true;
+    next[key] = result;
+  }
+  return changed ? next : value;
+}
+
 export default function VerifyForm() {
   const location = useLocation();
   const stateItems = location.state?.convertedForms;
-  const items = stateItems?.length ? stateItems : readVerifyItems();
+  const [items, setItems] = useState(() => stateItems?.length ? stateItems : readVerifyItems());
   const [current, setCurrent] = useState(0);
   const [views, setViews] = useState(readViews);
   const item = items[Math.min(current, items.length - 1)];
@@ -67,8 +90,14 @@ export default function VerifyForm() {
   }, []);
 
   useEffect(() => {
-    if (stateItems?.length) saveVerifyItems(stateItems);
+    if (stateItems?.length) {
+      setItems(stateItems);
+    }
   }, [stateItems]);
+
+  useEffect(() => {
+    saveVerifyItems(items);
+  }, [items]);
 
   function toggleView(key) {
     setViews((currentViews) => {
@@ -103,13 +132,26 @@ export default function VerifyForm() {
           views={views}
           onToggleView={toggleView}
           backState={location.state}
+          onUpdateForm={(nextForm) => {
+            setItems((currentItems) => currentItems.map((entry, entryIndex) =>
+              entryIndex === current
+                ? {
+                    ...entry,
+                    convertedForm: {
+                      ...entry.convertedForm,
+                      form: nextForm,
+                    },
+                  }
+                : entry,
+            ));
+          }}
         />
       </div>
     </main>
   );
 }
 
-function Comparison({ item, items, current, onCurrentChange, views, onToggleView, backState }) {
+function Comparison({ item, items, current, onCurrentChange, views, onToggleView, backState, onUpdateForm }) {
   const result = item.convertedForm;
   const form = result?.form;
   const index = useMemo(() => indexForm(form), [form]);
@@ -133,6 +175,11 @@ function Comparison({ item, items, current, onCurrentChange, views, onToggleView
   function showWarning(warning) {
     if (warning.tabIndex !== null) setPage(warning.tabIndex);
     if (warning.id) setSelectedId(warning.id);
+  }
+
+  function editFragment(id, replacement) {
+    const nextForm = replaceNodeById(form, id, replacement);
+    if (nextForm) onUpdateForm(nextForm);
   }
 
   const visible = VIEWS.filter(({ key }) => views[key]);
@@ -263,6 +310,7 @@ function Comparison({ item, items, current, onCurrentChange, views, onToggleView
             selectedId={selectedId}
             fieldIds={index.fieldIds}
             onSelect={select}
+            onEditFragment={editFragment}
           />
         )}
       </div>

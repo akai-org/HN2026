@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, Download } from "@/components/icons";
+import { Check, Copy, Download, Pencil } from "@/components/icons";
 import { buttonVariants } from "@/components/ui/button";
 import { downloadJson } from "@/lib/formDefinition";
 import { cn } from "@/lib/utils";
@@ -23,13 +23,27 @@ function objectRange(lines, id) {
   return [start, end];
 }
 
-export default function JsonPanel({ form, selectedId, fieldIds, onSelect }) {
+export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEditFragment }) {
   const text = useMemo(() => JSON.stringify(form, null, 2), [form]);
   const lines = useMemo(() => text.split("\n"), [text]);
   const range = useMemo(() => objectRange(lines, selectedId), [lines, selectedId]);
   const [copied, setCopied] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editDraft, setEditDraft] = useState("");
+  const [editError, setEditError] = useState("");
   const bodyRef = useRef(null);
   const startRef = useRef(null);
+
+  useEffect(() => {
+    setEditing(false);
+    setEditError("");
+  }, [selectedId]);
+
+  useEffect(() => {
+    if (!editing || !range) return;
+    const fragment = lines.slice(range[0], range[1] + 1).join("\n").trim().replace(/,$/, "");
+    setEditDraft(fragment);
+  }, [editing, selectedId]);
 
   // Scroll only the panel (scrollIntoView would also move the page).
   useEffect(() => {
@@ -50,6 +64,34 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect }) {
     }
   }
 
+  function toggleEditing() {
+    if (!range) return;
+    if (editing) {
+      setEditing(false);
+      setEditError("");
+      return;
+    }
+    const fragment = lines.slice(range[0], range[1] + 1).join("\n").trim().replace(/,$/, "");
+    setEditDraft(fragment);
+    setEditError("");
+    setEditing(true);
+  }
+
+  function changeFragment(value) {
+    setEditDraft(value);
+    try {
+      const replacement = JSON.parse(value);
+      if (replacement?.id !== selectedId) {
+        setEditError("Pole id nie może zostać zmienione podczas edycji fragmentu.");
+        return;
+      }
+      setEditError("");
+      onEditFragment?.(selectedId, replacement);
+    } catch {
+      setEditError("Nieprawidłowy JSON. Zmiany zostaną zastosowane po usunięciu błędu.");
+    }
+  }
+
   const digits = String(lines.length).length;
   const idPattern = /^\s*"id":\s*"((?:[^"\\]|\\.)*)",?\s*$/;
 
@@ -61,6 +103,17 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect }) {
       bodyRef={bodyRef}
       actions={
         <>
+          {range && (
+            <button
+              type="button"
+              className={cn(buttonVariants({ variant: "ghost", size: "xs" }))}
+              onClick={toggleEditing}
+              title={editing ? "Zakończ edycję fragmentu" : "Edytuj zaznaczony fragment"}
+            >
+              <Pencil />
+              {editing ? "Zakończ" : "Edytuj fragment"}
+            </button>
+          )}
           <button
             type="button"
             className={cn(buttonVariants({ variant: "ghost", size: "xs" }))}
@@ -81,6 +134,18 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect }) {
         </>
       }
     >
+      {editing ? (
+        <div className="p-3">
+          <textarea
+            value={editDraft}
+            onChange={(event) => changeFragment(event.target.value)}
+            spellCheck="false"
+            aria-label="Edytor zaznaczonego fragmentu JSON"
+            className="min-h-72 w-full resize-y rounded-md border border-amber-400 bg-background p-3 font-mono text-xs leading-5 outline-none focus:ring-3 focus:ring-ring/50"
+          />
+          {editError && <p role="alert" className="mt-2 text-xs font-medium text-destructive">{editError}</p>}
+        </div>
+      ) : (
       <pre className="min-w-max py-2 font-mono text-xs leading-5" aria-label="JSON formularza">
         {lines.map((line, index) => {
           const isHighlighted = range && index >= range[0] && index <= range[1];
@@ -122,6 +187,7 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect }) {
           );
         })}
       </pre>
+      )}
     </Panel>
   );
 }
