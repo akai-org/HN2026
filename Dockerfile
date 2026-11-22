@@ -1,4 +1,4 @@
-FROM node:24-alpine AS frontend
+FROM node:24.22.3-alpine3.24 AS frontend
 WORKDIR /app/frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
