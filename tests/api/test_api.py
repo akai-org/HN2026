@@ -180,5 +180,5 @@ def test_convert_reports_rule_violations_as_warnings(client, monkeypatch):
 
   monkeypatch.setattr(pipeline, "check_form", fake_check)
   body = upload(http, FORM5.name, FORM5.read_bytes()).json()
-  assert checked and checked[0]["title"] == "Wniosek o test"   # block F checks the built form
+  assert checked and checked[0]["title"] == "Wniosek o test"   # check_form checks the built form
   assert body["warnings"] == ["Tytuł ma ponad 255 znaków (title)", "Brak strony końcowej"]

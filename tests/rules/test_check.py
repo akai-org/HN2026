@@ -1,4 +1,4 @@
-"""Block F: check_form against the specification, the reference outputs and deliberately broken copies of them."""
+"""check_form against the specification, the reference outputs and deliberately broken copies of them."""
 
 import copy
 import json
@@ -98,7 +98,7 @@ def _spec() -> FormSpec:
 
 
 def test_builder_output_has_no_violations():
-  """Blocks D + E (real enrichment, no LLM) produce a form that passes every rule."""
+  """Builder + real enrichment (no LLM) produce a form that passes every rule."""
   settings = Settings(_env_file=None, llm_api_key="k", llm_model="m")
   form = build.build_form(_spec(), settings)
   assert check_form(form) == []

@@ -1,8 +1,7 @@
-"""Block C: extracted document -> FormSpec via LLM."""
+"""Extracted document -> FormSpec via LLM."""
 
 import difflib
 import re
-import unicodedata
 
 from pydantic import BaseModel, ValidationError
 
@@ -10,6 +9,7 @@ from hacknation_2026.config import Settings
 from hacknation_2026.contracts import AppError, ExtractedDocument, FormSpec, PageSpec
 from hacknation_2026.ai.client import LLMOutputError, chat
 from hacknation_2026.ai.prompt import build_messages, completion_prompt, retry_prompt
+from hacknation_2026.enrich import normalize
 
 MAX_ATTEMPTS = 2  # first try + one retry with the validation error
 # Long forms: the model sometimes stops halfway. A fillable line ("____" or a box) whose words appear nowhere in the
@@ -91,8 +91,7 @@ def _capitalize(option: str) -> str:
 
 def _stems(text: str) -> set[str]:
   """Word stems for a rough match despite Polish inflection: "miejscowości" ~ "Miejscowość", "ulicy" ~ "Ulica"."""
-  ascii_text = unicodedata.normalize("NFKD", text.lower().replace("ł", "l")).encode("ascii", "ignore").decode()
-  return {w[:min(6, max(4, len(w) - 2))] for w in re.findall(r"[a-z]{4,}", ascii_text)}
+  return {w[:min(6, max(4, len(w) - 2))] for w in re.findall(r"[a-z]{4,}", normalize(text))}
 
 
 def _spec_text(spec: FormSpec) -> str:
@@ -163,11 +162,12 @@ def _complete(doc: ExtractedDocument, spec: FormSpec, messages: list, raw: str, 
 
 
 def analyze(doc: ExtractedDocument, settings: Settings) -> FormSpec:
-  if not doc.as_text().strip() or not doc.blocks:
+  text = doc.as_text()
+  if not text.strip() or not doc.blocks:
     raise AppError("EMPTY_DOCUMENT", "Nie udało się odczytać tekstu z pliku.", 422)
 
-  if len(doc.as_text()) > MAX_FORM_CHARS:   # before the LLM: a 60-page manual would take minutes to analyse
-    raise _not_a_form(f": ma {len(doc.as_text()) // 1000} tys. znaków tekstu, a formularze mają do kilkudziesięciu tysięcy")
+  if len(text) > MAX_FORM_CHARS:   # before the LLM: a 60-page manual would take minutes to analyse
+    raise _not_a_form(f": ma {len(text) // 1000} tys. znaków tekstu, a formularze mają do kilkudziesięciu tysięcy")
 
   messages = build_messages(doc)
   schema = FormSpec.model_json_schema()

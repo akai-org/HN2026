@@ -1,5 +1,5 @@
-"""Block G: uploaded file -> FormDefinition, gluing blocks A (validation), B (extraction), C (LLM), D (builder),
-E (proposed dictionaries; field enrichment runs inside the builder) and F (rule check -> warnings)."""
+"""Uploaded file -> FormDefinition: validation, extraction, LLM analysis, builder (field enrichment runs inside it),
+proposed dictionaries and the rule check (-> warnings)."""
 
 from hacknation_2026.ai import analyze
 from hacknation_2026.builder import build_form
@@ -12,7 +12,7 @@ from hacknation_2026.rules import check_form
 
 
 def read_document(filename: str, data: bytes, settings: Settings) -> ExtractedDocument:
-  """Blocks A and B only, without the LLM: the text the system read from the file."""
+  """Validation and extraction only, without the LLM: the text the system read from the file."""
   fmt = validate_upload(filename, data, settings.max_file_size_bytes)
   return extract_document(data, fmt, settings.ocr_lang)
 

@@ -1,4 +1,4 @@
-"""HTTP client for an OpenAI-compatible chat API (Groq, or local Ollama at /v1)."""
+"""HTTP client for an OpenAI-compatible chat API (EdenAI by default)."""
 
 import time
 from typing import Any

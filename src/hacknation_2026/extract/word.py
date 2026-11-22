@@ -1,4 +1,4 @@
-"""Word extraction (block B2): DOCX via its XML, binary DOC via the piece table (olefile).
+"""Word extraction: DOCX via its XML, binary DOC via the piece table (olefile).
 
 DOC choice: the binary format is read directly with `olefile` (BSD) instead of converting with LibreOffice,
 so there is no external process and no copyleft tool in the image. Only text is recovered (no formatting),

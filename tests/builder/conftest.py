@@ -1,37 +1,23 @@
 import json
 import pathlib
-from dataclasses import dataclass, field
-
 import pytest
 
 from hacknation_2026.builder import build
 from hacknation_2026.config import Settings
 from hacknation_2026.contracts import FormSpec
+from hacknation_2026.enrich import Enrichment
 
 FIXTURES = pathlib.Path(__file__).parent / "fixtures"
 
 
-@dataclass
-class StubEnrichment:
-  """Same shape as block E's `Enrichment`, so builder tests do not depend on E's catalog."""
-  dictionary_name: str | None = None
-  multi_level_tree: bool = False
-  search_enabled: bool = False
-  default_value: str | None = None
-  external: bool = False
-  read_only: bool = False
-  validators: list[str] = field(default_factory=list)
-  field_type: str | None = None
-
-
 @pytest.fixture(autouse=True)
 def stub_enrichment(monkeypatch):
-  """Block E stub: no dictionaries, no initial data, no validators."""
+  """Enrichment stub: no dictionaries, no initial data, no validators."""
   calls = []
 
   def enrich_field(label, field_type, required, applicant_data):
     calls.append((label, field_type, required, applicant_data))
-    return StubEnrichment()
+    return Enrichment()
 
   monkeypatch.setattr(build, "enrich_field", enrich_field)
   return calls

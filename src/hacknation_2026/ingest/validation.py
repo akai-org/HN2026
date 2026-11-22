@@ -1,4 +1,4 @@
-"""Upload validation (block A): filename, size and content type matching the extension."""
+"""Upload validation: filename, size and content type matching the extension."""
 
 import io
 import zipfile

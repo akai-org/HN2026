@@ -1,4 +1,4 @@
-"""Shared types between pipeline blocks (see docs/bloki/00-kontrakty.md). Change only by agreement."""
+"""Types shared by the pipeline stages."""
 
 from enum import StrEnum
 from typing import Any, Literal
@@ -13,7 +13,7 @@ class AppError(Exception):
     self.code, self.message, self.status = code, message, status
 
 
-# --- A -> B: format detected from file CONTENT, not extension ---
+# --- validation -> extraction: format detected from file CONTENT, not extension ---
 class FileFormat(StrEnum):
   PDF = "pdf"
   DOC = "doc"
@@ -24,7 +24,7 @@ class FileFormat(StrEnum):
   PNG = "png"
 
 
-# --- B -> C: content extracted from the file ---
+# --- extraction -> LLM: content extracted from the file ---
 class Block(BaseModel):
   kind: Literal["text", "table", "checkbox"]
   text: str = ""                        # checkbox: label of the option
@@ -53,7 +53,7 @@ class ExtractedDocument(BaseModel):
     return "\n".join(lines)
 
 
-# --- C -> D: form description returned by the LLM ---
+# --- LLM -> builder: form description returned by the LLM ---
 FieldType = Literal[
   "TEXT_FIELD", "TEXTAREA", "NUMBER", "DATEPICKER", "RADIO",
   "CHECKBOX", "SELECT", "FILE_UPLOADER", "TEXT_BLOCK",
@@ -73,7 +73,7 @@ class FieldSpec(BaseModel):
   description: str = ""            # plain text; builder wraps it in HTML
   options: list[str] = []          # RADIO / CHECKBOX / SELECT
   show_if: list[Condition] = []    # different fields: all must hold (AND); options of one field: any (OR)
-  applicant_data: bool = False     # the applicant's own personal data; block E may feed it from a register
+  applicant_data: bool = False     # the applicant's own personal data; enrichment may feed it from a register
 
 
 class SectionSpec(BaseModel):
@@ -102,8 +102,8 @@ class FormSpec(BaseModel):
   consents: list[str] = []                     # statements/consents found on the paper form
 
 
-# --- D -> F -> API: result ---
-FormDefinition = dict[str, Any]                # shape as in the reference JSONs; validated by block F
+# --- builder -> rule check -> API: result ---
+FormDefinition = dict[str, Any]                # shape as in the reference JSONs; validated by rules.check_form
 
 
 class RuleViolation(BaseModel):
@@ -113,7 +113,7 @@ class RuleViolation(BaseModel):
 
 
 class ProposedDictionary(BaseModel):
-  """A new dictionary suggested by block E (Słowniki: name, structure and use in the form; optional extension)."""
+  """A new dictionary suggested by enrichment (Słowniki: name, structure and use in the form; optional extension)."""
   name: str                                    # e.g. "RODZAJ_POJAZDU"
   values_example: list[str]                    # values found on the paper form
   used_by: list[str]                           # labels of the fields that would use it

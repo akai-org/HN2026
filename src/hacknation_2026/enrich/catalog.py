@@ -1,4 +1,4 @@
-"""Block E data, copied from the documents in `dane_zadania/materialy/`. No logic here (see enrich.py).
+"""Enrichment data, copied from the documents in `dane_zadania/materialy/`. No logic here (see enrich.py).
 
 - Initial data (sources, attributes, Polish names, field types): "Dane inicjalne".
 - Which applicant field takes which attribute: Standardy ("Twoje dane", address and contact take MLPZ);
@@ -194,9 +194,6 @@ DICTIONARIES = (
 
 # --- validators (Reguły techniczne, Standardy) -------------------------------------------------------------------------
 
-VALIDATORS = ("REQUIRED", "EMAIL", "PESEL", "NIP", "REGON", "ZIP_CODE", "EPUAP", "ADE", "SERIAL_NUMBER_ID_CARD")
-# Reguły techniczne: format validators are allowed only on a text field; other inputs take only REQUIRED.
-TEXT_INPUT_TYPES = frozenset({"TEXT_FIELD"})
 # Standardy: a postal code outside Poland has no validation.
 FOREIGN_WORDS = (
   "zagraniczny", "zagranicznego", "zagranicznym", "zagraniczna", "zagranicznej", "zagranica", "zagranicy",
