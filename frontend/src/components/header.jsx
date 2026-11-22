@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Accessibility, Eye, FileText, Minus, Plus, RotateCcw, X } from "@/components/icons";
 
 const STORAGE_KEY = "uniform-accessibility";
+const STEP_PATHS = ["/", "/digitalize", "/verify"];
 const DEFAULT_SETTINGS = {
   fontSize: "normal",
   highContrast: false,
@@ -20,7 +21,9 @@ function readSettings() {
 export default function Header() {
   const [isAccessibilityOpen, setIsAccessibilityOpen] = useState(false);
   const [settings, setSettings] = useState(readSettings);
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const { pathname } = location;
+  const hasResults = Boolean(location.state?.convertedForms?.length);
   const activeStep =
     pathname === "/" ? 1 :
     pathname === "/digitalize" ? 2 :
@@ -78,15 +81,24 @@ export default function Header() {
             {stepLabels.map((label, index) => {
               const step = index + 1;
               const isActive = activeStep === step;
+              // Steps 2 and 3 need the conversion results, which travel in the router state.
+              const isReachable = step === 1 || hasResults;
+              const StepTag = isReachable ? Link : "span";
+              const linkProps = isReachable
+                ? { to: STEP_PATHS[index], state: step === 1 ? undefined : location.state }
+                : { "aria-disabled": true, title: "Najpierw dodaj i zcyfryzuj formularz" };
 
               return (
-                <span
+                <StepTag
                   key={step}
+                  {...linkProps}
                   aria-current={isActive ? "step" : undefined}
                   className={`flex items-center gap-2 pb-1 text-sm ${
                     isActive
                       ? "border-b-2 border-primary font-medium text-primary"
                       : "text-muted-foreground"
+                  } ${isReachable && !isActive ? "rounded-sm hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50" : ""} ${
+                    isReachable ? "" : "cursor-not-allowed opacity-60"
                   }`}
                 >
                   <span
@@ -99,7 +111,7 @@ export default function Header() {
                     {step}
                   </span>
                   <span className="hidden md:inline">{label}</span>
-                </span>
+                </StepTag>
               );
             })}
           </nav>

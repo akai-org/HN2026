@@ -1,6 +1,6 @@
 import { ArrowLeft, FileText } from "@/components/icons";
 import { Link, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 function FormSummary({ result }) {
@@ -51,12 +51,10 @@ export default function IdentifyForm() {
   return (
     <main className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-12 sm:px-6">
       <div className="mx-auto max-w-5xl">
-        <Button asChild variant="ghost" className="mb-6">
-          <Link to="/">
-            <ArrowLeft aria-hidden="true" />
-            Wróć do przesyłania
-          </Link>
-        </Button>
+        <Link to="/" className={buttonVariants({ variant: "ghost", className: "mb-6" })}>
+          <ArrowLeft aria-hidden="true" />
+          Wróć do przesyłania
+        </Link>
 
         <Card className="shadow-lg shadow-foreground/5">
           <CardHeader>
@@ -98,14 +96,13 @@ export default function IdentifyForm() {
                     </div>
                   </div>
                 ))}
-                <Button asChild className="mt-2 w-full">
-                  <Link
-                    to="/verify"
-                    state={{ fileName, convertedForm, convertedForms }}
-                  >
-                    Sprawdź i zatwierdź
-                  </Link>
-                </Button>
+                <Link
+                  to="/verify"
+                  state={{ fileName, convertedForm, convertedForms }}
+                  className={buttonVariants({ size: "lg", className: "mt-2 w-full" })}
+                >
+                  Sprawdź i zatwierdź
+                </Link>
               </div>
             ) : (
               <p className="text-muted-foreground">

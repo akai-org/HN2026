@@ -1,6 +1,6 @@
 import { ArrowLeft, FileQuestion } from "@/components/icons";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
@@ -18,12 +18,10 @@ export default function NotFound() {
         <p className="mx-auto mt-4 max-w-md text-muted-foreground">
           Strona, której szukasz, mogła zostać przeniesiona lub nie istnieje.
         </p>
-        <Button asChild className="mt-8">
-          <Link to="/">
-            <ArrowLeft aria-hidden="true" />
-            Wróć na stronę główną
-          </Link>
-        </Button>
+        <Link to="/" className={buttonVariants({ className: "mt-8" })}>
+          <ArrowLeft aria-hidden="true" />
+          Wróć na stronę główną
+        </Link>
       </div>
     </main>
   );
