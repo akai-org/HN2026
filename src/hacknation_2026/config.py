@@ -9,7 +9,7 @@ class Settings(BaseSettings):
   model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
   max_file_size_mb: int = 10
-  llm_base_url: str = "https://api.groq.com/openai/v1"  # any OpenAI-compatible /chat/completions API
+  llm_base_url: str = "https://api.edenai.run/v3"       # any OpenAI-compatible /chat/completions API
   llm_api_key: str                                       # required, set in .env
   llm_model: str                                         # required, set in .env
   llm_fallback_model: str = ""                           # same model at another provider, used when llm_model gets HTTP 429
