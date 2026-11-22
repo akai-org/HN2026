@@ -101,8 +101,9 @@ export default function IdentifyForm() {
     (item) => successfulFormNumbers.has(item.formNumber)
   );
   const hasErrors = statuses.some((status) => status.state === "error");
+  const hasSuccessfulForm = successfulConvertedForms.length > 0;
   const canOpenVerify =
-    (allFinished && successfulConvertedForms.length > 0) ||
+    (allFinished && hasSuccessfulForm) ||
     (selectedFiles.length === 0 && existingConvertedForms.length > 0);
 
   function openVerify() {
@@ -248,7 +249,9 @@ export default function IdentifyForm() {
                 <Button type="button" className="w-full" disabled={!canOpenVerify} onClick={openVerify}>
                   {canOpenVerify
                     ? "Przejdź do sprawdzenia i zatwierdzenia"
-                    : "Oczekiwanie na zakończenie przetwarzania"}
+                    : allFinished
+                      ? "Żaden formularz nie został przekonwertowany"
+                      : "Oczekiwanie na zakończenie przetwarzania"}
                 </Button>
               </div>
             ) : existingConvertedForms.length ? (
