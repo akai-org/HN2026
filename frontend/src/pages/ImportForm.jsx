@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowUpAZ, FileText, Image, Trash2, Upload, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { convertFormFile } from "@/lib/api";
 
 const ACCEPTED_FORMATS = ".pdf,.doc,.docx,.ods,.xlsx,.jpg,.jpeg,.png";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -11,7 +10,6 @@ function ImportForm() {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [splitBefore, setSplitBefore] = useState(new Set());
   const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   function addFiles(files) {
@@ -92,39 +90,13 @@ function ImportForm() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    if (!selectedFiles.length || isSubmitting) return;
-
-    setError("");
-    setIsSubmitting(true);
-
-    try {
-      const convertedForms = [];
-
-      for (let fileIndex = 0; fileIndex < selectedFiles.length; fileIndex += 1) {
-        const selectedFile = selectedFiles[fileIndex];
-        const convertedForm = await convertFormFile(selectedFile);
-
-        convertedForms.push({
-          fileName: selectedFile.name,
-          convertedForm,
-          formNumber: 1 + [...splitBefore].filter((index) =>
-            fileIndex >= index
-          ).length,
-        });
-      }
-
-      navigate("/digitalize", {
-        state: {
-          convertedForms,
-          fileName: convertedForms[0]?.fileName,
-          convertedForm: convertedForms[0]?.convertedForm,
-        },
-      });
-    } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Nie udało się przesłać formularzy.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    if (!selectedFiles.length) return;
+    navigate("/digitalize", {
+      state: {
+        selectedFiles,
+        splitBefore: [...splitBefore],
+      },
+    });
   }
 
   return (
@@ -300,8 +272,8 @@ function ImportForm() {
                   {error}
                 </p>
               )}
-              <Button type="submit" disabled={!selectedFiles.length || isSubmitting}>
-                {isSubmitting ? "Cyfryzowanie..." : "Cyfryzuj formularze"}
+              <Button type="submit" disabled={!selectedFiles.length}>
+                Cyfryzuj formularze
               </Button>
             </div>
           </div>
