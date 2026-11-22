@@ -69,6 +69,8 @@ class PageSpec(BaseModel):
   sections: list[SectionSpec]
 
 class FormSpec(BaseModel):
+  is_form: bool = True                          # False: plik nie jest formularzem do wypełnienia (menu, umowa, instrukcja…) → 422 NOT_A_FORM
+  not_form_reason: str = ""                     # czym jest dokument, gdy is_form == False
   title: str                                    # zaczyna się od Wniosek/Zgłoszenie/Deklaracja/Oświadczenie
   authority_name: str = ""                      # np. "Urząd Gminy X" / "Wójt Gminy Y"
   authority_kind: Literal["URZAD", "ORGAN"] = "URZAD"

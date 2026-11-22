@@ -100,7 +100,7 @@ Interaktywna dokumentacja OpenAPI jest dostępna pod adresem `http://localhost:3
 
 ### `GET /api/health`
 
-Zwraca stan aplikacji oraz połączenia z lokalnym LLM.
+Zwraca stan aplikacji oraz połączenia z modelem językowym.
 
 ```bash
 curl -s http://localhost:3000/api/health
@@ -141,10 +141,19 @@ W przypadku błędu walidacji lub przetwarzania API zwraca komunikat błędu w f
 
 ```json
 {
-  "code": "INVALID_FILE_TYPE",
-  "message": "Opis błędu"
+  "code": "NOT_A_FORM",
+  "message": "Plik nie wygląda na formularz do wypełnienia (menu restauracji)."
 }
 ```
+
+| Kod HTTP | `code` | Kiedy |
+|---|---|---|
+| 413 | `FILE_TOO_LARGE` | plik większy niż `MAX_FILE_SIZE_MB` |
+| 415 | `UNSUPPORTED_FORMAT`, `MIME_MISMATCH` | nieobsługiwane rozszerzenie albo treść niezgodna z rozszerzeniem |
+| 422 | `INVALID_FILENAME`, `UNREADABLE_FILE`, `EMPTY_DOCUMENT` | zła nazwa pliku, uszkodzony plik, brak tekstu |
+| 422 | `NOT_A_FORM` | plik nie jest formularzem do wypełnienia (np. menu, cennik, umowa, instrukcja, artykuł). Ocenia to model, a dodatkowo odrzucany jest tekst dłuższy niż 60 tys. znaków (przed wywołaniem modelu) i wynik, którego tytuł nie wskazuje na rodzaj formularza (wniosek, podanie, zgłoszenie, deklaracja, oświadczenie, formularz, zawiadomienie, informacja, kwestionariusz) |
+| 502 | `LLM_INVALID_RESPONSE`, `LLM_ERROR` | model zwrócił niepoprawną odpowiedź |
+| 503 | `LLM_UNAVAILABLE` | model niedostępny lub nie odpowiedział w `LLM_TIMEOUT_S` |
 
 ## Testowanie
 
