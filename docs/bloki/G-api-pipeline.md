@@ -24,6 +24,8 @@ def convert(filename: str, data: bytes, settings: Settings) -> ConvertResult
 
 **Wymagania:**
 - `POST /api/forms/convert` (multipart, jeden plik) → `ConvertResult`. Odczyt pliku z limitem rozmiaru, bez zapisu na dysk. Ciężką pracę uruchamiaj w `run_in_threadpool`.
+- `POST /api/forms/extract` (multipart, jeden plik) → `ExtractedDocument`, czyli same bloki A i B (`pipeline.read_document`), bez LLM. Frontend pokazuje ten tekst obok formularza cyfrowego (Word i arkusze nie mają podglądu w przeglądarce).
+- Frontend ma routing po stronie klienta, więc `SpaStaticFiles` w `app.py` zwraca `index.html` dla ścieżek bez rozszerzenia spoza `/api` (odświeżenie `/verify` działa).
 - `GET /api/health` → dokłada stan LLM (`GET {llm_base_url}/api/tags`).
 - `AppError` → `JSONResponse(status, {"code", "message"})`.
 - Do czasu bloków A–F testy używają `monkeypatch` na funkcjach pipeline'u.

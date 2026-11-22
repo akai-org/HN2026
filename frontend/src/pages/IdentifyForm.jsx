@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, CircleCheck, FileText, Image, X } from "@/components/icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { convertFormFile } from "@/lib/api";
+import { keepFile, keepOnly } from "@/lib/fileStore";
 
 function getFileExtension(file) {
   const extension = file.name.split(".").pop();
@@ -13,9 +14,9 @@ function getFileExtension(file) {
 export default function IdentifyForm() {
   const location = useLocation();
   const navigate = useNavigate();
-  const selectedFiles = location.state?.selectedFiles || [];
-  const splitBefore = location.state?.splitBefore || [];
-  const existingConvertedForms = location.state?.convertedForms || [];
+  const selectedFiles = useMemo(() => location.state?.selectedFiles || [], [location.state]);
+  const splitBefore = useMemo(() => location.state?.splitBefore || [], [location.state]);
+  const existingConvertedForms = useMemo(() => location.state?.convertedForms || [], [location.state]);
   const startedRef = useRef(false);
   const [convertedForms, setConvertedForms] = useState(existingConvertedForms);
   const [statuses, setStatuses] = useState(() =>
@@ -24,7 +25,7 @@ export default function IdentifyForm() {
       : existingConvertedForms.map(() => ({ state: "success", message: "" }))
   );
 
-  async function processFiles(files) {
+  const processFiles = useCallback(async (files) => {
     setStatuses(files.map(() => ({ state: "idle", message: "" })));
     setConvertedForms([]);
     const results = [];
@@ -43,6 +44,7 @@ export default function IdentifyForm() {
         const convertedForm = await convertFormFile(selectedFile);
         const result = {
           fileName: selectedFile.name,
+          fileId: keepFile(selectedFile),
           convertedForm,
           formNumber: 1 + splitBefore.filter((index) => fileIndex >= index).length,
         };
@@ -69,14 +71,15 @@ export default function IdentifyForm() {
         );
       }
     }
-  }
+    keepOnly(results.map((result) => result.fileId));
+  }, [splitBefore]);
 
   useEffect(() => {
     if (selectedFiles.length && !startedRef.current) {
       startedRef.current = true;
       processFiles(selectedFiles);
     }
-  }, [selectedFiles]);
+  }, [processFiles, selectedFiles]);
 
   const formSections = selectedFiles.reduce((sections, file, index) => {
     const formNumber = 1 + splitBefore.filter((splitIndex) => index >= splitIndex).length;
