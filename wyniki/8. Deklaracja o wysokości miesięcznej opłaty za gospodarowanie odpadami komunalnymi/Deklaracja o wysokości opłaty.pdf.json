@@ -1,0 +1,3006 @@
+{
+  "form": {
+    "title": "Deklaracja o wysokości miesięcznej opłaty za gospodarowanie odpadami komunalnymi",
+    "tabs": [
+      {
+        "id": "2c45513e-37b7-4be6-a9c6-ba479fff5bb4",
+        "title": "Dane",
+        "type": "MAIN",
+        "questions": [
+          {
+            "x": 0,
+            "y": 0,
+            "rows": 2,
+            "cols": 3,
+            "field": {
+              "id": "68266886-ba25-4baf-a550-fa95a7357ec1",
+              "type": "SECTION",
+              "techName": "organ_do_ktorego_jest_skladana_deklaracja",
+              "title": "Organ, do którego jest składana deklaracja",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "5a0b9329-130b-4bab-bb71-b8c798a245ca",
+                    "type": "TEXT_FIELD",
+                    "techName": "nazwa_organu",
+                    "title": "Nazwa organu",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": true,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": "",
+                    "defaultValue": "Prezydent Miasta Gdyni"
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 0,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 2,
+            "rows": 3,
+            "cols": 3,
+            "field": {
+              "id": "f34fc676-ab09-440c-a198-1224e13362e9",
+              "type": "SECTION",
+              "techName": "podmiot_wniosku",
+              "title": "Podmiot wniosku",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "ba20327e-3673-4877-856c-a5c2e9381538",
+                    "type": "RADIO",
+                    "techName": "wybierz_w_czyim_imieniu_deklarujesz",
+                    "title": "Wybierz, w czyim imieniu deklarujesz",
+                    "description": "",
+                    "options": [
+                      {
+                        "id": "Swoim",
+                        "name": "Swoim",
+                        "techName": "swoim"
+                      },
+                      {
+                        "id": "Innej osoby",
+                        "name": "Innej osoby",
+                        "techName": "innej_osoby"
+                      },
+                      {
+                        "id": "Osoby prawnej lub jednostki organizacyjnej",
+                        "name": "Osoby prawnej lub jednostki organizacyjnej",
+                        "techName": "osoby_prawnej_lub_jednostki_organizacyjnej"
+                      }
+                    ],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "0a5ce753-e415-4982-b105-47bf089678c3",
+                    "type": "RADIO",
+                    "techName": "wybierz_jako_kto_deklarujesz",
+                    "title": "Wybierz, jako kto deklarujesz",
+                    "description": "",
+                    "options": [
+                      {
+                        "id": "Pełnomocnik",
+                        "name": "Pełnomocnik",
+                        "techName": "pelnomocnik"
+                      },
+                      {
+                        "id": "Reprezentant",
+                        "name": "Reprezentant",
+                        "techName": "reprezentant"
+                      }
+                    ],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Osoby prawnej lub jednostki organizacyjnej\" in tabs['Dane' in title].questions['podmiot_wniosku' in field.techName].field.repeatingSectionGrid['wybierz_w_czyim_imieniu_deklarujesz' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 1,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 5,
+            "rows": 4,
+            "cols": 3,
+            "field": {
+              "id": "56b6faa9-85f6-4b7e-a320-2bb1d5358264",
+              "type": "SECTION",
+              "techName": "twoje_dane",
+              "title": "Twoje dane",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "997467a5-57d8-4566-9b95-d6dcc798cd59",
+                    "type": "TEXT_FIELD",
+                    "techName": "imie",
+                    "title": "Imię",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": true,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": "",
+                    "defaultValue": "MLPZ.name",
+                    "defaultValueType": "EXTERNAL_SYSTEM"
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "989925f0-d313-4665-a0de-533fda838d88",
+                    "type": "TEXT_FIELD",
+                    "techName": "nazwisko",
+                    "title": "Nazwisko",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": true,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 1,
+                    "tooltipMessage": "",
+                    "defaultValue": "MLPZ.surname",
+                    "defaultValueType": "EXTERNAL_SYSTEM"
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 2,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "e7bb89f1-6511-4558-9ed2-de5a229642d7",
+                    "type": "TEXT_FIELD",
+                    "techName": "numer_pesel",
+                    "title": "Numer PESEL",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED",
+                      "PESEL"
+                    ],
+                    "readOnly": true,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 2,
+                    "tooltipMessage": "",
+                    "defaultValue": "MLPZ.pesel",
+                    "defaultValueType": "EXTERNAL_SYSTEM"
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 2,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 9,
+            "rows": 10,
+            "cols": 3,
+            "field": {
+              "id": "0adc9ab8-d998-4db0-89bd-7c00dde558c6",
+              "type": "SECTION",
+              "techName": "adres_zamieszkania",
+              "title": "Adres zamieszkania",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "a1d838e7-431f-47aa-9d32-ee13b5b5d7e4",
+                    "type": "SELECT",
+                    "techName": "kraj",
+                    "title": "Kraj",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": "",
+                    "dictionaryName": "Kraje",
+                    "searchEnabled": true,
+                    "defaultValue": [
+                      "Polska"
+                    ]
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "794d96d6-9b9c-48b7-a6d4-5893ec73b65c",
+                    "type": "TEXT_FIELD",
+                    "techName": "miejscowosc_zagranica",
+                    "title": "Miejscowość",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "$not(\"Polska\" in tabs['Dane' in title].questions['adres_zamieszkania' in field.techName].field.repeatingSectionGrid['kraj' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 2,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "b2a087d0-47e9-40f6-93fd-6770d32250ee",
+                    "type": "TEXT_FIELD",
+                    "techName": "kod_pocztowy_zagranica",
+                    "title": "Kod pocztowy",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "$not(\"Polska\" in tabs['Dane' in title].questions['adres_zamieszkania' in field.techName].field.repeatingSectionGrid['kraj' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 2,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 3,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "9c8e808c-f47d-4b95-82af-6e0342913a4e",
+                    "type": "TEXT_FIELD",
+                    "techName": "ulica_zagranica",
+                    "title": "Ulica",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "$not(\"Polska\" in tabs['Dane' in title].questions['adres_zamieszkania' in field.techName].field.repeatingSectionGrid['kraj' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 3,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 4,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "572c8bf2-3402-445c-8cc3-d4d5b6f27733",
+                    "type": "SELECT",
+                    "techName": "wojewodztwo",
+                    "title": "Województwo, powiat, gmina, miejscowość",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Polska\" in tabs['Dane' in title].questions['adres_zamieszkania' in field.techName].field.repeatingSectionGrid['kraj' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 4,
+                    "tooltipMessage": "",
+                    "dictionaryName": "TERYT_4G_DOWODOWY",
+                    "multiLevelTree": true,
+                    "searchEnabled": true,
+                    "defaultValue": []
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 5,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "9e226c0e-702a-4521-9baa-63afbd7b072a",
+                    "type": "TEXT_FIELD",
+                    "techName": "kod_pocztowy",
+                    "title": "Kod pocztowy",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED",
+                      "ZIP_CODE"
+                    ],
+                    "readOnly": true,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Polska\" in tabs['Dane' in title].questions['adres_zamieszkania' in field.techName].field.repeatingSectionGrid['kraj' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 5,
+                    "tooltipMessage": "",
+                    "defaultValue": "MLPZ.postCode",
+                    "defaultValueType": "EXTERNAL_SYSTEM"
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 6,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "c61d4a8a-7c97-4352-be95-9cb6ada60ebb",
+                    "type": "TEXT_FIELD",
+                    "techName": "ulica",
+                    "title": "Ulica",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": true,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Polska\" in tabs['Dane' in title].questions['adres_zamieszkania' in field.techName].field.repeatingSectionGrid['kraj' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 6,
+                    "tooltipMessage": "",
+                    "defaultValue": "MLPZ.street",
+                    "defaultValueType": "EXTERNAL_SYSTEM"
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 7,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "87b12a33-361f-49ac-b38b-b84681d92972",
+                    "type": "TEXT_FIELD",
+                    "techName": "numer_budynku",
+                    "title": "Numer budynku",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": true,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 7,
+                    "tooltipMessage": "",
+                    "defaultValue": "MLPZ.building",
+                    "defaultValueType": "EXTERNAL_SYSTEM"
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 8,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "a3cd5d82-819e-496f-8e1b-ec687406511a",
+                    "type": "TEXT_FIELD",
+                    "techName": "numer_lokalu",
+                    "title": "Numer lokalu",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": true,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 8,
+                    "tooltipMessage": "",
+                    "defaultValue": "MLPZ.apartment",
+                    "defaultValueType": "EXTERNAL_SYSTEM"
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 3,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 19,
+            "rows": 5,
+            "cols": 3,
+            "field": {
+              "id": "732cdb6a-c44c-43bb-b269-787672333499",
+              "type": "SECTION",
+              "techName": "dane_podmiotu",
+              "title": "Dane podmiotu",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "b2580bd2-2fd8-488b-b455-799bdfcfa960",
+                    "type": "TEXT_FIELD",
+                    "techName": "nazwa",
+                    "title": "Nazwa",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "2238bb33-6e67-405f-a106-df0df7df11b9",
+                    "type": "TEXT_FIELD",
+                    "techName": "nip",
+                    "title": "NIP",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED",
+                      "NIP"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 2,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "d2a96b43-d369-4f82-b8f7-c88e6ef71492",
+                    "type": "TEXT_FIELD",
+                    "techName": "regon",
+                    "title": "REGON",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED",
+                      "REGON"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 2,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 3,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "7e91d8e0-eb01-4f51-88d6-2fdcfd100280",
+                    "type": "TEXT_FIELD",
+                    "techName": "numer_krs",
+                    "title": "Numer KRS",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 3,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [
+                {
+                  "type": "SHOW",
+                  "query": "(\"Osoby prawnej lub jednostki organizacyjnej\" in tabs['Dane' in title].questions['podmiot_wniosku' in field.techName].field.repeatingSectionGrid['wybierz_w_czyim_imieniu_deklarujesz' in field.techName].field.__userAnswer)"
+                }
+              ],
+              "questionOrder": 4,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 24,
+            "rows": 10,
+            "cols": 3,
+            "field": {
+              "id": "0719c497-6f89-4411-87ab-28b91a0647b1",
+              "type": "SECTION",
+              "techName": "adres_siedziby",
+              "title": "Adres siedziby",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "f408d417-c042-48fc-9a60-f58dd9c6e680",
+                    "type": "SELECT",
+                    "techName": "kraj_siedziba",
+                    "title": "Kraj",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": "",
+                    "dictionaryName": "Kraje",
+                    "searchEnabled": true,
+                    "defaultValue": [
+                      "Polska"
+                    ]
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "3a52cba3-74c5-46ec-ad7c-c057bf0c673a",
+                    "type": "TEXT_FIELD",
+                    "techName": "miejscowosc_siedziba_zagranica",
+                    "title": "Miejscowość",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "$not(\"Polska\" in tabs['Dane' in title].questions['adres_siedziby' in field.techName].field.repeatingSectionGrid['kraj_siedziba' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 2,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "29c61537-c7b9-40f1-9603-74dcf6349b71",
+                    "type": "TEXT_FIELD",
+                    "techName": "kod_pocztowy_siedziba_zagranica",
+                    "title": "Kod pocztowy",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "$not(\"Polska\" in tabs['Dane' in title].questions['adres_siedziby' in field.techName].field.repeatingSectionGrid['kraj_siedziba' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 2,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 3,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "3a365af9-5475-4104-8b43-1e6375019506",
+                    "type": "TEXT_FIELD",
+                    "techName": "ulica_siedziba_zagranica",
+                    "title": "Ulica",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "$not(\"Polska\" in tabs['Dane' in title].questions['adres_siedziby' in field.techName].field.repeatingSectionGrid['kraj_siedziba' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 3,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 4,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "0e753b42-a66c-4b9c-b9c6-af4b33fbfd2d",
+                    "type": "SELECT",
+                    "techName": "wojewodztwo_siedziba",
+                    "title": "Województwo, powiat, gmina, miejscowość",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Polska\" in tabs['Dane' in title].questions['adres_siedziby' in field.techName].field.repeatingSectionGrid['kraj_siedziba' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 4,
+                    "tooltipMessage": "",
+                    "dictionaryName": "TERYT_4G_DOWODOWY",
+                    "multiLevelTree": true,
+                    "searchEnabled": true,
+                    "defaultValue": []
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 5,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "9de2df60-f6fb-4bd3-a016-d30f844bb46f",
+                    "type": "TEXT_FIELD",
+                    "techName": "kod_pocztowy_siedziba",
+                    "title": "Kod pocztowy",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED",
+                      "ZIP_CODE"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Polska\" in tabs['Dane' in title].questions['adres_siedziby' in field.techName].field.repeatingSectionGrid['kraj_siedziba' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 5,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 6,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "a7e6f29f-046d-48d2-acce-cfcdc8807157",
+                    "type": "TEXT_FIELD",
+                    "techName": "ulica_siedziba",
+                    "title": "Ulica",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Polska\" in tabs['Dane' in title].questions['adres_siedziby' in field.techName].field.repeatingSectionGrid['kraj_siedziba' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 6,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 7,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "75282141-3b6d-4381-a46e-1007b804724b",
+                    "type": "TEXT_FIELD",
+                    "techName": "numer_budynku_siedziba",
+                    "title": "Numer budynku",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 7,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 8,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "a2ab696c-beea-482d-9443-c78765412ca0",
+                    "type": "TEXT_FIELD",
+                    "techName": "numer_lokalu_siedziba",
+                    "title": "Numer lokalu",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 8,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [
+                {
+                  "type": "SHOW",
+                  "query": "(\"Osoby prawnej lub jednostki organizacyjnej\" in tabs['Dane' in title].questions['podmiot_wniosku' in field.techName].field.repeatingSectionGrid['wybierz_w_czyim_imieniu_deklarujesz' in field.techName].field.__userAnswer)"
+                }
+              ],
+              "questionOrder": 5,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 34,
+            "rows": 2,
+            "cols": 3,
+            "field": {
+              "id": "c02eae8f-cd7d-4320-82b1-789fb448097b",
+              "type": "SECTION",
+              "techName": "potwierdzenie_ze_jestes_reprezentantem",
+              "title": "Potwierdzenie, że jesteś reprezentantem",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "c6327e09-7ecd-4a19-892d-37e79018c43a",
+                    "type": "FILE_UPLOADER",
+                    "techName": "plik_z_odpisem_danych",
+                    "title": "Plik z odpisem danych",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [
+                {
+                  "type": "SHOW",
+                  "query": "(\"Osoby prawnej lub jednostki organizacyjnej\" in tabs['Dane' in title].questions['podmiot_wniosku' in field.techName].field.repeatingSectionGrid['wybierz_w_czyim_imieniu_deklarujesz' in field.techName].field.__userAnswer) and (\"Reprezentant\" in tabs['Dane' in title].questions['podmiot_wniosku' in field.techName].field.repeatingSectionGrid['wybierz_jako_kto_deklarujesz' in field.techName].field.__userAnswer)"
+                }
+              ],
+              "questionOrder": 6,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 36,
+            "rows": 4,
+            "cols": 3,
+            "field": {
+              "id": "d571ad00-77e4-41b9-b981-07fedabc2f1b",
+              "type": "SECTION",
+              "techName": "dane_innej_osoby",
+              "title": "Dane innej osoby",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "dd59d7b3-2098-4251-bb55-f7ea6496b7f7",
+                    "type": "TEXT_FIELD",
+                    "techName": "imie_inna_osoba",
+                    "title": "Imię",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "e055103d-bb5e-4d4c-aa69-d91ac99bdf99",
+                    "type": "TEXT_FIELD",
+                    "techName": "nazwisko_inna_osoba",
+                    "title": "Nazwisko",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 2,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "813433dd-5507-4d0e-a905-a0d3a038ed5b",
+                    "type": "TEXT_FIELD",
+                    "techName": "numer_pesel_inna_osoba",
+                    "title": "Numer PESEL",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED",
+                      "PESEL"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 2,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [
+                {
+                  "type": "SHOW",
+                  "query": "(\"Innej osoby\" in tabs['Dane' in title].questions['podmiot_wniosku' in field.techName].field.repeatingSectionGrid['wybierz_w_czyim_imieniu_deklarujesz' in field.techName].field.__userAnswer)"
+                }
+              ],
+              "questionOrder": 7,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 40,
+            "rows": 10,
+            "cols": 3,
+            "field": {
+              "id": "6f1ee0b4-8201-4fa8-86be-59f5b049a0b0",
+              "type": "SECTION",
+              "techName": "adres_zamieszkania_osoby_ktorej_jestes_pelnomocnikiem",
+              "title": "Adres zamieszkania innej osoby",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "8daa7eae-7f91-4208-ab4a-36cf25508035",
+                    "type": "SELECT",
+                    "techName": "kraj_inna_osoba",
+                    "title": "Kraj",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": "",
+                    "dictionaryName": "Kraje",
+                    "searchEnabled": true,
+                    "defaultValue": [
+                      "Polska"
+                    ]
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "c35e3f44-3cc2-438a-9923-47f0c0901eda",
+                    "type": "TEXT_FIELD",
+                    "techName": "miejscowosc_inna_osoba_zagranica",
+                    "title": "Miejscowość",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "$not(\"Polska\" in tabs['Dane' in title].questions['adres_zamieszkania_osoby_ktorej_jestes_pelnomocnikiem' in field.techName].field.repeatingSectionGrid['kraj_inna_osoba' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 2,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "34db3c71-c3e2-4c3d-9dfc-ceb17d688eef",
+                    "type": "TEXT_FIELD",
+                    "techName": "kod_pocztowy_inna_osoba_zagranica",
+                    "title": "Kod pocztowy",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "$not(\"Polska\" in tabs['Dane' in title].questions['adres_zamieszkania_osoby_ktorej_jestes_pelnomocnikiem' in field.techName].field.repeatingSectionGrid['kraj_inna_osoba' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 2,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 3,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "8beca1ed-ff2c-4a96-970e-0b51a0be6168",
+                    "type": "TEXT_FIELD",
+                    "techName": "ulica_inna_osoba_zagranica",
+                    "title": "Ulica",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "$not(\"Polska\" in tabs['Dane' in title].questions['adres_zamieszkania_osoby_ktorej_jestes_pelnomocnikiem' in field.techName].field.repeatingSectionGrid['kraj_inna_osoba' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 3,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 4,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "458d5022-be45-442a-83e2-38e96da41cf6",
+                    "type": "SELECT",
+                    "techName": "wojewodztwo_inna_osoba",
+                    "title": "Województwo, powiat, gmina, miejscowość",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Polska\" in tabs['Dane' in title].questions['adres_zamieszkania_osoby_ktorej_jestes_pelnomocnikiem' in field.techName].field.repeatingSectionGrid['kraj_inna_osoba' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 4,
+                    "tooltipMessage": "",
+                    "dictionaryName": "TERYT_4G_DOWODOWY",
+                    "multiLevelTree": true,
+                    "searchEnabled": true,
+                    "defaultValue": []
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 5,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "648fcb44-0a1f-4345-a8c4-bcecf4f40343",
+                    "type": "TEXT_FIELD",
+                    "techName": "kod_pocztowy_inna_osoba",
+                    "title": "Kod pocztowy",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED",
+                      "ZIP_CODE"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Polska\" in tabs['Dane' in title].questions['adres_zamieszkania_osoby_ktorej_jestes_pelnomocnikiem' in field.techName].field.repeatingSectionGrid['kraj_inna_osoba' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 5,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 6,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "b2eeb34b-a9d7-47c5-bbb4-18526d7d3a5b",
+                    "type": "TEXT_FIELD",
+                    "techName": "ulica_inna_osoba",
+                    "title": "Ulica",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Polska\" in tabs['Dane' in title].questions['adres_zamieszkania_osoby_ktorej_jestes_pelnomocnikiem' in field.techName].field.repeatingSectionGrid['kraj_inna_osoba' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 6,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 7,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "68bd07dd-a83a-4949-81c5-28b3b78aef4e",
+                    "type": "TEXT_FIELD",
+                    "techName": "numer_budynku_inna_osoba",
+                    "title": "Numer budynku",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 7,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 8,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "ba985a55-3268-449a-9f8e-131b4b14b91e",
+                    "type": "TEXT_FIELD",
+                    "techName": "numer_lokalu_inna_osoba",
+                    "title": "Numer lokalu",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 8,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [
+                {
+                  "type": "SHOW",
+                  "query": "(\"Innej osoby\" in tabs['Dane' in title].questions['podmiot_wniosku' in field.techName].field.repeatingSectionGrid['wybierz_w_czyim_imieniu_deklarujesz' in field.techName].field.__userAnswer)"
+                }
+              ],
+              "questionOrder": 8,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 50,
+            "rows": 2,
+            "cols": 3,
+            "field": {
+              "id": "3581b1e0-b6c5-4513-ac4c-f1009e800425",
+              "type": "SECTION",
+              "techName": "pelnomocnictwo",
+              "title": "Pełnomocnictwo",
+              "description": "<html><head></head><body><p>Dodaj dokument potwierdzający, że jesteś pełnomocnikiem.</p></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "5edc5c60-c2e2-4b22-b197-06f773d9103a",
+                    "type": "FILE_UPLOADER",
+                    "techName": "plik_dokumentu_z_pelnomocnictwem",
+                    "title": "Plik dokumentu z pełnomocnictwem",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [
+                {
+                  "type": "SHOW",
+                  "query": "(\"Innej osoby\" in tabs['Dane' in title].questions['podmiot_wniosku' in field.techName].field.repeatingSectionGrid['wybierz_w_czyim_imieniu_deklarujesz' in field.techName].field.__userAnswer) or ((\"Osoby prawnej lub jednostki organizacyjnej\" in tabs['Dane' in title].questions['podmiot_wniosku' in field.techName].field.repeatingSectionGrid['wybierz_w_czyim_imieniu_deklarujesz' in field.techName].field.__userAnswer) and (\"Pełnomocnik\" in tabs['Dane' in title].questions['podmiot_wniosku' in field.techName].field.repeatingSectionGrid['wybierz_jako_kto_deklarujesz' in field.techName].field.__userAnswer))"
+                }
+              ],
+              "questionOrder": 9,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 52,
+            "rows": 4,
+            "cols": 3,
+            "field": {
+              "id": "44ccfcd8-801d-4ea3-9f20-b4e24d1bb808",
+              "type": "SECTION",
+              "techName": "oplata_skarbowa_pelnomocnictwo_1",
+              "title": "Opłata skarbowa",
+              "description": "<html><head></head><body><p>Nie musisz płacić za złożenie pełnomocnictwa wystawionego przez najbliższą rodzinę: małżonka, dzieci, rodziców, dziadków, wnuków, rodzeństwo.</p><p>Więcej informacji na stronie biznes.gov.pl</p></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "76daa689-0ed7-4319-aedc-7402cd5f48c1",
+                    "type": "RADIO",
+                    "techName": "czy_zlozenie_pelnomocnictwa_wymaga_oplaty_skarbowej",
+                    "title": "Czy złożenie pełnomocnictwa wymaga opłaty skarbowej?",
+                    "description": "",
+                    "options": [
+                      {
+                        "id": "Tak",
+                        "name": "Tak",
+                        "techName": "tak"
+                      },
+                      {
+                        "id": "Nie",
+                        "name": "Nie",
+                        "techName": "nie"
+                      }
+                    ],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "8c8158c3-2076-4129-84a8-a5c1615e1742",
+                    "type": "TEXT_BLOCK",
+                    "techName": "oplata_info_1",
+                    "title": "",
+                    "description": "<html><head></head><body><p>Opłata skarbowa wynosi 17 zł.</p><p>Przelej ją na konto urzędu miasta lub gminy właściwego dla adresu zamieszkania osoby, która udzieliła pełnomocnictwa. Jeśli adres nie jest w Polsce, opłatę przelej na konto Urzędu Miasta Stołecznego Warszawy – Centrum Obsługi Podatnika</p><p>W tytule przelewu wpisz „Deklaracja o wysokości miesięcznej opłaty za gospodarowanie odpadami komunalnymi – opłata skarbowa za pełnomocnictwo”.</p><p>Dodaj plik z potwierdzeniem przelewu. Znajdziesz go na stronie lub w aplikacji swojego banku.</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Tak\" in tabs['Dane' in title].questions['oplata_skarbowa_pelnomocnictwo_1' in field.techName].field.repeatingSectionGrid['czy_zlozenie_pelnomocnictwa_wymaga_oplaty_skarbowej' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 2,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "fa0b6c0a-f870-41f8-a648-00929599e1dd",
+                    "type": "FILE_UPLOADER",
+                    "techName": "plik_z_potwierdzeniem_przelewu",
+                    "title": "Plik z potwierdzeniem przelewu",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Tak\" in tabs['Dane' in title].questions['oplata_skarbowa_pelnomocnictwo_1' in field.techName].field.repeatingSectionGrid['czy_zlozenie_pelnomocnictwa_wymaga_oplaty_skarbowej' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 2,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [
+                {
+                  "type": "SHOW",
+                  "query": "(\"Innej osoby\" in tabs['Dane' in title].questions['podmiot_wniosku' in field.techName].field.repeatingSectionGrid['wybierz_w_czyim_imieniu_deklarujesz' in field.techName].field.__userAnswer)"
+                }
+              ],
+              "questionOrder": 10,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 56,
+            "rows": 3,
+            "cols": 3,
+            "field": {
+              "id": "842433b2-7013-4659-8aaa-fcf25977eec7",
+              "type": "SECTION",
+              "techName": "oplata_skarbowa_pelnomocnictwo_2",
+              "title": "Opłata skarbowa",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "6ad86d16-afe6-43d9-93ae-3b74bccea4f0",
+                    "type": "TEXT_BLOCK",
+                    "techName": "oplata_info",
+                    "title": "",
+                    "description": "<html><head></head><body><p>Opłata skarbowa wynosi 17 zł.</p><p>Przelej ją na konto urzędu miasta lub gminy właściwego dla adresu zamieszkania osoby, która udzieliła pełnomocnictwa. Jeśli adres nie jest w Polsce, opłatę przelej na konto Urzędu Miasta Stołecznego Warszawy – Centrum Obsługi Podatnika</p><p>W tytule przelewu wpisz „Deklaracja o wysokości miesięcznej opłaty za gospodarowanie odpadami komunalnymi – opłata skarbowa za pełnomocnictwo”.</p><p>Dodaj plik z potwierdzeniem przelewu. Znajdziesz go na stronie lub w aplikacji swojego banku.</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "e415a416-c9e5-400e-8b1b-d2328e79210b",
+                    "type": "FILE_UPLOADER",
+                    "techName": "plik_z_potwierdzeniem_przelewu_2",
+                    "title": "Plik z potwierdzeniem przelewu",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [
+                {
+                  "type": "SHOW",
+                  "query": "(\"Osoby prawnej lub jednostki organizacyjnej\" in tabs['Dane' in title].questions['podmiot_wniosku' in field.techName].field.repeatingSectionGrid['wybierz_w_czyim_imieniu_deklarujesz' in field.techName].field.__userAnswer) and (\"Pełnomocnik\" in tabs['Dane' in title].questions['podmiot_wniosku' in field.techName].field.repeatingSectionGrid['wybierz_jako_kto_deklarujesz' in field.techName].field.__userAnswer)"
+                }
+              ],
+              "questionOrder": 11,
+              "tooltipMessage": ""
+            }
+          }
+        ]
+      },
+      {
+        "id": "c740ace1-2479-4978-bfef-cf8a3ca739d0",
+        "title": "Okoliczności złożenia deklaracji",
+        "type": "MAIN",
+        "questions": [
+          {
+            "x": 0,
+            "y": 0,
+            "rows": 6,
+            "cols": 3,
+            "field": {
+              "id": "4b608185-a145-4cf8-aea3-e4268e1b4537",
+              "type": "SECTION",
+              "techName": "okolicznosci",
+              "title": "Okoliczności uzasadniające złożenie deklaracji",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "54b388aa-1e62-4afb-a316-82c59ef1e4ef",
+                    "type": "RADIO",
+                    "techName": "rodzaj_zdarzenia",
+                    "title": "Wybierz okoliczności złożenia deklaracji",
+                    "description": "",
+                    "options": [
+                      {
+                        "id": "Pierwsza deklaracja",
+                        "name": "Pierwsza deklaracja",
+                        "techName": "pierwsza_deklaracja"
+                      },
+                      {
+                        "id": "Nowa deklaracja ze względu na zmianę danych",
+                        "name": "Nowa deklaracja ze względu na zmianę danych",
+                        "techName": "nowa_deklaracja_ze_wzgledu_na_zmiane_danych"
+                      },
+                      {
+                        "id": "Ustanie obowiązku uiszczania opłaty",
+                        "name": "Ustanie obowiązku uiszczania opłaty",
+                        "techName": "ustanie_obowiazku_uiszczania_oplaty"
+                      },
+                      {
+                        "id": "Korekta złożonej deklaracji",
+                        "name": "Korekta złożonej deklaracji",
+                        "techName": "korekta_zlozonej_deklaracji"
+                      }
+                    ],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "5cbe6006-d163-4b5c-bbbe-0f226a636ba3",
+                    "type": "DATEPICKER",
+                    "techName": "data_powstania_obowiazku",
+                    "title": "Data powstania obowiązku opłaty",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Pierwsza deklaracja\" in tabs['Okoliczności złożenia deklaracji' in title].questions['okolicznosci' in field.techName].field.repeatingSectionGrid['rodzaj_zdarzenia' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 2,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "81869502-55ab-4144-a9c7-4c9b6d3abc40",
+                    "type": "DATEPICKER",
+                    "techName": "data_zmiany_danych",
+                    "title": "Data wystąpienia zmiany danych",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Nowa deklaracja ze względu na zmianę danych\" in tabs['Okoliczności złożenia deklaracji' in title].questions['okolicznosci' in field.techName].field.repeatingSectionGrid['rodzaj_zdarzenia' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 2,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 3,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "f32575ac-2120-4ca4-8eec-a64a41e24073",
+                    "type": "DATEPICKER",
+                    "techName": "data_ustania_obowiazku",
+                    "title": "Data powodująca ustanie obowiązku opłaty",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Ustanie obowiązku uiszczania opłaty\" in tabs['Okoliczności złożenia deklaracji' in title].questions['okolicznosci' in field.techName].field.repeatingSectionGrid['rodzaj_zdarzenia' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 3,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 4,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "15bee6f2-6626-4252-9e7c-e9dc3def4774",
+                    "type": "DATEPICKER",
+                    "techName": "data_korekty",
+                    "title": "Data wystąpienia zmiany danych (korekta)",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Korekta złożonej deklaracji\" in tabs['Okoliczności złożenia deklaracji' in title].questions['okolicznosci' in field.techName].field.repeatingSectionGrid['rodzaj_zdarzenia' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 4,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 0,
+              "tooltipMessage": ""
+            }
+          }
+        ]
+      },
+      {
+        "id": "c8351eb2-9827-49d9-a26c-cd6266ccc53e",
+        "title": "Dane nieruchomości",
+        "type": "MAIN",
+        "questions": [
+          {
+            "x": 0,
+            "y": 0,
+            "rows": 6,
+            "cols": 3,
+            "field": {
+              "id": "46ba9f24-f71e-420d-af53-37e670978b12",
+              "type": "SECTION",
+              "techName": "adres_nieruchomosci",
+              "title": "Adres nieruchomości",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "ff0b2e67-b7be-4bb2-90ac-180f5700247a",
+                    "type": "TEXT_FIELD",
+                    "techName": "miejscowosc_nieruchomosci",
+                    "title": "Miejscowość",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "e97d2e26-3316-451d-88a1-0500dacfef18",
+                    "type": "TEXT_FIELD",
+                    "techName": "kod_pocztowy_nieruchomosci",
+                    "title": "Kod pocztowy",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED",
+                      "ZIP_CODE"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 2,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "e8d43d04-713c-440f-856b-2a823c369374",
+                    "type": "TEXT_FIELD",
+                    "techName": "ulica_nieruchomosci",
+                    "title": "Ulica",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 2,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 3,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "2e1994fc-81c7-4700-9864-84896fcfe892",
+                    "type": "TEXT_FIELD",
+                    "techName": "numer_domu",
+                    "title": "Numer nieruchomości/domu",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 3,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 4,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "ca15040b-b227-4542-8ff3-64967badd15e",
+                    "type": "TEXT_FIELD",
+                    "techName": "numer_lokalu",
+                    "title": "Numer lokalu",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 4,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 0,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 6,
+            "rows": 3,
+            "cols": 3,
+            "field": {
+              "id": "a527802a-a091-419f-b25a-853374d864d0",
+              "type": "SECTION",
+              "techName": "miejsce_gromadzenia",
+              "title": "Miejsce gromadzenia odpadów",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "f97feb53-0e25-46a9-bd3d-7673ea2f3982",
+                    "type": "TEXTAREA",
+                    "techName": "opis_miejsca_pojemnikow",
+                    "title": "Adres lub opis miejsca lokalizacji pojemników",
+                    "description": "<html><head></head><body><p>Wypełnić w przypadku budynków wielolokalowych z oddzielnymi miejscami gromadzenia</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "0fc39db5-01f3-4b67-a87e-feef5e230a2d",
+                    "type": "TEXT_FIELD",
+                    "techName": "numery_dzialek_geodezyjnych",
+                    "title": "Numery działek geodezyjnych",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 1,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 9,
+            "rows": 4,
+            "cols": 3,
+            "field": {
+              "id": "2cb13620-d2c5-42e0-b31b-acd99d393ff8",
+              "type": "SECTION",
+              "techName": "charakterystyka_nieruchomosci",
+              "title": "Charakterystyka nieruchomości",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "bfb1faa7-ec4d-4db9-b1cd-9c61df52aa1c",
+                    "type": "RADIO",
+                    "techName": "rodzaj_nieruchomosci",
+                    "title": "Rodzaj nieruchomości",
+                    "description": "",
+                    "options": [
+                      {
+                        "id": "Nieruchomość zabudowana budynkiem mieszkalnym jednorodzinnym",
+                        "name": "Nieruchomość zabudowana budynkiem mieszkalnym jednorodzinnym",
+                        "techName": "nieruchomosc_zabudowana_budynkiem_mieszkalnym_jednorodzinnym"
+                      },
+                      {
+                        "id": "Nieruchomość zabudowana budynkiem mieszkalnym wielolokalowym",
+                        "name": "Nieruchomość zabudowana budynkiem mieszkalnym wielolokalowym",
+                        "techName": "nieruchomosc_zabudowana_budynkiem_mieszkalnym_wielolokalowym"
+                      }
+                    ],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "127dd82a-3a3f-4f79-a7cc-d1be30dc5587",
+                    "type": "RADIO",
+                    "techName": "nieruchomosc_mieszana",
+                    "title": "Czy nieruchomość w części stanowi miejsce zamieszkania, a w części nie zamieszkują mieszkańcy, a powstają odpady?",
+                    "description": "",
+                    "options": [
+                      {
+                        "id": "Tak",
+                        "name": "Tak",
+                        "techName": "tak"
+                      },
+                      {
+                        "id": "Nie",
+                        "name": "Nie",
+                        "techName": "nie"
+                      }
+                    ],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 2,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "fe99b62f-1378-4f68-bb5e-b5e35c5598c8",
+                    "type": "CHECKBOX",
+                    "techName": "posiada_kompostownik",
+                    "title": "Czy nieruchomość wyposażona jest w przydomowy kompostownik?",
+                    "description": "<html><head></head><body><p>Dotyczy wyłącznie budynków mieszkalnych jednorodzinnych</p></body></html>",
+                    "options": [
+                      {
+                        "id": "Oświadczam, że nieruchomość wyposażona jest w przydomowy kompostownik",
+                        "name": "Oświadczam, że nieruchomość wyposażona jest w przydomowy kompostownik",
+                        "techName": "oswiadczam_ze_nieruchomosc_wyposazona_jest_w_przydomowy_kompostownik"
+                      }
+                    ],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Nieruchomość zabudowana budynkiem mieszkalnym jednorodzinnym\" in tabs['Dane nieruchomości' in title].questions['charakterystyka_nieruchomosci' in field.techName].field.repeatingSectionGrid['rodzaj_nieruchomosci' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 2,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 2,
+              "tooltipMessage": ""
+            }
+          }
+        ]
+      },
+      {
+        "id": "037e8fe1-235c-47c1-85e8-a580435b19f0",
+        "title": "Rola wnioskodawcy",
+        "type": "MAIN",
+        "questions": [
+          {
+            "x": 0,
+            "y": 0,
+            "rows": 3,
+            "cols": 3,
+            "field": {
+              "id": "21a71f8b-e761-4593-bb89-5785b181540d",
+              "type": "SECTION",
+              "techName": "rola_skladajacego",
+              "title": "Status składającego deklarację",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "4e657136-fc77-427f-8775-528cd8c1f700",
+                    "type": "SELECT",
+                    "techName": "status_wnioskodawcy",
+                    "title": "Wybierz status składającego deklarację",
+                    "description": "",
+                    "options": [
+                      {
+                        "id": "Właściciel/współwłaściciel",
+                        "name": "Właściciel/współwłaściciel",
+                        "techName": "wlasciciel_wspolwlasciciel"
+                      },
+                      {
+                        "id": "Współwłaściciel (wspólność majątkowa)",
+                        "name": "Współwłaściciel (wspólność majątkowa)",
+                        "techName": "wspolwlasciciel_wspolnosc_majatkowa"
+                      },
+                      {
+                        "id": "Najemca/dzierżawca",
+                        "name": "Najemca/dzierżawca",
+                        "techName": "najemca_dzierzawca"
+                      },
+                      {
+                        "id": "Wspólnota mieszkaniowa",
+                        "name": "Wspólnota mieszkaniowa",
+                        "techName": "wspolnota_mieszkaniowa"
+                      },
+                      {
+                        "id": "Spółdzielnia mieszkaniowa",
+                        "name": "Spółdzielnia mieszkaniowa",
+                        "techName": "spoldzielnia_mieszkaniowa"
+                      },
+                      {
+                        "id": "Inny podmiot posiadający nieruchomość w zarządzie lub użytkowaniu",
+                        "name": "Inny podmiot posiadający nieruchomość w zarządzie lub użytkowaniu",
+                        "techName": "inny_podmiot_posiadajacy_nieruchomosc_w_zarzadzie_lub_uzytkowaniu"
+                      }
+                    ],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "afd1d8aa-7618-4875-94b2-060686d8baf6",
+                    "type": "TEXT_FIELD",
+                    "techName": "opis_innego_podmiotu",
+                    "title": "Opisz jaki podmiot posiada nieruchomość w zarządzie lub użytkowaniu",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "REQUIRED"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Inny podmiot posiadający nieruchomość w zarządzie lub użytkowaniu\" in tabs['Rola wnioskodawcy' in title].questions['rola_skladajacego' in field.techName].field.repeatingSectionGrid['status_wnioskodawcy' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 0,
+              "tooltipMessage": ""
+            }
+          }
+        ]
+      },
+      {
+        "id": "d0143867-78cd-416e-ba44-222344f61bf2",
+        "title": "Obliczenie wysokości opłaty",
+        "type": "MAIN",
+        "questions": [
+          {
+            "x": 0,
+            "y": 0,
+            "rows": 12,
+            "cols": 3,
+            "field": {
+              "id": "4907cb43-ff27-4e15-9574-e0ee38583d74",
+              "type": "SECTION",
+              "techName": "obliczenia_standardowe",
+              "title": "Obliczenie opłaty standardowej",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "e2da2d79-369f-4749-b3f3-5d0896492a1b",
+                    "type": "NUMBER",
+                    "techName": "liczba_gd_do_45m2",
+                    "title": "Liczba gospodarstw domowych do 45 m²",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "fcce0029-5297-4ec8-82bb-a20512e46200",
+                    "type": "NUMBER",
+                    "techName": "oplata_gd_do_45m2",
+                    "title": "Wysokość miesięcznej opłaty dla lokali do 45 m²",
+                    "description": "<html><head></head><body><p>Stawka: 38 zł</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 2,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "d0c9827a-ee4f-4029-ae56-c5f186a77c91",
+                    "type": "NUMBER",
+                    "techName": "liczba_gd_45_60m2",
+                    "title": "Liczba gospodarstw domowych od 45 m² do 60 m²",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 2,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 3,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "3fc93724-6911-49e5-b8b1-82e710d4847e",
+                    "type": "NUMBER",
+                    "techName": "oplata_gd_45_60m2",
+                    "title": "Wysokość miesięcznej opłaty dla lokali 45-60 m²",
+                    "description": "<html><head></head><body><p>Stawka: 69 zł</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 3,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 4,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "ff9a40ba-821c-4288-86f0-3f1858c2a811",
+                    "type": "NUMBER",
+                    "techName": "liczba_gd_60_80m2",
+                    "title": "Liczba gospodarstw domowych od 60 m² do 80 m²",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 4,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 5,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "2503106a-ea37-48cd-9d50-f3b63a0fd8a0",
+                    "type": "NUMBER",
+                    "techName": "oplata_gd_60_80m2",
+                    "title": "Wysokość miesięcznej opłaty dla lokali 60-80 m²",
+                    "description": "<html><head></head><body><p>Stawka: 81 zł</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 5,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 6,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "5c2ac7f7-9f5f-49d7-a3f2-a8038be54c40",
+                    "type": "NUMBER",
+                    "techName": "liczba_gd_powyzej_80m2",
+                    "title": "Liczba gospodarstw domowych powyżej 80 m²",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 6,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 7,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "e0d56704-59b1-4dff-a927-61c611e517d8",
+                    "type": "NUMBER",
+                    "techName": "oplata_gd_powyzej_80m2",
+                    "title": "Wysokość miesięcznej opłaty dla lokali powyżej 80 m²",
+                    "description": "<html><head></head><body><p>Stawka: 101 zł</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 7,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 8,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "68b91ca0-97b4-4572-9273-d46099b95748",
+                    "type": "NUMBER",
+                    "techName": "liczba_gd_zwolnienie",
+                    "title": "Liczba gospodarstw domowych objętych zwolnieniem dochodowym",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 8,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 9,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "3028b82a-dcd8-42ed-afb3-c4258ef940e7",
+                    "type": "NUMBER",
+                    "techName": "kwota_zwolnienia",
+                    "title": "Wysokość miesięcznego zwolnienia",
+                    "description": "<html><head></head><body><p>Stawka: 15 zł</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 9,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 10,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "bf4cec0c-99d8-4c02-a5be-fdfe476c98d6",
+                    "type": "NUMBER",
+                    "techName": "suma_oplat_standard",
+                    "title": "Suma opłat pomniejszona o kwotę zwolnienia",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 10,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 0,
+              "tooltipMessage": ""
+            }
+          }
+        ]
+      },
+      {
+        "id": "555fab4d-5697-4ce2-a524-239602eaaa10",
+        "title": "Obliczenie opłaty ze zwolnieniem za kompostownik",
+        "type": "MAIN",
+        "questions": [
+          {
+            "x": 0,
+            "y": 0,
+            "rows": 12,
+            "cols": 3,
+            "field": {
+              "id": "3eae6dc8-a60d-4373-af13-5884b7f2bf0d",
+              "type": "SECTION",
+              "techName": "obliczenia_kompostownik",
+              "title": "Obliczenie opłaty dla nieruchomości z kompostownikiem",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "48d95e75-f568-4119-a8d1-3eb4e6ad2c5c",
+                    "type": "NUMBER",
+                    "techName": "liczba_gd_komp_do_45m2",
+                    "title": "Liczba gospodarstw domowych do 45 m² (kompostownik)",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Oświadczam, że nieruchomość wyposażona jest w przydomowy kompostownik\" in tabs['Dane nieruchomości' in title].questions['charakterystyka_nieruchomosci' in field.techName].field.repeatingSectionGrid['posiada_kompostownik' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "02234ae4-1d82-429b-a46f-8c54228f19f1",
+                    "type": "NUMBER",
+                    "techName": "oplata_gd_komp_do_45m2",
+                    "title": "Wysokość miesięcznej opłaty dla lokali do 45 m² (kompostownik)",
+                    "description": "<html><head></head><body><p>Stawka: 28 zł</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Oświadczam, że nieruchomość wyposażona jest w przydomowy kompostownik\" in tabs['Dane nieruchomości' in title].questions['charakterystyka_nieruchomosci' in field.techName].field.repeatingSectionGrid['posiada_kompostownik' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 2,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "d1d433e7-6e0f-4743-a4d9-e81f91381859",
+                    "type": "NUMBER",
+                    "techName": "liczba_gd_komp_45_60m2",
+                    "title": "Liczba gospodarstw domowych od 45 m² do 60 m² (kompostownik)",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Oświadczam, że nieruchomość wyposażona jest w przydomowy kompostownik\" in tabs['Dane nieruchomości' in title].questions['charakterystyka_nieruchomosci' in field.techName].field.repeatingSectionGrid['posiada_kompostownik' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 2,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 3,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "c7e90f36-a65b-4e3b-9318-ce66f019750e",
+                    "type": "NUMBER",
+                    "techName": "oplata_gd_komp_45_60m2",
+                    "title": "Wysokość miesięcznej opłaty dla lokali 45-60 m² (kompostownik)",
+                    "description": "<html><head></head><body><p>Stawka: 59 zł</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Oświadczam, że nieruchomość wyposażona jest w przydomowy kompostownik\" in tabs['Dane nieruchomości' in title].questions['charakterystyka_nieruchomosci' in field.techName].field.repeatingSectionGrid['posiada_kompostownik' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 3,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 4,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "486285d3-1c39-4158-8f74-770abcfd310b",
+                    "type": "NUMBER",
+                    "techName": "liczba_gd_komp_60_80m2",
+                    "title": "Liczba gospodarstw domowych od 60 m² do 80 m² (kompostownik)",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Oświadczam, że nieruchomość wyposażona jest w przydomowy kompostownik\" in tabs['Dane nieruchomości' in title].questions['charakterystyka_nieruchomosci' in field.techName].field.repeatingSectionGrid['posiada_kompostownik' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 4,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 5,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "a4880085-cc4e-4a80-9d6d-dd6e07108b0d",
+                    "type": "NUMBER",
+                    "techName": "oplata_gd_komp_60_80m2",
+                    "title": "Wysokość miesięcznej opłaty dla lokali 60-80 m² (kompostownik)",
+                    "description": "<html><head></head><body><p>Stawka: 71 zł</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Oświadczam, że nieruchomość wyposażona jest w przydomowy kompostownik\" in tabs['Dane nieruchomości' in title].questions['charakterystyka_nieruchomosci' in field.techName].field.repeatingSectionGrid['posiada_kompostownik' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 5,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 6,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "cd0e20c8-dab6-4038-bfb2-3cf059e4d6b4",
+                    "type": "NUMBER",
+                    "techName": "liczba_gd_komp_powyzej_80m2",
+                    "title": "Liczba gospodarstw domowych powyżej 80 m² (kompostownik)",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Oświadczam, że nieruchomość wyposażona jest w przydomowy kompostownik\" in tabs['Dane nieruchomości' in title].questions['charakterystyka_nieruchomosci' in field.techName].field.repeatingSectionGrid['posiada_kompostownik' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 6,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 7,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "c24b6865-9e59-44b4-a9cd-d92fb45042fc",
+                    "type": "NUMBER",
+                    "techName": "oplata_gd_komp_powyzej_80m2",
+                    "title": "Wysokość miesięcznej opłaty dla lokali powyżej 80 m² (kompostownik)",
+                    "description": "<html><head></head><body><p>Stawka: 91 zł</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Oświadczam, że nieruchomość wyposażona jest w przydomowy kompostownik\" in tabs['Dane nieruchomości' in title].questions['charakterystyka_nieruchomosci' in field.techName].field.repeatingSectionGrid['posiada_kompostownik' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 7,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 8,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "895d40bb-4b73-4b2b-8bbf-e463dadc5197",
+                    "type": "NUMBER",
+                    "techName": "liczba_gd_komp_zwolnienie",
+                    "title": "Liczba gospodarstw domowych objętych zwolnieniem dochodowym (kompostownik)",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Oświadczam, że nieruchomość wyposażona jest w przydomowy kompostownik\" in tabs['Dane nieruchomości' in title].questions['charakterystyka_nieruchomosci' in field.techName].field.repeatingSectionGrid['posiada_kompostownik' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 8,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 9,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "6abc5247-e7d8-4325-91d0-207e7cf3bfd2",
+                    "type": "NUMBER",
+                    "techName": "kwota_zwolnienia_komp",
+                    "title": "Wysokość miesięcznego zwolnienia (kompostownik)",
+                    "description": "<html><head></head><body><p>Stawka: 15 zł</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Oświadczam, że nieruchomość wyposażona jest w przydomowy kompostownik\" in tabs['Dane nieruchomości' in title].questions['charakterystyka_nieruchomosci' in field.techName].field.repeatingSectionGrid['posiada_kompostownik' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 9,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 10,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "d8dd9817-89f6-4162-ae40-d47290841f1f",
+                    "type": "NUMBER",
+                    "techName": "suma_oplat_kompostownik",
+                    "title": "Suma opłat pomniejszona o kwotę zwolnienia (kompostownik)",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"Oświadczam, że nieruchomość wyposażona jest w przydomowy kompostownik\" in tabs['Dane nieruchomości' in title].questions['charakterystyka_nieruchomosci' in field.techName].field.repeatingSectionGrid['posiada_kompostownik' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 10,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 0,
+              "tooltipMessage": ""
+            }
+          }
+        ]
+      },
+      {
+        "id": "e106bb47-7ca1-47a6-8cf6-9340fa544063",
+        "title": "Załączniki i zgody",
+        "type": "MAIN",
+        "questions": [
+          {
+            "x": 0,
+            "y": 0,
+            "rows": 6,
+            "cols": 3,
+            "field": {
+              "id": "a8497331-551e-4698-877f-f7bce8b93776",
+              "type": "SECTION",
+              "techName": "zalaczniki_dodatkowe",
+              "title": "Załączniki",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "6560de4e-2e2c-4cb7-a53c-7f430c5d4fc1",
+                    "type": "FILE_UPLOADER",
+                    "techName": "zalacznik_a",
+                    "title": "Załącznik A",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "3407ffe3-55dd-4856-9f2e-d628eef6bd84",
+                    "type": "FILE_UPLOADER",
+                    "techName": "zalacznik_b",
+                    "title": "Załącznik B",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 1,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 2,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "cd349add-9708-4c62-959a-b8c108d9e4d5",
+                    "type": "FILE_UPLOADER",
+                    "techName": "dokumenty_upowazniajace",
+                    "title": "Dokumenty upoważniające do złożenia deklaracji",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 2,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 3,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "85ddfedf-36de-42db-8570-aba3083fa933",
+                    "type": "TEXT_FIELD",
+                    "techName": "inne_zalaczniki_opis",
+                    "title": "Inne załączniki (podać jakie)",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 3,
+                    "tooltipMessage": ""
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 4,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "2134f6fb-0377-42e8-ab99-2fa19747b607",
+                    "type": "FILE_UPLOADER",
+                    "techName": "inne_zalaczniki_plik",
+                    "title": "Pliki innych załączników",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [
+                      {
+                        "type": "SHOW",
+                        "query": "(\"true\" in tabs['Załączniki i zgody' in title].questions['zalaczniki_dodatkowe' in field.techName].field.repeatingSectionGrid['inne_zalaczniki_opis' in field.techName].field.__userAnswer)"
+                      }
+                    ],
+                    "questionOrder": 4,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 0,
+              "tooltipMessage": ""
+            }
+          }
+        ]
+      },
+      {
+        "id": "ce8393ab-465e-488e-a0e6-0cc34ea80152",
+        "title": "Kontakt i zgody",
+        "type": "MAIN",
+        "questions": [
+          {
+            "x": 0,
+            "y": 0,
+            "rows": 3,
+            "cols": 3,
+            "field": {
+              "id": "40522a0a-e697-417f-a6a0-2ff27fd684ce",
+              "type": "SECTION",
+              "techName": "dane_do_kontaktu",
+              "title": "Dane do kontaktu",
+              "description": "<html><head></head><body><p>Wpisanie danych do kontaktu może przyspieszyć załatwienie sprawy. Urzędnik będzie mógł skontaktować się z Tobą w przypadku pytań lub wątpliwości.</p><p>Jeśli widzisz uzupełnione dane, sprawdź, czy są poprawne. Możesz je zmienić lub usunąć.</p></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "d8a55349-5a14-40ae-a9ca-bae964d10ef1",
+                    "type": "TEXT_FIELD",
+                    "techName": "numer_telefonu",
+                    "title": "Numer telefonu",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": "",
+                    "defaultValue": "MLPZ.phoneNumber",
+                    "defaultValueType": "EXTERNAL_SYSTEM"
+                  }
+                },
+                {
+                  "x": 0,
+                  "y": 1,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "a42493ac-6c10-4382-921d-75516e485b62",
+                    "type": "TEXT_FIELD",
+                    "techName": "adres_e_mail",
+                    "title": "Adres e-mail",
+                    "description": "",
+                    "options": [],
+                    "validation": [
+                      "EMAIL"
+                    ],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 1,
+                    "tooltipMessage": "",
+                    "defaultValue": "MLPZ.email",
+                    "defaultValueType": "EXTERNAL_SYSTEM"
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 0,
+              "tooltipMessage": ""
+            }
+          },
+          {
+            "x": 0,
+            "y": 3,
+            "rows": 2,
+            "cols": 3,
+            "field": {
+              "id": "9c78f3d7-cff8-4ff1-94a2-e3d9b0b52f29",
+              "type": "SECTION",
+              "techName": "zgoda",
+              "title": "Zgoda",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "81b80ffd-b61c-435d-bdc4-2828ba712062",
+                    "type": "CONSENT_SECTION",
+                    "techName": "sekcja_zgod",
+                    "title": "",
+                    "description": "",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": "",
+                    "consentSectionConfig": {
+                      "consents": [
+                        {
+                          "description": "<html><head></head><body><p>Wyrażam zgodę na przetwarzanie moich danych osobowych zgodnie z klauzulą informacyjną.</p></body></html>",
+                          "required": true
+                        }
+                      ],
+                      "required": true,
+                      "files": []
+                    }
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 1,
+              "tooltipMessage": ""
+            }
+          }
+        ]
+      },
+      {
+        "id": "0a2dd63d-6f2c-4b7e-8982-d43163927914",
+        "title": "Strona końcowa",
+        "type": "FINISH",
+        "questions": [
+          {
+            "x": 0,
+            "y": 0,
+            "rows": 2,
+            "cols": 3,
+            "field": {
+              "id": "cce0b5be-68c1-47e7-93a0-8f5741d5fbbf",
+              "type": "SECTION",
+              "techName": "podglad",
+              "title": "Podgląd",
+              "description": "<html><head></head><body></body></html>",
+              "options": [],
+              "validation": [],
+              "readOnly": false,
+              "repeatingSectionGrid": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "rows": 1,
+                  "cols": 3,
+                  "field": {
+                    "id": "31dbe3f1-adba-4b2c-b57d-855061600577",
+                    "type": "INFO_SECTION",
+                    "techName": "podglad_info",
+                    "title": "",
+                    "description": "<html><head></head><body><p>Zanim przejdziesz do wyboru sposobu podpisu, sprawdź dane na podglądzie. Jeśli zobaczysz błędy, wróć do edycji.</p></body></html>",
+                    "options": [],
+                    "validation": [],
+                    "readOnly": false,
+                    "repeatingSectionGrid": [],
+                    "states": [],
+                    "questionOrder": 0,
+                    "tooltipMessage": ""
+                  }
+                }
+              ],
+              "states": [],
+              "questionOrder": 0,
+              "tooltipMessage": ""
+            }
+          }
+        ]
+      }
+    ],
+    "flow": {
+      "links": [
+        {
+          "id": "7d10e813-00fb-462b-a1ba-dcb678f7d795",
+          "source": "2c45513e-37b7-4be6-a9c6-ba479fff5bb4",
+          "target": "c740ace1-2479-4978-bfef-cf8a3ca739d0"
+        },
+        {
+          "id": "d236bf52-893e-4fb5-ad4a-b8e69ee49a21",
+          "source": "c740ace1-2479-4978-bfef-cf8a3ca739d0",
+          "target": "c8351eb2-9827-49d9-a26c-cd6266ccc53e"
+        },
+        {
+          "id": "cd2ac9bb-8b77-4b4c-bb54-fb6c1b04f0b3",
+          "source": "c8351eb2-9827-49d9-a26c-cd6266ccc53e",
+          "target": "037e8fe1-235c-47c1-85e8-a580435b19f0"
+        },
+        {
+          "id": "c644c77a-dd3e-4200-8e9c-31278c4f5d10",
+          "source": "037e8fe1-235c-47c1-85e8-a580435b19f0",
+          "target": "d0143867-78cd-416e-ba44-222344f61bf2"
+        },
+        {
+          "id": "25954eed-aeca-4f6a-a9d9-24335db32f9e",
+          "source": "d0143867-78cd-416e-ba44-222344f61bf2",
+          "target": "555fab4d-5697-4ce2-a524-239602eaaa10"
+        },
+        {
+          "id": "e5adba80-c0ce-4249-a2c1-7a83433a8b74",
+          "source": "555fab4d-5697-4ce2-a524-239602eaaa10",
+          "target": "e106bb47-7ca1-47a6-8cf6-9340fa544063"
+        },
+        {
+          "id": "5d54ef37-2ae1-41d6-b014-5f01275c9675",
+          "source": "e106bb47-7ca1-47a6-8cf6-9340fa544063",
+          "target": "ce8393ab-465e-488e-a0e6-0cc34ea80152"
+        },
+        {
+          "id": "639abdd2-e20e-4490-bccb-98234902af19",
+          "source": "ce8393ab-465e-488e-a0e6-0cc34ea80152",
+          "target": "0a2dd63d-6f2c-4b7e-8982-d43163927914"
+        }
+      ]
+    }
+  },
+  "warnings": [],
+  "proposed_dictionaries": []
+}
