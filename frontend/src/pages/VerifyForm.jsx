@@ -158,6 +158,7 @@ function Comparison({ item, items, current, onCurrentChange, views, onToggleView
   const file = getFile(item.fileId);
   const [page, setPage] = useState(0);
   const [selectedId, setSelectedId] = useState(null);
+  const [previewRevision, setPreviewRevision] = useState(0);
 
   const warnings = useMemo(
     () => (result?.warnings || []).map((warning) => resolveWarning(warning, form)),
@@ -180,6 +181,13 @@ function Comparison({ item, items, current, onCurrentChange, views, onToggleView
   function editFragment(id, replacement) {
     const nextForm = replaceNodeById(form, id, replacement);
     if (nextForm) onUpdateForm(nextForm);
+  }
+
+  function regenerateFragment(id, replacement) {
+    const nextForm = replaceNodeById(form, id, replacement);
+    if (!nextForm) return;
+    onUpdateForm(nextForm);
+    setPreviewRevision((revision) => revision + 1);
   }
 
   const visible = VIEWS.filter(({ key }) => views[key]);
@@ -296,6 +304,7 @@ function Comparison({ item, items, current, onCurrentChange, views, onToggleView
         {views.original && <OriginalPanel file={file} fileName={item.fileName} />}
         {views.form && (
           <FormPreview
+            key={`form-preview-${previewRevision}`}
             form={form}
             index={index}
             page={page}
@@ -311,6 +320,7 @@ function Comparison({ item, items, current, onCurrentChange, views, onToggleView
             fieldIds={index.fieldIds}
             onSelect={select}
             onEditFragment={editFragment}
+            onRegenerateFragment={regenerateFragment}
           />
         )}
       </div>

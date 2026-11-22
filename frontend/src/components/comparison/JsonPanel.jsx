@@ -23,7 +23,7 @@ function objectRange(lines, id) {
   return [start, end];
 }
 
-export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEditFragment }) {
+export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEditFragment, onRegenerateFragment }) {
   const text = useMemo(() => JSON.stringify(form, null, 2), [form]);
   const lines = useMemo(() => text.split("\n"), [text]);
   const range = useMemo(() => objectRange(lines, selectedId), [lines, selectedId]);
@@ -31,6 +31,7 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEdit
   const [editing, setEditing] = useState(false);
   const [editDraft, setEditDraft] = useState("");
   const [editError, setEditError] = useState("");
+  const [editStatus, setEditStatus] = useState("");
   const bodyRef = useRef(null);
   const startRef = useRef(null);
 
@@ -79,6 +80,7 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEdit
 
   function changeFragment(value) {
     setEditDraft(value);
+    setEditStatus("");
     try {
       const replacement = JSON.parse(value);
       if (replacement?.id !== selectedId) {
@@ -90,6 +92,28 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEdit
     } catch {
       setEditError("Nieprawidłowy JSON. Zmiany zostaną zastosowane po usunięciu błędu.");
     }
+  }
+
+  function parseEditedFragment() {
+    try {
+      const replacement = JSON.parse(editDraft);
+      if (replacement?.id !== selectedId) {
+        setEditError("Pole id nie może zostać zmienione podczas edycji fragmentu.");
+        return null;
+      }
+      setEditError("");
+      return replacement;
+    } catch {
+      setEditError("Nieprawidłowy JSON.");
+      return null;
+    }
+  }
+
+  function saveFragment() {
+    const replacement = parseEditedFragment();
+    if (!replacement) return;
+    onRegenerateFragment?.(selectedId, replacement);
+    setEditStatus("Zapisano i wygenerowano formularz ponownie");
   }
 
   const digits = String(lines.length).length;
@@ -144,6 +168,29 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEdit
             className="min-h-72 w-full resize-y rounded-md border border-amber-400 bg-background p-3 font-mono text-xs leading-5 outline-none focus:ring-3 focus:ring-ring/50"
           />
           {editError && <p role="alert" className="mt-2 text-xs font-medium text-destructive">{editError}</p>}
+          {editStatus && !editError && (
+            <p role="status" className="mt-2 text-xs font-medium text-emerald-700">{editStatus}</p>
+          )}
+          <div className="mt-3 flex flex-wrap justify-end gap-2">
+            <button
+              type="button"
+              className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
+              onClick={() => {
+                setEditing(false);
+                setEditError("");
+                setEditStatus("");
+              }}
+            >
+              Anuluj
+            </button>
+            <button
+              type="button"
+              className={cn(buttonVariants({ size: "sm" }))}
+              onClick={saveFragment}
+            >
+              Zapisz
+            </button>
+          </div>
         </div>
       ) : (
       <pre className="min-w-max py-2 font-mono text-xs leading-5" aria-label="JSON formularza">
