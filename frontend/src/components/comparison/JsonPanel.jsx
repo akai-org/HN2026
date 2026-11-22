@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Check, Copy, Download, Pencil } from "@/components/icons";
 import { buttonVariants } from "@/components/ui/button";
 import { downloadJson } from "@/lib/formDefinition";
@@ -23,6 +23,46 @@ function objectRange(lines, id) {
   return [start, end];
 }
 
+const ID_LINE = /^\s*"id":\s*"((?:[^"\\]|\\.)*)",?\s*$/;
+
+/**
+ * For each line, the id (from `fieldIds`) of the innermost field object containing it, or null.
+ * Relies on the JSON.stringify(…, null, 2) layout: objects and arrays open at the end of a line
+ * and close at the start of another, and string values never start with a bracket.
+ */
+function lineOwners(lines, fieldIds) {
+  const owners = new Array(lines.length).fill(null);
+  if (!fieldIds?.size) return owners;
+  const stack = [];
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    if (trimmed.startsWith("}") || trimmed.startsWith("]")) {
+      const node = stack.pop();
+      // Inner objects close first, so `??=` keeps the innermost owner.
+      if (node?.id) for (let i = node.start; i <= index; i += 1) owners[i] ??= node.id;
+      return;
+    }
+    const idMatch = line.match(ID_LINE);
+    if (idMatch && stack.length) {
+      const id = idMatch[1].replace(/\\(.)/g, "$1");
+      if (fieldIds.has(id)) stack[stack.length - 1].id = id;
+    }
+    if (trimmed.endsWith("{") || trimmed.endsWith("[")) stack.push({ start: index, id: null });
+  });
+  return owners;
+}
+
+/** Runs of consecutive lines with the same owner: [{ owner, start, end }]. */
+function lineGroups(owners) {
+  const groups = [];
+  owners.forEach((owner, index) => {
+    const last = groups[groups.length - 1];
+    if (last && last.owner === owner) last.end = index;
+    else groups.push({ owner, start: index, end: index });
+  });
+  return groups;
+}
+
 function editableFragment(lines, range) {
   if (!range) return "";
   return lines
@@ -37,6 +77,7 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEdit
   const text = useMemo(() => JSON.stringify(form, null, 2), [form]);
   const lines = useMemo(() => text.split("\n"), [text]);
   const range = useMemo(() => objectRange(lines, selectedId), [lines, selectedId]);
+  const groups = useMemo(() => lineGroups(lineOwners(lines, fieldIds)), [lines, fieldIds]);
   const [copied, setCopied] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editDraft, setEditDraft] = useState("");
@@ -134,7 +175,35 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEdit
   }
 
   const digits = String(lines.length).length;
-  const idPattern = /^\s*"id":\s*"((?:[^"\\]|\\.)*)",?\s*$/;
+
+  function renderLine(index) {
+    const isHighlighted = range && index >= range[0] && index <= range[1];
+    return (
+      <div
+        key={index}
+        ref={range && index === range[0] ? startRef : undefined}
+        className={cn("flex pr-4", isHighlighted && "bg-amber-100")}
+      >
+        <span
+          aria-hidden="true"
+          className={cn(
+            "sticky left-0 select-none border-r border-border px-2 text-right text-muted-foreground",
+            isHighlighted ? "bg-amber-200/70" : "bg-background",
+          )}
+          style={{ minWidth: `${digits + 2}ch` }}
+        >
+          {index + 1}
+        </span>
+        <span className="whitespace-pre pl-3">{lines[index]}</span>
+      </div>
+    );
+  }
+
+  function selectFromJson(id) {
+    // Don't treat finishing a text selection (to copy part of the JSON) as a click.
+    if (window.getSelection()?.toString()) return;
+    onSelect(id);
+  }
 
   return (
     <Panel
@@ -211,42 +280,26 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEdit
         </div>
       ) : (
       <pre className="min-w-max py-2 font-mono text-xs leading-5" aria-label="JSON formularza">
-        {lines.map((line, index) => {
-          const isHighlighted = range && index >= range[0] && index <= range[1];
-          const idMatch = line.match(idPattern);
-          const lineId = idMatch ? idMatch[1].replace(/\\(.)/g, "$1") : null;
-          const isFieldId = Boolean(lineId && fieldIds?.has(lineId));
+        {groups.map(({ owner, start, end }) => {
+          const rows = [];
+          for (let index = start; index <= end; index += 1) rows.push(renderLine(index));
+          if (!owner || !onSelect) return <Fragment key={start}>{rows}</Fragment>;
           return (
             <div
-              key={index}
-              ref={range && index === range[0] ? startRef : undefined}
-              role={isFieldId && onSelect ? "button" : undefined}
-              tabIndex={isFieldId && onSelect ? 0 : undefined}
-              aria-label={isFieldId && onSelect ? `Zaznacz pole ${lineId} w formularzu` : undefined}
-              onClick={isFieldId && onSelect ? () => onSelect(lineId) : undefined}
-              onKeyDown={isFieldId && onSelect ? (event) => {
+              key={start}
+              role="button"
+              tabIndex={0}
+              aria-label={`Zaznacz pole ${owner} w formularzu`}
+              onClick={() => selectFromJson(owner)}
+              onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
-                  onSelect(lineId);
+                  onSelect(owner);
                 }
-              } : undefined}
-              className={cn(
-                "flex pr-4",
-                isHighlighted && "bg-amber-100",
-                isFieldId && onSelect && "cursor-pointer hover:bg-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
-              )}
+              }}
+              className="cursor-pointer hover:bg-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
             >
-              <span
-                aria-hidden="true"
-                className={cn(
-                  "sticky left-0 select-none border-r border-border px-2 text-right text-muted-foreground",
-                  isHighlighted ? "bg-amber-200/70" : "bg-background",
-                )}
-                style={{ minWidth: `${digits + 2}ch` }}
-              >
-                {index + 1}
-              </span>
-              <span className="whitespace-pre pl-3">{line}</span>
+              {rows}
             </div>
           );
         })}
