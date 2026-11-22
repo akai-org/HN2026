@@ -205,13 +205,21 @@ function Comparison({
           ))}
         </div>
         <span className="hidden max-w-72 text-right text-xs text-muted-foreground md:inline">
-          Porównaj oryginał z wersją cyfrową. Kliknij element formularza lub JSON, aby zaznaczyć go po drugiej
-          stronie.
+          Porównaj oryginał z wersją cyfrową. Kliknij pole na oryginale PDF, w formularzu lub w JSON, aby
+          zaznaczyć je w pozostałych widokach.
         </span>
       </div>
 
       <div className={cn("grid gap-4", GRID_COLUMNS[panelCount])}>
-        {views.original && <OriginalPanel file={getFile(result.fileId)} fileName={result.fileName} />}
+        {views.original && (
+          <OriginalPanel
+            file={getFile(result.fileId)}
+            fileName={result.fileName}
+            form={form}
+            selectedId={selectedId}
+            onSelect={select}
+          />
+        )}
         {views.form && (
           <FormPreview
             form={form}

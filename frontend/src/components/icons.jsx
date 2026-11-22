@@ -65,6 +65,14 @@ export function ChevronLeft(props) {
   );
 }
 
+export function ChevronRight(props) {
+  return (
+    <Icon {...props}>
+      <path d="m9 18 6-6-6-6" />
+    </Icon>
+  );
+}
+
 export function CircleCheck(props) {
   return (
     <Icon {...props}>

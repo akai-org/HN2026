@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ExternalLink, FileQuestion, Minus, Plus } from "@/components/icons";
+import { ChevronLeft, ChevronRight, ExternalLink, FileQuestion, Minus, Plus } from "@/components/icons";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { extractFormFile } from "@/lib/api";
 import { fileUrl } from "@/lib/fileStore";
 import { fileExtension } from "@/lib/uploads";
 import Panel, { SegmentedControl } from "./Panel";
+import PdfPage from "./PdfPage";
+import usePdfOriginal from "./usePdfOriginal";
 
 const ZOOM_STEPS = [50, 75, 100, 125, 150, 200, 300];
 const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png"]);
@@ -49,7 +51,19 @@ function useExtractedDocument(file, enabled, attempt) {
   return result?.file === file && result.attempt === attempt ? result : { status: "loading" };
 }
 
-export default function OriginalPanel({ file, fileName }) {
+/** Page the PDF shows: it follows the selected field to its page; manual paging wins until the next selection. */
+function useFollowedPage(selectedId, hit) {
+  const [page, setPage] = useState(1);
+  const [followed, setFollowed] = useState(null);
+  const target = hit ? `${selectedId}@${hit.page}` : null;
+  if (target !== followed) {
+    setFollowed(target);
+    if (hit) setPage(hit.page);
+  }
+  return [page, setPage];
+}
+
+export default function OriginalPanel({ file, fileName, form, selectedId, onSelect }) {
   const kind = fileKind(file?.name || fileName);
   const [view, setView] = useState(kind === "document" ? "text" : "file");
   const [zoom, setZoom] = useState(100);
@@ -57,39 +71,68 @@ export default function OriginalPanel({ file, fileName }) {
   const url = file ? fileUrl(file) : null;
   const extracted = useExtractedDocument(file, view === "text", attempt);
 
-  const zoomIndex = ZOOM_STEPS.indexOf(zoom);
+  const pdf = usePdfOriginal(kind === "pdf" ? file : null, form);
+  const hit = selectedId ? pdf.matches.get(selectedId) : null;
+  const [page, setPage] = useFollowedPage(selectedId, hit);
+  const numPages = pdf.doc?.numPages ?? 0;
+  const shownPage = Math.min(page, Math.max(1, numPages));
+  const showsPdf = kind === "pdf" && view === "file";
+
+  let pdfNote = null;
+  if (showsPdf && pdf.pdfIndex?.empty) {
+    pdfNote = {
+      text: "Skan bez tekstu",
+      hint: "Ten PDF nie ma warstwy tekstu, więc nie da się wskazać na nim pól.",
+    };
+  } else if (showsPdf && pdf.pdfIndex && selectedId && !hit) {
+    pdfNote = {
+      text: "Brak na oryginale",
+      hint: "Na oryginale nie ma napisu pasującego do zaznaczonego pola. Pole mogło zostać dodane według standardu e-formularzy.",
+    };
+  }
+
   const actions = file && (
     <>
-      {view === "file" && kind === "image" && (
-        <div className="flex items-center gap-0.5" role="group" aria-label="Powiększenie">
+      {pdfNote && (
+        <span
+          role="status"
+          title={pdfNote.hint}
+          className="rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
+        >
+          {pdfNote.text}
+          <span className="sr-only">: {pdfNote.hint}</span>
+        </span>
+      )}
+      {showsPdf && numPages > 1 && (
+        <div className="flex items-center gap-0.5" role="group" aria-label="Strony PDF">
           <Button
             variant="ghost"
             size="icon-xs"
-            aria-label="Pomniejsz"
-            disabled={zoomIndex <= 0}
-            onClick={() => setZoom(ZOOM_STEPS[zoomIndex - 1])}
+            aria-label="Poprzednia strona"
+            disabled={shownPage <= 1}
+            onClick={() => setPage(shownPage - 1)}
           >
-            <Minus />
+            <ChevronLeft />
           </Button>
-          <button
-            type="button"
-            title="Dopasuj do szerokości"
-            onClick={() => setZoom(100)}
-            className="min-w-11 rounded-md px-1 text-xs text-muted-foreground tabular-nums focus-ring hover:bg-muted"
+          <span
+            className="min-w-10 text-center text-xs text-muted-foreground tabular-nums"
+            aria-live="polite"
           >
-            {zoom}%
-          </button>
+            <span className="sr-only">Strona </span>
+            {shownPage} / {numPages}
+          </span>
           <Button
             variant="ghost"
             size="icon-xs"
-            aria-label="Powiększ"
-            disabled={zoomIndex >= ZOOM_STEPS.length - 1}
-            onClick={() => setZoom(ZOOM_STEPS[zoomIndex + 1])}
+            aria-label="Następna strona"
+            disabled={shownPage >= numPages}
+            onClick={() => setPage(shownPage + 1)}
           >
-            <Plus />
+            <ChevronRight />
           </Button>
         </div>
       )}
+      {view === "file" && kind !== "document" && <ZoomControls zoom={zoom} onZoom={setZoom} />}
       {url && kind !== "document" && view === "file" && (
         <a
           href={url}
@@ -132,11 +175,37 @@ export default function OriginalPanel({ file, fileName }) {
       ) : view === "text" ? (
         <ExtractedText state={extracted} kind={kind} onRetry={() => setAttempt((count) => count + 1)} />
       ) : !url ? null : kind === "pdf" ? (
-        <iframe
-          title={`Oryginał: ${file.name}`}
-          src={`${url}#view=FitH&navpanes=0`}
-          className="block h-full w-full border-0"
-        />
+        pdf.error ? (
+          <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
+            <p className="max-w-xs text-sm text-destructive" role="alert">
+              {pdf.error}
+            </p>
+            <a
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              Otwórz w nowej karcie
+            </a>
+          </div>
+        ) : !pdf.doc ? (
+          <p className="p-6 text-center text-sm text-muted-foreground" role="status">
+            Wczytywanie pliku PDF…
+          </p>
+        ) : (
+          <PdfPage
+            doc={pdf.doc}
+            page={shownPage}
+            zoom={zoom}
+            fileName={file.name}
+            pdfIndex={pdf.pdfIndex}
+            matches={pdf.matches}
+            titles={pdf.titles}
+            selectedId={selectedId}
+            onSelect={onSelect}
+          />
+        )
       ) : (
         <div className="p-3">
           <img
@@ -148,6 +217,41 @@ export default function OriginalPanel({ file, fileName }) {
         </div>
       )}
     </Panel>
+  );
+}
+
+/** Zoom in percent of the panel width (100 = fit to width), shared by the PDF and image views. */
+function ZoomControls({ zoom, onZoom }) {
+  const zoomIndex = ZOOM_STEPS.indexOf(zoom);
+  return (
+    <div className="flex items-center gap-0.5" role="group" aria-label="Powiększenie">
+      <Button
+        variant="ghost"
+        size="icon-xs"
+        aria-label="Pomniejsz"
+        disabled={zoomIndex <= 0}
+        onClick={() => onZoom(ZOOM_STEPS[zoomIndex - 1])}
+      >
+        <Minus />
+      </Button>
+      <button
+        type="button"
+        title="Dopasuj do szerokości"
+        onClick={() => onZoom(100)}
+        className="min-w-11 rounded-md px-1 text-xs text-muted-foreground tabular-nums focus-ring hover:bg-muted"
+      >
+        {zoom}%
+      </button>
+      <Button
+        variant="ghost"
+        size="icon-xs"
+        aria-label="Powiększ"
+        disabled={zoomIndex >= ZOOM_STEPS.length - 1}
+        onClick={() => onZoom(ZOOM_STEPS[zoomIndex + 1])}
+      >
+        <Plus />
+      </Button>
+    </div>
   );
 }
 

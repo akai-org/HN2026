@@ -131,3 +131,88 @@ html.a11y-wide-spacing p {
     transform: rotate(1turn);
   }
 }
+
+/* Original PDF (components/comparison/PdfPage.jsx): transparent pdf.js text layer over the page image,
+   so text can be selected and read by screen readers. Based on pdf.js `.textLayer`. */
+.pdf-textlayer {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  line-height: 1;
+  text-align: initial;
+  forced-color-adjust: none;
+  transform-origin: 0 0;
+  z-index: 1;
+  --min-font-size: 1;
+  --text-scale-factor: calc(var(--total-scale-factor) * var(--min-font-size));
+  --min-font-size-inv: calc(1 / var(--min-font-size));
+}
+
+.pdf-textlayer :is(span, br) {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  cursor: text;
+  transform-origin: 0% 0%;
+}
+
+.pdf-textlayer > :not(.markedContent),
+.pdf-textlayer .markedContent span:not(.markedContent) {
+  z-index: 1;
+  --font-height: 0;
+  font-size: calc(var(--text-scale-factor) * var(--font-height));
+  --scale-x: 1;
+  --rotate: 0deg;
+  transform: rotate(var(--rotate)) scaleX(var(--scale-x)) scale(var(--min-font-size-inv));
+}
+
+.pdf-textlayer .markedContent {
+  display: contents;
+}
+
+.pdf-textlayer ::selection {
+  background: rgb(0 95 204 / 0.28);
+}
+
+/* Selected field on the original: a light marker on the label and a lighter space to write in.
+   The page is neither dimmed nor zoomed, so the original stays readable. */
+.pdf-marks {
+  animation: pdf-marks-in 180ms ease-out;
+}
+
+.pdf-mark,
+.pdf-mark-area {
+  position: absolute;
+  border-radius: 3px;
+}
+
+.pdf-mark {
+  background: rgb(255 213 0 / 0.35);
+  box-shadow: 0 0 0 1px rgb(214 160 0 / 0.6);
+}
+
+.pdf-mark-area {
+  background: rgb(255 213 0 / 0.12);
+  border-bottom: 2px dotted rgb(214 160 0 / 0.8);
+}
+
+html.a11y-high-contrast .pdf-mark {
+  background: rgb(255 212 0 / 0.5);
+  box-shadow: 0 0 0 2px #000;
+}
+
+html.a11y-high-contrast .pdf-mark-area {
+  border-bottom: 2px dashed #000;
+}
+
+@keyframes pdf-marks-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdf-marks {
+    animation: none;
+  }
+}
