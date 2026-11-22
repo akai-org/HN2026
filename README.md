@@ -9,8 +9,7 @@ z konfiguracją formularza gotową do importu: strony, sekcje, pola, walidacje, 
 
 ## Konfiguracja
 
-Zmienne środowiskowe albo plik `.env` (wzór: [.env.example](.env.example)). Sekrety podaje się dopiero przy uruchomieniu;
-`.env` nie trafia do obrazu Docker.
+Zmienne środowiskowe albo plik `.env` (wzór: [.env.example](.env.example)). `.env` nie trafia do obrazu Docker.
 
 | Zmienna | Domyślnie | Opis |
 |---|---|---|
@@ -24,28 +23,18 @@ Zmienne środowiskowe albo plik `.env` (wzór: [.env.example](.env.example)). Se
 | `EMIT_VALIDATORS` | `true` | Czy dodawać walidatory pól do wynikowego JSON-u |
 | `HOST`, `PORT` | `127.0.0.1`, `3000` | Adres i port serwera (w obrazie Docker `HOST=0.0.0.0`) |
 
-## Budowanie obrazu Docker
-
-```bash
-docker build -t cyfryzacja-formularzy:1.0.0 .
-```
-
-## Uruchomienie
-
+## Uruchomienie (poprzez docker compose)
+1.
 ```bash
 cp .env.example .env        # uzupełnij LLM_API_KEY
-docker run --rm --env-file .env -p 127.0.0.1:3000:3000 cyfryzacja-formularzy:1.0.0
 ```
 
-Albo przez Docker Compose: `docker compose up --build`. Aplikacja: `http://localhost:3000`, dokumentacja API:
-`http://localhost:3000/docs`.
+2.
+`docker compose up --build`.
 
-Bez Dockera (Python 3.14, [uv](https://docs.astral.sh/uv/), Node.js 24, Tesseract z językiem `pol`):
-
-```bash
-uv sync && uv run hacknation-2026                 # backend na :3000
-cd frontend && npm ci && npm run dev              # frontend (Vite) z proxy /api
-```
+API: `http://localhost:3000/api`, 
+aplikacja (frontend): `http://localhost:3000`, 
+dokumentacja API: `http://localhost:3000/docs`.
 
 ## REST API
 
