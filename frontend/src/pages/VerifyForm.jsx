@@ -6,6 +6,7 @@ import JsonPanel from "@/components/comparison/JsonPanel";
 import OriginalPanel from "@/components/comparison/OriginalPanel";
 import { ChevronLeft, ChevronRight, Download, TriangleAlert } from "@/components/icons";
 import { Button, buttonVariants } from "@/components/ui/button";
+import InfoTip from "@/components/ui/InfoTip";
 import { getFile } from "@/lib/fileStore";
 import { downloadJson, indexForm, plural, replaceNode, resolveWarning } from "@/lib/formDefinition";
 import { localStore, sessionStore } from "@/lib/storage";
@@ -176,7 +177,7 @@ function Comparison({
         </div>
       )}
 
-      <div className="mb-3 flex items-center justify-end gap-3">
+      <div className="mb-3 flex items-center justify-end gap-2">
         <div className="flex flex-wrap items-center justify-end gap-2">
           {VIEWS.map(({ key, label }) => (
             <button
@@ -195,10 +196,10 @@ function Comparison({
             </button>
           ))}
         </div>
-        <span className="hidden max-w-72 text-right text-xs text-muted-foreground md:inline">
+        <InfoTip label="Jak porównywać widoki" side="left">
           Porównaj oryginał z wersją cyfrową. Kliknij pole na oryginale PDF, w formularzu lub w JSON, aby
           zaznaczyć je w pozostałych widokach.
-        </span>
+        </InfoTip>
       </div>
 
       <div className={cn("grid gap-4", GRID_COLUMNS[panelCount])}>

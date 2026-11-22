@@ -5,6 +5,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { extractFormFile } from "@/lib/api";
 import { fileUrl } from "@/lib/fileStore";
 import { fileExtension } from "@/lib/uploads";
+import InfoTip from "@/components/ui/InfoTip";
 import Panel, { SegmentedControl } from "./Panel";
 import PdfPage from "./PdfPage";
 import usePdfOriginal from "./usePdfOriginal";
@@ -144,6 +145,14 @@ export default function OriginalPanel({ file, fileName, form, selectedId, onSele
         >
           <ExternalLink />
         </a>
+      )}
+      {view === "text" && (
+        <InfoTip label="O odczytanym tekście">
+          {kind === "document"
+            ? "Przeglądarka nie wyświetla plików Word ani arkuszy, dlatego pokazujemy tekst odczytany z pliku. "
+            : ""}
+          Na tym tekście pracował model AI. Kreski „____” oznaczają miejsca do wpisania odpowiedzi.
+        </InfoTip>
       )}
       <SegmentedControl
         label="Widok oryginału"
@@ -305,12 +314,6 @@ function ExtractedText({ state, kind, onRetry }) {
 
   return (
     <div className="space-y-4 p-4 text-sm">
-      <p className="rounded-md bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
-        {kind === "document"
-          ? "Przeglądarka nie wyświetla plików Word ani arkuszy, dlatego pokazujemy tekst odczytany z pliku. "
-          : ""}
-        Na tym tekście pracował model AI. Kreski „____” oznaczają miejsca do wpisania odpowiedzi.
-      </p>
       {pages.size === 0 && <p className="text-muted-foreground">Nie odczytano żadnego tekstu.</p>}
       {[...pages].map(([page, blocks]) => (
         <section key={page} aria-label={`Strona ${page}`} className="space-y-2">

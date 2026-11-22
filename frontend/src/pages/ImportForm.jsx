@@ -11,10 +11,15 @@ import { cn } from "@/lib/utils";
 let nextGroupId = 1;
 const newGroup = (files, name = "") => ({ id: `formularz-${nextGroupId++}`, files, name });
 const MAX_NAME_LENGTH = 80;
-/** Name the official gave the form, or its number. */
-const formLabel = (group, number) => group.name || `Formularz ${number}`;
+/** Name the official gave the group of forms, or its number among the groups ("Grupa 2"). */
+const groupLabel = (group, groupNumber) => group.name || `Grupa ${groupNumber}`;
+const formsLabel = (count) => `${count} ${plural(count, "formularz", "formularze", "formularzy")}`;
+/** Number of each group among the multi-file entries (null for a single form). */
+const groupNumbers = (groups) => {
+  let count = 0;
+  return groups.map((group) => (group.files.length > 1 ? ++count : null));
+};
 const byName = (a, b) => a.name.localeCompare(b.name, "pl", { sensitivity: "base" });
-const filesLabel = (count) => `${count} ${plural(count, "plik", "pliki", "plików")}`;
 
 export default function ImportForm() {
   const navigate = useNavigate();
@@ -73,7 +78,7 @@ export default function ImportForm() {
   function startGrouping() {
     setIsGrouping(true);
     setSelected(new Set());
-    setNotice("Tryb grupowania: zaznacz pliki jednego formularza.");
+    setNotice("Tryb grupowania: zaznacz formularze, które mają trafić do jednej grupy.");
   }
 
   function stopGrouping() {
@@ -81,7 +86,7 @@ export default function ImportForm() {
     setSelected(new Set());
   }
 
-  /** Joins the ticked files (in list order) into one form, placed where the first of them was. */
+  /** Joins the ticked forms (in list order) into one group, placed where the first of them was. */
   function joinSelected() {
     const chosen = files.filter((file) => selected.has(fileKey(file)));
     if (chosen.length < 2) return;
@@ -92,24 +97,27 @@ export default function ImportForm() {
       ...group,
       files: group.files.filter((file) => !selected.has(fileKey(file))),
     }));
-    const next = [...rest.slice(0, at), newGroup(chosen, name), ...rest.slice(at)].filter((group) => group.files.length);
+    const joined = newGroup(chosen, name);
+    const next = [...rest.slice(0, at), joined, ...rest.slice(at)].filter((group) => group.files.length);
     setGroups(next);
     stopGrouping();
-    setNotice(`Połączono ${filesLabel(chosen.length)} w formularz ${name || at + 1}.`);
+    const label = groupLabel(joined, groupNumbers(next)[next.indexOf(joined)]);
+    setNotice(`Utworzono grupę „${label}” z ${chosen.length} formularzy. Ołówek przy grupie zmienia jej nazwę.`);
   }
 
   function splitGroup(group) {
     setGroups((current) =>
       current.flatMap((candidate) => (candidate.id === group.id ? group.files.map((file) => newGroup([file])) : [candidate])),
     );
-    setNotice(`Rozdzielono formularz na ${filesLabel(group.files.length)}.`);
+    setNotice(`Rozgrupowano ${formsLabel(group.files.length)}.`);
   }
 
   function renameGroup(id, name) {
     const index = groups.findIndex((group) => group.id === id);
     if (index < 0 || groups[index].name === name) return;
     setGroups((current) => current.map((group) => (group.id === id ? { ...group, name } : group)));
-    setNotice(name ? `Formularz ${index + 1} nazywa się teraz „${name}”.` : `Przywrócono nazwę „Formularz ${index + 1}”.`);
+    const fallback = `Grupa ${groupNumbers(groups)[index]}`;
+    setNotice(name ? `Grupa nazywa się teraz „${name}”.` : `Przywrócono nazwę „${fallback}”.`);
   }
 
   function toggleCollapsed(id) {
@@ -140,11 +148,14 @@ export default function ImportForm() {
     event.preventDefault();
     if (!files.length) return;
     const { files: ordered, splitBefore } = flattenGroups(groups);
-    const formNames = groups.map((group) => group.name);
+    // Only groups have names; a group without one is shown further on as "Grupa N", like here.
+    const numbers = groupNumbers(groups);
+    const formNames = groups.map((group, index) => (numbers[index] ? groupLabel(group, numbers[index]) : ""));
     navigate("/digitalize", { state: { selectedFiles: ordered, splitBefore, formNames } });
   }
 
   const selectedCount = selected.size;
+  const numbersInList = groupNumbers(groups);
 
   return (
     <div className="px-4 py-8 sm:px-6">
@@ -159,14 +170,14 @@ export default function ImportForm() {
           <section aria-labelledby="file-list-title" className="mt-6 rounded-lg border bg-background p-5">
             <div className="text-center">
               <h2 id="file-list-title" className="text-base font-semibold">
-                Formularze{groups.length > 0 && ` (${groups.length})`}
+                Formularze{files.length > 0 && ` (${files.length})`}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
                 {!files.length
-                  ? "Każdy dodany plik to osobny formularz. Pliki jednego formularza możesz potem połączyć."
+                  ? "Każdy dodany plik to osobny formularz. Formularze możesz potem połączyć w nazwane grupy."
                   : isGrouping
-                    ? "Zaznacz pliki jednego formularza (np. kolejne strony skanu) i kliknij „Połącz w formularz”."
-                    : "Każdy plik to osobny formularz. Jeśli formularz ma kilka plików, połącz je przyciskiem „Grupuj pliki”. Ołówek zmienia nazwę formularza."}
+                    ? "Zaznacz formularze, które mają trafić do jednej grupy, i kliknij „Utwórz grupę”."
+                    : "Każdy plik to osobny formularz. Przyciskiem „Grupuj formularze” połączysz je w grupę, a ołówkiem przy grupie zmienisz jej nazwę."}
               </p>
             </div>
             <p role="status" className="sr-only">
@@ -179,7 +190,7 @@ export default function ImportForm() {
                   {files.length > 1 && !isGrouping && (
                     <Button variant="outline" size="sm" onClick={startGrouping}>
                       <Layers />
-                      Grupuj pliki
+                      Grupuj formularze
                     </Button>
                   )}
                   <Button variant="outline" size="sm" onClick={sortByName} disabled={isGrouping}>
@@ -195,7 +206,7 @@ export default function ImportForm() {
                 {isGrouping && (
                   <div
                     role="region"
-                    aria-label="Grupowanie plików"
+                    aria-label="Grupowanie formularzy"
                     className="sticky top-2 z-10 mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-primary/50 bg-background/95 px-3 py-2 shadow-md backdrop-blur"
                   >
                     <Layers size={18} className="text-primary" />
@@ -203,7 +214,7 @@ export default function ImportForm() {
                       Zaznaczono {selectedCount} z {files.length}
                     </span>
                     <Button size="sm" onClick={joinSelected} disabled={selectedCount < 2}>
-                      Połącz w formularz
+                      Utwórz grupę
                     </Button>
                     <Button variant="ghost" size="sm" onClick={stopGrouping}>
                       Anuluj
@@ -216,7 +227,7 @@ export default function ImportForm() {
                     <li key={group.id}>
                       <FormGroup
                         group={group}
-                        number={index + 1}
+                        groupNumber={numbersInList[index]}
                         isGrouping={isGrouping}
                         isCollapsed={collapsed.has(group.id)}
                         selected={selected}
@@ -255,7 +266,7 @@ export default function ImportForm() {
 
 /**
  * Editing a form name in place: the pencil turns the name into a field; Enter or leaving the field saves,
- * Esc cancels. An empty name brings back the number ("Formularz 2").
+ * Esc cancels. An empty name brings back the number ("Grupa 2").
  */
 function useNameEditor(name, onRename) {
   const [draft, setDraft] = useState(null); // null: not editing
@@ -310,13 +321,13 @@ function useNameEditor(name, onRename) {
   };
 }
 
-function NameInput({ inputProps, number, className }) {
+function NameInput({ inputProps, placeholder, className }) {
   return (
     <input
       {...inputProps}
       type="text"
-      aria-label={`Nazwa formularza ${number}`}
-      placeholder={`Formularz ${number}`}
+      aria-label="Nazwa grupy formularzy"
+      placeholder={placeholder}
       className={cn(
         "h-8 min-w-0 rounded-md border border-primary bg-background px-2 text-sm font-semibold focus-ring",
         className,
@@ -325,14 +336,14 @@ function NameInput({ inputProps, number, className }) {
   );
 }
 
-function RenameButton({ buttonRef, onStart, number }) {
+function RenameButton({ buttonRef, onStart, label }) {
   return (
     <Button
       ref={buttonRef}
       variant="ghost"
       size="icon-sm"
-      aria-label={`Zmień nazwę formularza ${number}`}
-      title="Zmień nazwę"
+      aria-label={`Zmień nazwę grupy: ${label}`}
+      title="Zmień nazwę grupy"
       onClick={(event) => {
         event.stopPropagation();
         onStart();
@@ -345,13 +356,13 @@ function RenameButton({ buttonRef, onStart, number }) {
 }
 
 /**
- * One form. A single file is a plain row; several files make a card that can be folded (then it shows only
- * small previews) and split back into separate forms. In grouping mode every file gets a checkbox.
- * Outside grouping mode the pencil renames the form.
+ * One entry of the list. A single file (one form) is a plain row; a group of forms is a card that can be
+ * folded (then it shows only small previews), renamed with the pencil and ungrouped. In grouping mode every
+ * form gets a checkbox.
  */
 function FormGroup({
   group,
-  number,
+  groupNumber,
   isGrouping,
   isCollapsed,
   selected,
@@ -362,9 +373,8 @@ function FormGroup({
   onRemove,
 }) {
   const { isEditing, start, inputProps, buttonRef } = useNameEditor(group.name, onRename);
-  const renameButton = <RenameButton buttonRef={buttonRef} onStart={start} number={number} />;
   const isMulti = group.files.length > 1;
-  const label = formLabel(group, number);
+  const label = groupLabel(group, groupNumber);
   const bodyId = `${group.id}-pliki`;
   const allSelected = group.files.every((file) => selected.has(fileKey(file)));
 
@@ -377,38 +387,27 @@ function FormGroup({
         isSelected={selected.has(fileKey(file))}
         onToggle={(isOn) => onToggleFiles([file], isOn)}
         onRemove={() => onRemove(file)}
-      >
-        <div className="mt-1 flex min-h-7 items-center gap-1">
-          {isEditing ? (
-            <NameInput inputProps={inputProps} number={number} className="w-full max-w-72" />
-          ) : (
-            <>
-              <span className={cn("truncate text-xs font-medium text-primary", group.name && "font-semibold")}>{label}</span>
-              {!isGrouping && renameButton}
-            </>
-          )}
-        </div>
-      </SelectableFile>
+      />
     );
   }
 
   return (
-    <section aria-label={`${label}, ${filesLabel(group.files.length)}`} className="rounded-xl border border-primary/40 bg-primary/5 p-3">
+    <section aria-label={`${label}, ${formsLabel(group.files.length)}`} className="rounded-xl border border-primary/40 bg-primary/5 p-3">
       <div className="flex flex-wrap items-center gap-2">
         {isGrouping && (
           <input
             type="checkbox"
             checked={allSelected}
             onChange={(event) => onToggleFiles(group.files, event.target.checked)}
-            aria-label={`Zaznacz wszystkie pliki: ${label}`}
+            aria-label={`Zaznacz wszystkie formularze: ${label}`}
             className="size-5 accent-primary"
           />
         )}
         {isEditing ? (
           <div className="flex min-w-0 flex-1 items-center gap-2 px-1">
             <ChevronDown size={18} className={cn("shrink-0 text-primary", isCollapsed && "-rotate-90")} />
-            <NameInput inputProps={inputProps} number={number} className="w-full max-w-80" />
-            <span className="shrink-0 text-sm text-muted-foreground">· {filesLabel(group.files.length)}</span>
+            <NameInput inputProps={inputProps} placeholder={`Grupa ${groupNumber}`} className="w-full max-w-80" />
+            <span className="shrink-0 text-sm text-muted-foreground">· {formsLabel(group.files.length)}</span>
           </div>
         ) : (
           <button
@@ -420,7 +419,7 @@ function FormGroup({
           >
             <ChevronDown size={18} className={cn("shrink-0 text-primary transition-transform", isCollapsed && "-rotate-90")} />
             <span className="truncate text-sm font-semibold">{label}</span>
-            <span className="shrink-0 text-sm text-muted-foreground">· {filesLabel(group.files.length)}</span>
+            <span className="shrink-0 text-sm text-muted-foreground">· {formsLabel(group.files.length)}</span>
             {isCollapsed && (
               <span className="ml-1 flex items-center gap-1" aria-hidden="true">
                 {group.files.slice(0, 6).map((file) => (
@@ -433,10 +432,10 @@ function FormGroup({
             )}
           </button>
         )}
-        {!isGrouping && !isEditing && renameButton}
+        {!isGrouping && !isEditing && <RenameButton buttonRef={buttonRef} onStart={start} label={label} />}
         {!isGrouping && (
           <Button variant="ghost" size="sm" onClick={onSplit}>
-            Rozdziel
+            Rozgrupuj
           </Button>
         )}
       </div>
@@ -453,7 +452,7 @@ function FormGroup({
               className="bg-background"
             >
               <p className="mt-1 text-xs font-medium text-primary">
-                Plik {index + 1} z {group.files.length}
+                Formularz {index + 1} z {group.files.length}
               </p>
             </SelectableFile>
           ))}
