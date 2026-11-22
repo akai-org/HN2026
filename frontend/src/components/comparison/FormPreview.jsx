@@ -26,8 +26,10 @@ export default function FormPreview({ form, index, page, onPageChange, selectedI
     if (selected) {
       const bodyRect = bodyRef.current.getBoundingClientRect();
       const selectedRect = selected.getBoundingClientRect();
+      const stickyHeader = bodyRef.current.querySelector("[data-form-header]");
+      const stickyOffset = stickyHeader?.getBoundingClientRect().height || 112;
       bodyRef.current.scrollTo({
-        top: Math.max(0, bodyRef.current.scrollTop + selectedRect.top - bodyRect.top - 48),
+        top: Math.max(0, bodyRef.current.scrollTop + selectedRect.top - bodyRect.top - stickyOffset - 16),
         behavior: "smooth",
       });
     }
@@ -35,7 +37,7 @@ export default function FormPreview({ form, index, page, onPageChange, selectedI
 
   return (
     <Panel number={2} title="Formularz" subtitle="kliknij pole, aby zobaczyć jego JSON" bodyRef={bodyRef} bodyClassName="bg-muted/30">
-      <div className="sticky top-0 z-10 border-b border-border bg-background/95 px-3 py-2 backdrop-blur">
+      <div data-form-header className="sticky top-0 z-10 border-b border-border bg-background/95 px-3 py-2 backdrop-blur">
         <p className="truncate text-sm font-semibold" title={form?.title}>{form?.title || "Formularz bez tytułu"}</p>
         <div role="tablist" aria-label="Strony formularza" className="mt-2 flex gap-2 overflow-x-auto pb-1 pr-1">
           {tabs.map((item, tabIndex) => (
