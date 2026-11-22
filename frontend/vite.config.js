@@ -1,21 +1,19 @@
-import path from 'node:path'
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
-import tailwindcss from '@tailwindcss/vite'
+import { fileURLToPath, URL } from "node:url";
+import tailwindcss from "@tailwindcss/vite";
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(),    tailwindcss(),],
+  plugins: [react(), tailwindcss()],
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
+    alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
   },
   build: {
-    outDir: '../src/hacknation_2026/static',
+    // FastAPI serves the built app from the Python package.
+    outDir: "../src/hacknation_2026/static",
     emptyOutDir: true,
   },
   server: {
-    proxy: { '/api': 'http://127.0.0.1:3000' },
+    proxy: { "/api": "http://127.0.0.1:3000" },
   },
-})
+});

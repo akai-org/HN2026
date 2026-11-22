@@ -5,9 +5,9 @@ export default function Panel({ number, title, subtitle, actions, bodyRef, bodyC
   return (
     <section
       aria-label={title}
-      className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-background shadow-sm"
+      className="flex min-w-0 flex-col overflow-hidden rounded-xl border bg-background shadow-sm"
     >
-      <header className="flex min-h-12 flex-wrap items-center gap-x-2 gap-y-1 border-b border-border px-3 py-2">
+      <header className="flex min-h-12 flex-wrap items-center gap-x-2 gap-y-1 border-b px-3 py-2">
         <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
           {number}
         </span>
@@ -32,7 +32,7 @@ export default function Panel({ number, title, subtitle, actions, bodyRef, bodyC
 /** Small two-state toggle used in panel headers ("Plik" / "Odczytany tekst"). */
 export function SegmentedControl({ label, options, value, onChange }) {
   return (
-    <div role="group" aria-label={label} className="inline-flex rounded-lg border border-border bg-muted/40 p-0.5">
+    <div role="group" aria-label={label} className="inline-flex rounded-lg border bg-muted/40 p-0.5">
       {options.map((option) => (
         <button
           key={option.value}
@@ -42,7 +42,7 @@ export function SegmentedControl({ label, options, value, onChange }) {
           title={option.title}
           onClick={() => onChange(option.value)}
           className={cn(
-            "rounded-md px-2 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
+            "rounded-md px-2 py-1 text-xs font-medium focus-ring transition-colors disabled:cursor-not-allowed disabled:opacity-50",
             value === option.value
               ? "bg-background text-foreground shadow-sm"
               : "text-muted-foreground hover:text-foreground",
