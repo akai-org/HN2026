@@ -6,8 +6,8 @@ Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i
 
 **Używa interfejsów innych bloków:** `validate_upload` (A: `A-walidacja-pliku.md`), `extract_*` (B1/B2/B3: `B1-…`, `B2-…`, `B3-…`), `analyze` (C: `C-analiza-llm.md`), `build_form` (D: `D-builder.md`), `check_form` (F: `F-kontrola-regul.md`). Wszystkie w `docs/bloki/`, sekcje Interfejs. Do czasu ich ukończenia mockuj je w swoich testach.
 
-> **Status: zrobione (częściowo, do czasu bloku F).** `pipeline.py`, `extract/__init__.py` (wybór ekstraktora), `api/__init__.py`, obsługa `AppError` w `app.py`, testy w `tests/api/`.
-> - `POST /api/forms/convert` (pole `file`) wykonuje A → B → C → D i zwraca `ConvertResult`: `form` to `FormDefinition` z `build_form()` (pola wzbogaca blok E), `proposed_dictionaries` to propozycje słowników z bloku E, a `warnings` jest puste. Po bloku F trzeba dopisać w `pipeline.convert` wywołanie `check_form()`, którego naruszenia trafią do `warnings`.
+> **Status: zrobione.** `pipeline.py`, `extract/__init__.py` (wybór ekstraktora), `api/__init__.py`, obsługa `AppError` w `app.py`, testy w `tests/api/`.
+> - `POST /api/forms/convert` (pole `file`) wykonuje A → B → C → D → F i zwraca `ConvertResult`: `form` to `FormDefinition` z `build_form()` (pola wzbogaca blok E), `proposed_dictionaries` to propozycje słowników z bloku E, a `warnings` to naruszenia reguł z `check_form()` (blok F) jako tekst „komunikat (ścieżka)”.
 > - `GET /api/health` zwraca `{"status": "ok", "llm": "ok"|"unavailable"}` (sprawdza `GET {LLM_BASE_URL}/models`).
 > - Bez JWT: mentorzy potwierdzili, że nie jest wymagane.
 

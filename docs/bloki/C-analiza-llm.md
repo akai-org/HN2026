@@ -28,7 +28,7 @@ def analyze(doc: ExtractedDocument, settings: Settings) -> FormSpec
 
 ## Stan implementacji
 
-> **Status:** kod i testy jednostkowe są gotowe. Do zrobienia zostało porównanie modeli i `docs/wybor-modelu.md`. Szczegóły w punkcie „Co zostało”.
+> **Status: zrobione.** Kod i testy jednostkowe są gotowe, porównanie modeli jest w `docs/wybor-modelu.md`. Model: Gemma 4 31B przez EdenAI (`LLM_MODEL=google/gemma-4-31b-it`, przy HTTP 429 klient przełącza się na `LLM_FALLBACK_MODEL=deepinfra/google/gemma-4-31B-it`, ten sam model u innego dostawcy). Bez prefiksu dostawcy EdenAI kieruje część zapytań do flexai, który nie trzyma się schematu (śmieci w tytule, zgubione flagi), więc dostawca jest przypięty. Po odpowiedzi modelu `analyze` poprawia nazwy opcji (wielka litera, pojedyncza kratka → „Tak”) i warunki `show_if` wskazujące na nieistniejącą opcję.
 
 ### Jak to działa
 
@@ -52,7 +52,7 @@ Zamiast `POST /api/chat` Ollamy klient używa endpointu `POST {LLM_BASE_URL}/cha
 
 Zamiast pola `format` Ollamy schemat `FormSpec` idzie w `response_format: {"type": "json_schema", ...}`.
 
-**Uwaga:** Groq to zewnętrzne API, a zasady wspólne go zabraniają. Przed oddaniem rozwiązania przełącz `.env` na lokalną Ollamę albo uzgodnij to w drużynie.
+**Uwaga:** API wolno używać tylko z modelem open source (ustalenie z mentorami). Obecnie EdenAI z Gemmą (szczegóły w statusie wyżej); lokalna Ollama nadal działa przez ten sam klient.
 
 ### Pliki
 
@@ -108,8 +108,7 @@ Ręczny test na prawdziwym modelu opisuje `README.md` (sekcja „Testowanie”).
 
 ### Co zostało
 
-- `uv add httpx`. Obecnie `httpx` jest tylko w grupie `dev`, a `client.py` potrzebuje go w runtime.
-- Porównanie 2–3 modeli na formularzach 1 i 5 i wynik w `docs/wybor-modelu.md`. Potem wybrany model trzeba wpisać do `LLM_MODEL` w `.env.example`.
+Nic z pierwotnego zakresu: `httpx` jest w zależnościach runtime, porównanie modeli jest w `docs/wybor-modelu.md`, a `.env.example` opisuje lokalną Ollamę i przykład EdenAI. Znany problem: przy długich formularzach (np. deklaracja odpadowa, 6 stron) model bywa niekompletny i kończy wcześniej.
 
 ## Zasady wspólne
 
