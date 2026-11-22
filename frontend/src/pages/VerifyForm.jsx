@@ -257,7 +257,14 @@ function Comparison({ item, items, current, onCurrentChange, views, onToggleView
             onSelect={select}
           />
         )}
-        {views.json && <JsonPanel form={form} selectedId={selectedId} onSelect={select} />}
+        {views.json && (
+          <JsonPanel
+            form={form}
+            selectedId={selectedId}
+            fieldIds={index.fieldIds}
+            onSelect={select}
+          />
+        )}
       </div>
     </>
   );

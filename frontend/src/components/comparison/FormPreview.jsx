@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { ChevronDown, Upload } from "@/components/icons";
 import {
   SECTION_TYPES,
@@ -16,9 +17,24 @@ import Panel from "./Panel";
 export default function FormPreview({ form, index, page, onPageChange, selectedId, onSelect }) {
   const tabs = form?.tabs || [];
   const tab = tabs[page];
+  const bodyRef = useRef(null);
+
+  useEffect(() => {
+    if (!selectedId || !bodyRef.current) return;
+    const selected = [...bodyRef.current.querySelectorAll("[data-node-id]")]
+      .find((element) => element.dataset.nodeId === selectedId);
+    if (selected) {
+      const bodyRect = bodyRef.current.getBoundingClientRect();
+      const selectedRect = selected.getBoundingClientRect();
+      bodyRef.current.scrollTo({
+        top: Math.max(0, bodyRef.current.scrollTop + selectedRect.top - bodyRect.top - 48),
+        behavior: "smooth",
+      });
+    }
+  }, [page, selectedId]);
 
   return (
-    <Panel number={2} title="Formularz" subtitle="kliknij pole, aby zobaczyć jego JSON" bodyClassName="bg-muted/30">
+    <Panel number={2} title="Formularz" subtitle="kliknij pole, aby zobaczyć jego JSON" bodyRef={bodyRef} bodyClassName="bg-muted/30">
       <div className="sticky top-0 z-10 border-b border-border bg-background/95 px-3 py-2 backdrop-blur">
         <p className="truncate text-sm font-semibold" title={form?.title}>{form?.title || "Formularz bez tytułu"}</p>
         <div role="tablist" aria-label="Strony formularza" className="mt-2 flex gap-2 overflow-x-auto pb-1 pr-1">
