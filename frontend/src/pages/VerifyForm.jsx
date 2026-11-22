@@ -1,49 +1,240 @@
-import { ArrowLeft, CircleCheck } from "@/components/icons";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowLeft, Download, TriangleAlert } from "@/components/icons";
+import { buttonVariants } from "@/components/ui/button";
+import FormPreview from "@/components/comparison/FormPreview";
+import JsonPanel from "@/components/comparison/JsonPanel";
+import OriginalPanel from "@/components/comparison/OriginalPanel";
+import { getFile } from "@/lib/fileStore";
+import { downloadJson, indexForm, plural, resolveWarning } from "@/lib/formDefinition";
+import { cn } from "@/lib/utils";
+
+const VIEWS = [
+  { key: "original", label: "Oryginał" },
+  { key: "form", label: "Formularz" },
+  { key: "json", label: "JSON" },
+];
+const VIEWS_STORAGE_KEY = "uniform-comparison-views";
+const DEFAULT_VIEWS = { original: true, form: true, json: true };
+
+function readViews() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(VIEWS_STORAGE_KEY) || "null");
+    if (saved && VIEWS.some(({ key }) => saved[key])) return { ...DEFAULT_VIEWS, ...saved };
+  } catch {
+    // storage unavailable (private mode, blocked site data): use the default layout
+  }
+  return DEFAULT_VIEWS;
+}
+
+function saveViews(views) {
+  try {
+    localStorage.setItem(VIEWS_STORAGE_KEY, JSON.stringify(views));
+  } catch {
+    // the layout is only a convenience
+  }
+}
 
 export default function VerifyForm() {
   const location = useLocation();
-  const fileName = location.state?.fileName;
-  const convertedForms = location.state?.convertedForms || [];
+  const items = location.state?.convertedForms || [];
+  const [current, setCurrent] = useState(0);
+  const [views, setViews] = useState(readViews);
+  const item = items[Math.min(current, items.length - 1)];
+
+  // The router keeps the previous page's scroll position; the comparison starts at the top.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  function toggleView(key) {
+    setViews((currentViews) => {
+      const next = { ...currentViews, [key]: !currentViews[key] };
+      if (!VIEWS.some(({ key: name }) => next[name])) return currentViews;   // keep at least one panel
+      saveViews(next);
+      return next;
+    });
+  }
+
+  if (!item) {
+    return (
+      <main id="main-content" tabIndex="-1" className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-12 sm:px-6">
+        <div className="mx-auto max-w-xl rounded-xl border border-border bg-background p-6 text-center shadow-sm">
+          <h1 className="text-xl font-semibold">Brak formularza do sprawdzenia</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Dodaj plik z formularzem, żeby porównać go z wersją cyfrową.</p>
+          <Link to="/" className={cn(buttonVariants(), "mt-4")}>Dodaj formularz</Link>
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <main className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-12 sm:px-6">
-      <div className="mx-auto max-w-5xl">
-        <Button asChild variant="ghost" className="mb-6">
-          <Link
-            to="/digitalize"
-            state={location.state}
-          >
-            <ArrowLeft aria-hidden="true" />
-            Wróć do cyfryzowania
-          </Link>
-        </Button>
-
-        <Card className="mx-auto max-w-2xl shadow-lg shadow-foreground/5">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <span className="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                <CircleCheck aria-hidden="true" size={20} />
-              </span>
-              <div>
-                <CardTitle className="text-xl">Sprawdź i zatwierdź</CardTitle>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {convertedForms.length
-                    ? convertedForms.map((item) => item.fileName).join(", ")
-                    : fileName || "Brak nazwy pliku"}
-                </p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              Formularz został rozpoznany i można przejść do końcowej kontroli.
-            </p>
-          </CardContent>
-        </Card>
+    <main id="main-content" tabIndex="-1" className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-6 sm:px-6">
+      <div className="mx-auto max-w-[1800px]">
+        <Comparison
+          key={`${current}-${item.fileId || item.fileName}`}
+          item={item}
+          items={items}
+          current={current}
+          onCurrentChange={setCurrent}
+          views={views}
+          onToggleView={toggleView}
+          backState={location.state}
+        />
       </div>
     </main>
+  );
+}
+
+function Comparison({ item, items, current, onCurrentChange, views, onToggleView, backState }) {
+  const result = item.convertedForm;
+  const form = result?.form;
+  const index = useMemo(() => indexForm(form), [form]);
+  const file = getFile(item.fileId);
+  const [page, setPage] = useState(0);
+  const [selectedId, setSelectedId] = useState(null);
+
+  const warnings = useMemo(
+    () => (result?.warnings || []).map((warning) => resolveWarning(warning, form)),
+    [result, form],
+  );
+  const proposals = result?.proposed_dictionaries || [];
+  const pageCount = form?.tabs?.length || 0;
+
+  function select(id) {
+    setSelectedId((currentId) => (currentId === id ? null : id));
+    const tabIndex = index.byId.get(id)?.tabIndex;
+    if (tabIndex !== undefined) setPage(tabIndex);
+  }
+
+  function showWarning(warning) {
+    if (warning.tabIndex !== null) setPage(warning.tabIndex);
+    if (warning.id) setSelectedId(warning.id);
+  }
+
+  const visible = VIEWS.filter(({ key }) => views[key]);
+  const gridColumns = visible.length === 3 ? "lg:grid-cols-2 xl:grid-cols-3" : visible.length === 2 ? "lg:grid-cols-2" : "";
+
+  return (
+    <>
+      <div className="mb-4 flex flex-wrap items-start gap-3">
+        <Link to="/digitalize" state={backState} className={buttonVariants({ variant: "ghost", size: "sm" })}>
+          <ArrowLeft />
+          Wróć
+        </Link>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl font-semibold tracking-tight">{form?.title || "Formularz bez tytułu"}</h1>
+          <p className="mt-0.5 truncate text-sm text-muted-foreground">
+            {item.fileName} · {pageCount} {plural(pageCount, "strona", "strony", "stron")} · {index.fieldCount}{" "}
+            {plural(index.fieldCount, "pole", "pola", "pól")}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {items.length > 1 && (
+            <label className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Plik</span>
+              <select
+                value={current}
+                onChange={(event) => onCurrentChange(Number(event.target.value))}
+                className="h-8 max-w-72 rounded-lg border border-border bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+              >
+                {items.map((entry, entryIndex) => (
+                  <option key={entryIndex} value={entryIndex}>
+                    Formularz {entry.formNumber || 1} · {entry.fileName}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
+          <button type="button" className={buttonVariants()} onClick={() => downloadJson(form)}>
+            <Download />
+            Pobierz JSON
+          </button>
+        </div>
+      </div>
+
+      {(warnings.length > 0 || proposals.length > 0) && (
+        <div className="mb-4 grid gap-3 lg:grid-cols-2">
+          {warnings.length > 0 && (
+            <details open className="rounded-xl border border-amber-300 bg-amber-50 text-amber-950">
+              <summary className="flex cursor-pointer items-center gap-2 px-4 py-2.5 text-sm font-semibold">
+                <TriangleAlert size={16} />
+                Do sprawdzenia ({warnings.length})
+              </summary>
+              <ul className="max-h-40 space-y-1 overflow-auto border-t border-amber-200 px-4 py-2 text-sm">
+                {warnings.map((warning, warningIndex) => (
+                  <li key={warningIndex} className="flex items-start gap-2">
+                    <span className="flex-1">{warning.text}</span>
+                    {(warning.id || warning.tabIndex !== null) && (
+                      <button
+                        type="button"
+                        className="shrink-0 text-xs font-semibold underline underline-offset-2 hover:no-underline"
+                        onClick={() => showWarning(warning)}
+                      >
+                        Pokaż
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+          {proposals.length > 0 && (
+            <details className="rounded-xl border border-violet-200 bg-violet-50 text-violet-950">
+              <summary className="cursor-pointer px-4 py-2.5 text-sm font-semibold">
+                Propozycje nowych słowników ({proposals.length})
+              </summary>
+              <ul className="max-h-40 space-y-2 overflow-auto border-t border-violet-200 px-4 py-2 text-sm">
+                {proposals.map((proposal) => (
+                  <li key={proposal.name}>
+                    <p className="font-mono text-xs font-semibold">{proposal.name}</p>
+                    <p className="text-xs">Wartości: {proposal.values_example.join(", ")}</p>
+                    <p className="text-xs text-violet-800">Pola: {proposal.used_by.join(", ")}</p>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </div>
+      )}
+
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className="text-sm text-muted-foreground">Widok:</span>
+        {VIEWS.map(({ key, label }) => (
+          <button
+            key={key}
+            type="button"
+            aria-pressed={views[key]}
+            onClick={() => onToggleView(key)}
+            className={cn(
+              "rounded-full border px-3 py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+              views[key]
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-background text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {label}
+          </button>
+        ))}
+        <span className="hidden text-xs text-muted-foreground md:inline">
+          Porównaj oryginał z wersją cyfrową. Kliknięte pole podświetla się w JSON-ie.
+        </span>
+      </div>
+
+      <div className={cn("grid gap-4", gridColumns)}>
+        {views.original && <OriginalPanel file={file} fileName={item.fileName} />}
+        {views.form && (
+          <FormPreview
+            form={form}
+            index={index}
+            page={page}
+            onPageChange={setPage}
+            selectedId={selectedId}
+            onSelect={select}
+          />
+        )}
+        {views.json && <JsonPanel form={form} selectedId={selectedId} />}
+      </div>
+    </>
   );
 }

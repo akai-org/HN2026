@@ -1,7 +1,13 @@
+<<<<<<< Updated upstream
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, CircleCheck, FileText, Image, X } from "@/components/icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+=======
+import { ArrowLeft, FileText } from "@/components/icons";
+import { Link, useLocation } from "react-router-dom";
+import { buttonVariants } from "@/components/ui/button";
+>>>>>>> Stashed changes
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { convertFormFile } from "@/lib/api";
 
@@ -126,6 +132,7 @@ export default function IdentifyForm() {
   }, []);
 
   return (
+<<<<<<< Updated upstream
     <main className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-8 sm:px-6">
       <div className="mx-auto max-w-3xl">
         <Button asChild variant="ghost" className="mb-6">
@@ -134,6 +141,14 @@ export default function IdentifyForm() {
             Wróć do przesyłania
           </Link>
         </Button>
+=======
+    <main className="min-h-[calc(100vh-9rem)] bg-muted/30 px-4 py-12 sm:px-6">
+      <div className="mx-auto max-w-5xl">
+        <Link to="/" className={buttonVariants({ variant: "ghost", className: "mb-6" })}>
+          <ArrowLeft aria-hidden="true" />
+          Wróć do przesyłania
+        </Link>
+>>>>>>> Stashed changes
 
         <Card className="shadow-lg shadow-foreground/5">
           <CardHeader>
@@ -271,9 +286,19 @@ export default function IdentifyForm() {
                     ))}
                   </section>
                 ))}
+<<<<<<< Updated upstream
                 <Button type="button" className="w-full" onClick={openVerify}>
                   Przejdź do sprawdzenia i zatwierdzenia
                 </Button>
+=======
+                <Link
+                  to="/verify"
+                  state={{ fileName, convertedForm, convertedForms }}
+                  className={buttonVariants({ size: "lg", className: "mt-2 w-full" })}
+                >
+                  Sprawdź i zatwierdź
+                </Link>
+>>>>>>> Stashed changes
               </div>
             ) : (
               <p className="text-muted-foreground">Nie przekazano plików do cyfryzowania.</p>

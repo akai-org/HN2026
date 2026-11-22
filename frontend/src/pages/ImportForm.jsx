@@ -2,6 +2,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowUpAZ, FileText, Image, Trash2, Upload, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
+<<<<<<< Updated upstream
+=======
+import { convertFormFile } from "@/lib/api";
+import { keepFile, keepOnly } from "@/lib/fileStore";
+>>>>>>> Stashed changes
 
 const ACCEPTED_FORMATS = ".pdf,.doc,.docx,.ods,.xlsx,.jpg,.jpeg,.png";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -90,6 +95,7 @@ function ImportForm() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+<<<<<<< Updated upstream
     if (!selectedFiles.length) return;
     navigate("/digitalize", {
       state: {
@@ -97,6 +103,43 @@ function ImportForm() {
         splitBefore: [...splitBefore],
       },
     });
+=======
+    if (!selectedFiles.length || isSubmitting) return;
+
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      const convertedForms = [];
+
+      for (let fileIndex = 0; fileIndex < selectedFiles.length; fileIndex += 1) {
+        const selectedFile = selectedFiles[fileIndex];
+        const convertedForm = await convertFormFile(selectedFile);
+
+        convertedForms.push({
+          fileName: selectedFile.name,
+          fileId: keepFile(selectedFile),   // the original is shown next to the digital form in "Sprawdź i zatwierdź"
+          convertedForm,
+          formNumber: 1 + [...splitBefore].filter((index) =>
+            fileIndex >= index
+          ).length,
+        });
+      }
+
+      keepOnly(convertedForms.map((item) => item.fileId));
+      navigate("/digitalize", {
+        state: {
+          convertedForms,
+          fileName: convertedForms[0]?.fileName,
+          convertedForm: convertedForms[0]?.convertedForm,
+        },
+      });
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : "Nie udało się przesłać formularzy.");
+    } finally {
+      setIsSubmitting(false);
+    }
+>>>>>>> Stashed changes
   }
 
   return (

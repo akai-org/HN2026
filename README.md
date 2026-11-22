@@ -146,6 +146,7 @@ W przypadku błędu walidacji lub przetwarzania API zwraca komunikat błędu w f
 }
 ```
 
+<<<<<<< Updated upstream
 | Kod HTTP | `code` | Kiedy |
 |---|---|---|
 | 413 | `FILE_TOO_LARGE` | plik większy niż `MAX_FILE_SIZE_MB` |
@@ -154,6 +155,28 @@ W przypadku błędu walidacji lub przetwarzania API zwraca komunikat błędu w f
 | 422 | `NOT_A_FORM` | plik nie jest formularzem do wypełnienia (np. menu, cennik, umowa, instrukcja, artykuł). Ocenia to model, a dodatkowo odrzucany jest tekst dłuższy niż 60 tys. znaków (przed wywołaniem modelu) i wynik, którego tytuł nie wskazuje na rodzaj formularza (wniosek, podanie, zgłoszenie, deklaracja, oświadczenie, formularz, zawiadomienie, informacja, kwestionariusz) |
 | 502 | `LLM_INVALID_RESPONSE`, `LLM_ERROR` | model zwrócił niepoprawną odpowiedź |
 | 503 | `LLM_UNAVAILABLE` | model niedostępny lub nie odpowiedział w `LLM_TIMEOUT_S` |
+=======
+### `POST /api/forms/extract`
+
+Przyjmuje plik tak samo jak `convert` (te same formaty, walidacja i błędy), ale bez modelu AI: zwraca tekst odczytany z pliku (`ExtractedDocument`). Frontend pokazuje go na ekranie „Sprawdź i zatwierdź” obok formularza cyfrowego, bo przeglądarka nie wyświetla plików Word ani arkuszy, a przy skanach widać, co odczytał OCR.
+
+```bash
+curl -X POST http://localhost:3000/api/forms/extract \
+  -F "file=@sciezka/do/formularza.docx"
+```
+
+Przykładowa odpowiedź (`200 OK`):
+
+```json
+{
+  "format": "docx",
+  "blocks": [
+    {"kind": "text", "text": "WNIOSEK o stwierdzenie nadpłaty podatku", "checked": null, "rows": null, "page": 1},
+    {"kind": "checkbox", "text": "zwrócić przelewem", "checked": false, "rows": null, "page": 1}
+  ]
+}
+```
+>>>>>>> Stashed changes
 
 ## Testowanie
 
