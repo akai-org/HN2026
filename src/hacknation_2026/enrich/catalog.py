@@ -195,8 +195,8 @@ DICTIONARIES = (
 # --- validators (Reguły techniczne, Standardy) -------------------------------------------------------------------------
 
 VALIDATORS = ("REQUIRED", "EMAIL", "PESEL", "NIP", "REGON", "ZIP_CODE", "EPUAP", "ADE", "SERIAL_NUMBER_ID_CARD")
-# Format validators check typed text, so they go only on these types.
-TEXT_INPUT_TYPES = frozenset({"TEXT_FIELD", "NUMBER"})
+# Reguły techniczne: format validators are allowed only on a text field; other inputs take only REQUIRED.
+TEXT_INPUT_TYPES = frozenset({"TEXT_FIELD"})
 # Standardy: a postal code outside Poland has no validation.
 FOREIGN_WORDS = (
   "zagraniczny", "zagranicznego", "zagranicznym", "zagraniczna", "zagranicznej", "zagranica", "zagranicy",

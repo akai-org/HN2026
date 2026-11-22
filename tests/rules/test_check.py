@@ -177,6 +177,10 @@ BROKEN = [
   ("techName.duplicate", KWOTA, lambda f: node(f, 1, 0, 1).update(techName=node(f, 1, 0, 0)["techName"])),
   ("techName.duplicate", grid(1, 1), lambda f: node(f, 1, 1).update(techName=node(f, 1, 0)["techName"])),
   ("validation.unknown", PODATEK, lambda f: node(f, 1, 0, 0).update(validation=["REQUIRED", "FOO"])),
+  ("validation.not_allowed_for_type", KWOTA, lambda f: node(f, 1, 0, 1).update(validation=["REQUIRED", "PESEL"])),
+  ("validation.not_allowed_for_type", grid(2, 1, 0), lambda f: node(f, 2, 1, 0).update(validation=["REQUIRED"])),
+  ("validation.not_allowed_for_type", grid(3, 0, 0), lambda f: node(f, 3, 0, 0).update(validation=["REQUIRED"])),
+  ("validation.not_allowed_for_type", grid(1, 0), lambda f: node(f, 1, 0).update(validation=["REQUIRED"])),
   ("option.missing_key", f"{RADIO}.options[0]", lambda f: node(f, 1, 1, 0)["options"][0].pop("techName")),
   ("options.on_non_choice", PODATEK,
    lambda f: node(f, 1, 0, 0).update(options=[{"id": "a", "name": "A", "techName": "a"}])),
@@ -247,6 +251,19 @@ def test_editable_initial_data_only_for_mlpz_contact(reference5):
   assert (phone["defaultValue"], email["defaultValue"]) == ("MLPZ.phoneNumber", "MLPZ.email")
   assert phone["readOnly"] is False and email["readOnly"] is False
   assert violations(form) == KNOWN_REFERENCE_VIOLATIONS["5"]
+
+
+def test_validators_allowed_for_type(reference5):
+  form = copy.deepcopy(reference5)
+  node(form, 1, 0, 0).update(validation=["REQUIRED", "PESEL", "EMAIL"])  # TEXT_FIELD: any validator
+  node(form, 1, 1, 0).update(validation=["REQUIRED"])  # RADIO: REQUIRED
+  assert violations(form) == KNOWN_REFERENCE_VIOLATIONS["5"]
+
+
+def test_unknown_validator_reported_once(reference5):
+  form = copy.deepcopy(reference5)
+  node(form, 1, 1, 0).update(validation=["FOO"])
+  assert violations(form) - KNOWN_REFERENCE_VIOLATIONS["5"] == {("validation.unknown", RADIO)}
 
 
 def test_states_are_optional(reference5):
