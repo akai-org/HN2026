@@ -78,6 +78,11 @@ Błędy zwracają `{"code": "...", "message": "..."}`:
 Podsumowanie (liczba pól, naruszenia reguł, czas, zgodność między formatami) jest w `wyniki/raport.json`. Wyniki generuje
 `uv run python scripts/evaluate.py`.
 
+## Środowisko testowe
+
+Projekt był testowany na serwerze Ubuntu 26.04 8 GB RAM
+
 ## Licencja
+
 
 [MIT](LICENSE)
