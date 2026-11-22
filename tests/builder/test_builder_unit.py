@@ -8,8 +8,9 @@ from hacknation_2026 import initial_data
 from hacknation_2026.builder import build, build_form, jsonata
 from hacknation_2026.builder.layout import html_text, slug, unique
 from hacknation_2026.contracts import Condition, FieldSpec, FormSpec, PageSpec, SectionSpec
+from hacknation_2026.enrich import Enrichment
 
-from .conftest import StubEnrichment, load_spec
+from .conftest import load_spec
 
 FIELD_KEYS = {
   "id", "type", "techName", "title", "description", "options", "validation", "readOnly",
@@ -228,10 +229,10 @@ def test_options_of_one_field_are_ored_and_different_fields_anded(settings):
 def test_enrichment_is_applied_to_subject_fields(settings, monkeypatch):
   def enrich_field(label, field_type, required, applicant_data):
     if label == "Kraj pochodzenia":
-      return StubEnrichment(dictionary_name="Kraje", search_enabled=True)
+      return Enrichment(dictionary_name="Kraje", search_enabled=True)
     if label == "Wybór":
-      return StubEnrichment(default_value="MLPZ.surname", external=True, validators=["EMAIL", "PATTERN"])
-    return StubEnrichment()
+      return Enrichment(default_value="MLPZ.surname", external=True, validators=["EMAIL", "PATTERN"])
+    return Enrichment()
 
   monkeypatch.setattr(build, "enrich_field", enrich_field)
   section = build_form(subject_spec(), settings)["tabs"][1]["questions"][0]["field"]["repeatingSectionGrid"]
@@ -244,7 +245,7 @@ def test_enrichment_is_applied_to_subject_fields(settings, monkeypatch):
 
 def test_format_validators_kept_on_text_field(settings, monkeypatch):
   def enrich_field(label, field_type, required, applicant_data):
-    return StubEnrichment(validators=["EMAIL", "PATTERN"])
+    return Enrichment(validators=["EMAIL", "PATTERN"])
 
   monkeypatch.setattr(build, "enrich_field", enrich_field)
   spec = minimal_spec(pages=[PageSpec(title="Sprawa", sections=[SectionSpec(key="s", title="Sekcja", fields=[
@@ -264,7 +265,7 @@ def test_format_validators_kept_on_text_field(settings, monkeypatch):
 def test_read_only_of_initial_data_depends_on_register_attribute(
   settings, monkeypatch, initial, enriched_read_only, explicit, expected,
 ):
-  monkeypatch.setattr(build, "enrich_field", lambda *_: StubEnrichment(read_only=enriched_read_only))
+  monkeypatch.setattr(build, "enrich_field", lambda *_: Enrichment(read_only=enriched_read_only))
   make = build.FieldFactory(settings)
   field = make("TEXT_FIELD", "pole", "Pole", initial=initial, read_only=explicit)
   assert (field["defaultValueType"], field["readOnly"]) == ("EXTERNAL_SYSTEM", expected)
@@ -278,8 +279,8 @@ def test_editable_initial_data_is_a_subset_of_known_attributes():
 def test_enrichment_can_turn_text_field_into_select(settings, monkeypatch):
   def enrich_field(label, field_type, required, applicant_data):
     if field_type == "TEXT_FIELD":
-      return StubEnrichment(dictionary_name="Kraje", search_enabled=True, field_type="SELECT")
-    return StubEnrichment(field_type="DATEPICKER")  # ignored: only a TEXT_FIELD changes its type
+      return Enrichment(dictionary_name="Kraje", search_enabled=True, field_type="SELECT")
+    return Enrichment(field_type="DATEPICKER")  # ignored: only a TEXT_FIELD changes its type
 
   monkeypatch.setattr(build, "enrich_field", enrich_field)
   spec = minimal_spec(pages=[PageSpec(title="Sprawa", sections=[SectionSpec(key="s", title="Sekcja", fields=[
@@ -293,7 +294,7 @@ def test_enrichment_can_turn_text_field_into_select(settings, monkeypatch):
 
 
 def test_enrichment_dictionary_skipped_when_field_has_own_options(settings, monkeypatch):
-  monkeypatch.setattr(build, "enrich_field", lambda *_: StubEnrichment(dictionary_name="Kraje", search_enabled=True))
+  monkeypatch.setattr(build, "enrich_field", lambda *_: Enrichment(dictionary_name="Kraje", search_enabled=True))
   kraj = build_form(subject_spec(options=["Polska", "Niemcy", "Inny"]), settings)["tabs"][1]["questions"][0]
   kraj = kraj["field"]["repeatingSectionGrid"][1]["field"]
   assert "dictionaryName" not in kraj, "the paper form's options win over a dictionary guessed from the label"

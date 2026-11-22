@@ -1,23 +1,17 @@
 """Grid layout and node construction: every section and field gets the full key set of the reference outputs."""
 
 import html
-import re
-import unicodedata
 import uuid
 from typing import Any
 
-COLS = 3
-EMPTY_HTML = "<html><head></head><body></body></html>"
-CHOICE_TYPES = {"RADIO", "CHECKBOX", "SELECT"}
+from hacknation_2026.enrich.enrich import normalize
 
-_POLISH = str.maketrans({"ł": "l", "Ł": "L"})
+COLS = 3
 
 
 def slug(text: str, fallback: str = "pole") -> str:
   """snake_case ASCII from a Polish label: 'Adres e-mail' -> 'adres_e_mail'."""
-  ascii_text = unicodedata.normalize("NFKD", text.translate(_POLISH)).encode("ascii", "ignore").decode()
-  result = re.sub(r"[^a-z0-9]+", "_", ascii_text.lower()).strip("_")
-  return result or fallback
+  return "_".join(normalize(text).split()) or fallback
 
 
 def unique(name: str, taken: set[str]) -> str:
