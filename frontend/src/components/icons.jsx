@@ -145,6 +145,15 @@ export function Image(props) {
   );
 }
 
+export function Layers(props) {
+  return (
+    <Icon {...props}>
+      <path d="m12 3 9 5-9 5-9-5 9-5Z" />
+      <path d="m3 13 9 5 9-5" />
+    </Icon>
+  );
+}
+
 export function Minus(props) {
   return (
     <Icon {...props}>

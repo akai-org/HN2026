@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import FileThumb from "@/components/FileThumb";
 import FormPreview from "@/components/comparison/FormPreview";
 import JsonPanel from "@/components/comparison/JsonPanel";
 import OriginalPanel from "@/components/comparison/OriginalPanel";
-import { ChevronLeft, Download, TriangleAlert } from "@/components/icons";
+import { ChevronLeft, ChevronRight, Download, TriangleAlert } from "@/components/icons";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { getFile } from "@/lib/fileStore";
 import { downloadJson, indexForm, plural, replaceNode, resolveWarning } from "@/lib/formDefinition";
@@ -44,7 +45,11 @@ export default function VerifyForm() {
 
 function VerifySession({ location }) {
   const [results, setResults] = useState(() => initialResults(location));
-  const [current, setCurrent] = useState(0);
+  // The digitalize step can open the comparison at a chosen file.
+  const [current, setCurrent] = useState(() => {
+    const wanted = Number(location.state?.current ?? 0);
+    return Number.isInteger(wanted) && wanted >= 0 ? wanted : 0;
+  });
   const [views, setViews] = useState(savedViews);
   const result = results[current];
 
@@ -150,27 +155,13 @@ function Comparison({
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-semibold tracking-tight">{form?.title || "Formularz bez tytułu"}</h1>
           <p className="mt-0.5 truncate text-sm text-muted-foreground">
+            {result.formName && `${result.formName} · `}
             {result.fileName} · {pageCount} {plural(pageCount, "strona", "strony", "stron")} ·{" "}
             {index.fieldCount} {plural(index.fieldCount, "pole", "pola", "pól")}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {results.length > 1 && (
-            <label className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Plik</span>
-              <select
-                value={current}
-                onChange={(event) => onCurrentChange(Number(event.target.value))}
-                className="h-10 max-w-72 rounded-lg border border-foreground/25 bg-background px-3 py-2 text-sm font-medium shadow-sm focus-ring"
-              >
-                {results.map((entry, entryIndex) => (
-                  <option key={entryIndex} value={entryIndex}>
-                    Formularz {entry.formNumber ?? 1} · {entry.fileName}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+          {results.length > 1 && <FileSwitcher results={results} current={current} onChange={onCurrentChange} />}
           <Button onClick={() => downloadJson(form)}>
             <Download />
             Pobierz JSON
@@ -287,5 +278,57 @@ function DictionaryProposals({ proposals }) {
         ))}
       </ul>
     </details>
+  );
+}
+
+/** Small previews of all converted files with previous/next, to move between them without losing edits. */
+function FileSwitcher({ results, current, onChange }) {
+  return (
+    <nav aria-label="Pliki do sprawdzenia" className="flex items-center gap-1">
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Poprzedni plik"
+        disabled={current <= 0}
+        onClick={() => onChange(current - 1)}
+      >
+        <ChevronLeft />
+      </Button>
+      <ol className="flex max-w-[min(60vw,26rem)] items-center gap-1.5 overflow-x-auto p-1">
+        {results.map((entry, index) => {
+          const isCurrent = index === current;
+          const name = `${entry.formName || `Formularz ${entry.formNumber ?? 1}`}: ${entry.fileName}`;
+          return (
+            <li key={`${index}-${entry.fileId ?? entry.fileName}`}>
+              <button
+                type="button"
+                aria-label={name}
+                aria-current={isCurrent ? "true" : undefined}
+                title={name}
+                onClick={() => onChange(index)}
+                className={cn(
+                  "block rounded-md p-0.5 transition focus-ring",
+                  isCurrent ? "ring-2 ring-primary" : "opacity-60 hover:opacity-100",
+                )}
+              >
+                <FileThumb file={getFile(entry.fileId) ?? { name: entry.fileName }} size="sm" />
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Następny plik"
+        disabled={current >= results.length - 1}
+        onClick={() => onChange(current + 1)}
+      >
+        <ChevronRight />
+      </Button>
+      <span className="text-sm whitespace-nowrap text-muted-foreground tabular-nums">
+        {current + 1} z {results.length}
+      </span>
+    </nav>
   );
 }

@@ -286,10 +286,12 @@ export default function PdfPage({
             </div>
           )}
           {busy && (
-            <div className="absolute inset-0 flex min-h-48 min-w-48 items-center justify-center bg-white/60">
-              <span className="text-sm text-muted-foreground" role="status">
-                Wczytywanie strony…
-              </span>
+            <div
+              className="absolute inset-0 flex min-h-48 min-w-48 flex-col items-center justify-center gap-3 bg-white/60 text-sm text-muted-foreground"
+              role="status"
+            >
+              <span className="loader" aria-hidden="true" />
+              Wczytywanie strony…
             </div>
           )}
         </div>

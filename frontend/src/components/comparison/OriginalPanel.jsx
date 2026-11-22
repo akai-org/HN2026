@@ -190,9 +190,13 @@ export default function OriginalPanel({ file, fileName, form, selectedId, onSele
             </a>
           </div>
         ) : !pdf.doc ? (
-          <p className="p-6 text-center text-sm text-muted-foreground" role="status">
+          <div
+            className="flex flex-col items-center justify-center gap-3 p-10 text-center text-sm text-muted-foreground"
+            role="status"
+          >
+            <span className="loader" aria-hidden="true" />
             Wczytywanie pliku PDF…
-          </p>
+          </div>
         ) : (
           <PdfPage
             doc={pdf.doc}
@@ -285,11 +289,15 @@ function ExtractedText({ state, kind, onRetry }) {
   }
   if (state.status !== "done") {
     return (
-      <p className="p-6 text-center text-sm text-muted-foreground" role="status">
+      <div
+        className="flex flex-col items-center justify-center gap-3 p-10 text-center text-sm text-muted-foreground"
+        role="status"
+      >
+        <span className="loader" aria-hidden="true" />
         {kind === "document"
           ? "Odczytywanie pliku…"
           : "Odczytywanie tekstu z pliku (skany przechodzą przez OCR)…"}
-      </p>
+      </div>
     );
   }
 

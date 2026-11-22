@@ -107,28 +107,32 @@ html.a11y-wide-spacing p {
   margin-bottom: 2em;
 }
 
-/* Spinner shown while a file is being converted. */
+/* Spinner shown while a file is being converted: a plain ring in the primary (orange) color, CSS only. */
 .loader {
-  --thickness: 8px;
-  width: 50px;
+  width: 36px;
   aspect-ratio: 1;
   border-radius: 50%;
-  padding: 1px;
-  background: conic-gradient(#0000 10%, var(--primary)) content-box;
-  mask:
-    repeating-conic-gradient(#0000 0deg, #000 1deg 20deg, #0000 21deg 36deg),
-    radial-gradient(
-      farthest-side,
-      #0000 calc(100% - var(--thickness) - 1px),
-      #000 calc(100% - var(--thickness))
-    );
-  mask-composite: intersect;
-  animation: loader-spin 1s infinite steps(10);
+  border: 4px solid color-mix(in oklab, var(--primary) 20%, transparent);
+  border-top-color: var(--primary);
+  animation: loader-spin 0.8s linear infinite;
 }
 
 @keyframes loader-spin {
   to {
     transform: rotate(1turn);
+  }
+}
+
+/* Small variant for file thumbnails. */
+.loader-sm {
+  width: 16px;
+  border-width: 2px;
+}
+
+/* With reduced motion the ring still turns (it is the only sign of progress), just slowly. */
+@media (prefers-reduced-motion: reduce) {
+  .loader {
+    animation-duration: 2.4s;
   }
 }
 

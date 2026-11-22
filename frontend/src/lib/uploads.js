@@ -17,6 +17,21 @@ export function fileKey(file) {
   return `${file.name}-${file.size}-${file.lastModified}`;
 }
 
+/**
+ * Forms as groups of files (upload step) → the flat list and form boundaries the next steps use:
+ * `files` in group order, `splitBefore` = indexes of the files that start a new form (never 0).
+ */
+export function flattenGroups(groups) {
+  const files = groups.flatMap((group) => group.files);
+  const splitBefore = [];
+  let index = 0;
+  for (const group of groups) {
+    if (index > 0) splitBefore.push(index);
+    index += group.files.length;
+  }
+  return { files, splitBefore };
+}
+
 /** Number of the form (from 1) that the file at `index` belongs to; `splitBefore` holds the indexes that start a new form. */
 export function formNumberAt(index, splitBefore) {
   return 1 + [...splitBefore].filter((split) => split <= index).length;

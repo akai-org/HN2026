@@ -1,18 +1,32 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Divider from "@/components/Divider";
 import FileRow from "@/components/FileRow";
-import { ArrowUpAZ, Trash, Upload, X } from "@/components/icons";
+import FileThumb from "@/components/FileThumb";
+import { ArrowUpAZ, ChevronDown, Layers, Pencil, Trash, Upload, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { ACCEPTED_FILE_TYPES, MAX_FILE_SIZE, fileKey, formNumberAt } from "@/lib/uploads";
+import { plural } from "@/lib/formDefinition";
+import { ACCEPTED_FILE_TYPES, MAX_FILE_SIZE, fileKey, flattenGroups } from "@/lib/uploads";
 import { cn } from "@/lib/utils";
+
+let nextGroupId = 1;
+const newGroup = (files, name = "") => ({ id: `formularz-${nextGroupId++}`, files, name });
+const MAX_NAME_LENGTH = 80;
+/** Name the official gave the form, or its number. */
+const formLabel = (group, number) => group.name || `Formularz ${number}`;
+const byName = (a, b) => a.name.localeCompare(b.name, "pl", { sensitivity: "base" });
+const filesLabel = (count) => `${count} ${plural(count, "plik", "pliki", "plików")}`;
 
 export default function ImportForm() {
   const navigate = useNavigate();
-  const [files, setFiles] = useState([]);
-  // Indexes of the files that start a new form. The first file always starts form 1, so 0 is never here.
-  const [splitBefore, setSplitBefore] = useState(() => new Set());
+  // Forms as groups of files, in sending order. A new file is a form of its own; in grouping mode the
+  // official ticks the files of one form (e.g. the pages of a scan) and joins them into one group.
+  const [groups, setGroups] = useState([]);
+  const [isGrouping, setIsGrouping] = useState(false);
+  const [selected, setSelected] = useState(() => new Set()); // fileKey of the ticked files
+  const [collapsed, setCollapsed] = useState(() => new Set()); // ids of the folded groups
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const files = groups.flatMap((group) => group.files);
 
   function addFiles(fileList) {
     const incoming = [...fileList];
@@ -22,53 +36,115 @@ export default function ImportForm() {
       setError(`Plik „${tooLarge.name}” przekracza limit 10 MB.`);
       return;
     }
-    setFiles((current) => {
-      const known = new Set(current.map(fileKey));
-      return [...current, ...incoming.filter((file) => !known.has(fileKey(file)))];
+    setGroups((current) => {
+      const known = new Set(current.flatMap((group) => group.files).map(fileKey));
+      const fresh = incoming.filter((file) => !known.has(fileKey(file)));
+      return [...current, ...fresh.map((file) => newGroup([file]))];
     });
     setError("");
   }
 
-  function removeFile(index) {
-    setFiles((current) => current.toSpliced(index, 1));
-    setSplitBefore(
-      (current) =>
-        new Set(
-          [...current]
-            .filter((split) => split !== index)
-            .map((split) => (split > index ? split - 1 : split))
-            .filter((split) => split > 0),
-        ),
+  function removeFile(file) {
+    const key = fileKey(file);
+    setGroups((current) =>
+      current
+        .map((group) => ({ ...group, files: group.files.filter((candidate) => fileKey(candidate) !== key) }))
+        .filter((group) => group.files.length > 0),
     );
+    setSelected((current) => {
+      const next = new Set(current);
+      next.delete(key);
+      return next;
+    });
+    setNotice(`Usunięto plik ${file.name}.`);
   }
 
-  function toggleSplit(index) {
-    setSplitBefore((current) => {
+  function toggleFiles(list, isOn) {
+    setSelected((current) => {
       const next = new Set(current);
-      if (next.has(index)) next.delete(index);
-      else next.add(index);
+      for (const file of list) {
+        if (isOn) next.add(fileKey(file));
+        else next.delete(fileKey(file));
+      }
+      return next;
+    });
+  }
+
+  function startGrouping() {
+    setIsGrouping(true);
+    setSelected(new Set());
+    setNotice("Tryb grupowania: zaznacz pliki jednego formularza.");
+  }
+
+  function stopGrouping() {
+    setIsGrouping(false);
+    setSelected(new Set());
+  }
+
+  /** Joins the ticked files (in list order) into one form, placed where the first of them was. */
+  function joinSelected() {
+    const chosen = files.filter((file) => selected.has(fileKey(file)));
+    if (chosen.length < 2) return;
+    const sources = groups.filter((group) => group.files.some((file) => selected.has(fileKey(file))));
+    const at = groups.indexOf(sources[0]);
+    const name = sources.find((group) => group.name)?.name ?? "";
+    const rest = groups.map((group) => ({
+      ...group,
+      files: group.files.filter((file) => !selected.has(fileKey(file))),
+    }));
+    const next = [...rest.slice(0, at), newGroup(chosen, name), ...rest.slice(at)].filter((group) => group.files.length);
+    setGroups(next);
+    stopGrouping();
+    setNotice(`Połączono ${filesLabel(chosen.length)} w formularz ${name || at + 1}.`);
+  }
+
+  function splitGroup(group) {
+    setGroups((current) =>
+      current.flatMap((candidate) => (candidate.id === group.id ? group.files.map((file) => newGroup([file])) : [candidate])),
+    );
+    setNotice(`Rozdzielono formularz na ${filesLabel(group.files.length)}.`);
+  }
+
+  function renameGroup(id, name) {
+    const index = groups.findIndex((group) => group.id === id);
+    if (index < 0 || groups[index].name === name) return;
+    setGroups((current) => current.map((group) => (group.id === id ? { ...group, name } : group)));
+    setNotice(name ? `Formularz ${index + 1} nazywa się teraz „${name}”.` : `Przywrócono nazwę „Formularz ${index + 1}”.`);
+  }
+
+  function toggleCollapsed(id) {
+    setCollapsed((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   }
 
   function sortByName() {
-    setFiles((current) =>
-      current.toSorted((a, b) => a.name.localeCompare(b.name, "pl", { sensitivity: "base" })),
+    setGroups((current) =>
+      current
+        .map((group) => ({ ...group, files: group.files.toSorted(byName) }))
+        .toSorted((a, b) => byName(a.files[0], b.files[0])),
     );
-    setSplitBefore(new Set());
   }
 
   function clearAll() {
-    setFiles([]);
-    setSplitBefore(new Set());
+    setGroups([]);
+    stopGrouping();
+    setCollapsed(new Set());
     setError("");
   }
 
   function submit(event) {
     event.preventDefault();
     if (!files.length) return;
-    navigate("/digitalize", { state: { selectedFiles: files, splitBefore: [...splitBefore] } });
+    const { files: ordered, splitBefore } = flattenGroups(groups);
+    const formNames = groups.map((group) => group.name);
+    navigate("/digitalize", { state: { selectedFiles: ordered, splitBefore, formNames } });
   }
+
+  const selectedCount = selected.size;
 
   return (
     <div className="px-4 py-8 sm:px-6">
@@ -83,20 +159,30 @@ export default function ImportForm() {
           <section aria-labelledby="file-list-title" className="mt-6 rounded-lg border bg-background p-5">
             <div className="text-center">
               <h2 id="file-list-title" className="text-base font-semibold">
-                Przesłane pliki{files.length > 0 && ` (${files.length})`}
+                Formularze{groups.length > 0 && ` (${groups.length})`}
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                {files.length
-                  ? "Kliknij pomiędzy plikami, aby ustawić granicę kolejnego formularza."
-                  : "Po dodaniu plików możesz ustawić granice pomiędzy formularzami."}{" "}
-                Kliknij ponownie, żeby ją usunąć.
+                {!files.length
+                  ? "Każdy dodany plik to osobny formularz. Pliki jednego formularza możesz potem połączyć."
+                  : isGrouping
+                    ? "Zaznacz pliki jednego formularza (np. kolejne strony skanu) i kliknij „Połącz w formularz”."
+                    : "Każdy plik to osobny formularz. Jeśli formularz ma kilka plików, połącz je przyciskiem „Grupuj pliki”. Ołówek zmienia nazwę formularza."}
               </p>
             </div>
+            <p role="status" className="sr-only">
+              {notice}
+            </p>
 
             {files.length > 0 && (
               <>
-                <div className="mt-4 flex justify-end gap-2">
-                  <Button variant="outline" size="sm" onClick={sortByName}>
+                <div className="mt-4 flex flex-wrap justify-end gap-2">
+                  {files.length > 1 && !isGrouping && (
+                    <Button variant="outline" size="sm" onClick={startGrouping}>
+                      <Layers />
+                      Grupuj pliki
+                    </Button>
+                  )}
+                  <Button variant="outline" size="sm" onClick={sortByName} disabled={isGrouping}>
                     <ArrowUpAZ />
                     Sortuj alfabetycznie
                   </Button>
@@ -106,29 +192,39 @@ export default function ImportForm() {
                   </Button>
                 </div>
 
+                {isGrouping && (
+                  <div
+                    role="region"
+                    aria-label="Grupowanie plików"
+                    className="sticky top-2 z-10 mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-primary/50 bg-background/95 px-3 py-2 shadow-md backdrop-blur"
+                  >
+                    <Layers size={18} className="text-primary" />
+                    <span className="mr-auto text-sm font-medium" aria-live="polite">
+                      Zaznaczono {selectedCount} z {files.length}
+                    </span>
+                    <Button size="sm" onClick={joinSelected} disabled={selectedCount < 2}>
+                      Połącz w formularz
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={stopGrouping}>
+                      Anuluj
+                    </Button>
+                  </div>
+                )}
+
                 <ol className="mt-3 space-y-3">
-                  {files.map((file, index) => (
-                    <li key={fileKey(file)} className="space-y-3">
-                      <FormBoundary
-                        index={index}
-                        fileName={file.name}
-                        splitBefore={splitBefore}
-                        onToggle={toggleSplit}
-                      />
-                      <FileRow
-                        file={file}
-                        className="bg-muted/20"
-                        action={
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            aria-label={`Usuń plik ${file.name}`}
-                            onClick={() => removeFile(index)}
-                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                          >
-                            <X />
-                          </Button>
-                        }
+                  {groups.map((group, index) => (
+                    <li key={group.id}>
+                      <FormGroup
+                        group={group}
+                        number={index + 1}
+                        isGrouping={isGrouping}
+                        isCollapsed={collapsed.has(group.id)}
+                        selected={selected}
+                        onToggleFiles={toggleFiles}
+                        onToggleCollapsed={() => toggleCollapsed(group.id)}
+                        onSplit={() => splitGroup(group)}
+                        onRename={(name) => renameGroup(group.id, name)}
+                        onRemove={removeFile}
                       />
                     </li>
                   ))}
@@ -142,7 +238,7 @@ export default function ImportForm() {
                   {error}
                 </p>
               )}
-              <Button type="submit" disabled={!files.length}>
+              <Button type="submit" disabled={!files.length || isGrouping}>
                 Cyfryzuj formularze
               </Button>
             </div>
@@ -154,6 +250,259 @@ export default function ImportForm() {
         </p>
       </div>
     </div>
+  );
+}
+
+/**
+ * Editing a form name in place: the pencil turns the name into a field; Enter or leaving the field saves,
+ * Esc cancels. An empty name brings back the number ("Formularz 2").
+ */
+function useNameEditor(name, onRename) {
+  const [draft, setDraft] = useState(null); // null: not editing
+  const isEditingRef = useRef(false);
+  const refocus = useRef(false);
+  const buttonRef = useRef(null);
+  const inputRef = useRef(null);
+  const isEditing = draft !== null;
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    } else if (refocus.current) {
+      refocus.current = false;
+      buttonRef.current?.focus();
+    }
+  }, [isEditing]);
+
+  function finish(value, { save, returnFocus }) {
+    if (!isEditingRef.current) return; // Esc already closed the field; its blur must not save
+    isEditingRef.current = false;
+    if (save) onRename(value.trim().slice(0, MAX_NAME_LENGTH));
+    refocus.current = returnFocus;
+    setDraft(null);
+  }
+
+  return {
+    isEditing,
+    buttonRef,
+    start() {
+      isEditingRef.current = true;
+      setDraft(name);
+    },
+    inputProps: {
+      ref: inputRef,
+      value: draft ?? "",
+      maxLength: MAX_NAME_LENGTH,
+      onChange: (event) => setDraft(event.target.value),
+      onKeyDown: (event) => {
+        if (event.key === "Enter") {
+          event.preventDefault(); // inside the upload <form>: Enter must not send the files
+          finish(event.currentTarget.value, { save: true, returnFocus: true });
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          finish("", { save: false, returnFocus: true });
+        }
+      },
+      onBlur: (event) => finish(event.currentTarget.value, { save: true, returnFocus: false }),
+      onClick: (event) => event.stopPropagation(),
+    },
+  };
+}
+
+function NameInput({ inputProps, number, className }) {
+  return (
+    <input
+      {...inputProps}
+      type="text"
+      aria-label={`Nazwa formularza ${number}`}
+      placeholder={`Formularz ${number}`}
+      className={cn(
+        "h-8 min-w-0 rounded-md border border-primary bg-background px-2 text-sm font-semibold focus-ring",
+        className,
+      )}
+    />
+  );
+}
+
+function RenameButton({ buttonRef, onStart, number }) {
+  return (
+    <Button
+      ref={buttonRef}
+      variant="ghost"
+      size="icon-sm"
+      aria-label={`Zmień nazwę formularza ${number}`}
+      title="Zmień nazwę"
+      onClick={(event) => {
+        event.stopPropagation();
+        onStart();
+      }}
+      className="text-muted-foreground hover:text-primary"
+    >
+      <Pencil />
+    </Button>
+  );
+}
+
+/**
+ * One form. A single file is a plain row; several files make a card that can be folded (then it shows only
+ * small previews) and split back into separate forms. In grouping mode every file gets a checkbox.
+ * Outside grouping mode the pencil renames the form.
+ */
+function FormGroup({
+  group,
+  number,
+  isGrouping,
+  isCollapsed,
+  selected,
+  onToggleFiles,
+  onToggleCollapsed,
+  onSplit,
+  onRename,
+  onRemove,
+}) {
+  const { isEditing, start, inputProps, buttonRef } = useNameEditor(group.name, onRename);
+  const renameButton = <RenameButton buttonRef={buttonRef} onStart={start} number={number} />;
+  const isMulti = group.files.length > 1;
+  const label = formLabel(group, number);
+  const bodyId = `${group.id}-pliki`;
+  const allSelected = group.files.every((file) => selected.has(fileKey(file)));
+
+  if (!isMulti) {
+    const [file] = group.files;
+    return (
+      <SelectableFile
+        file={file}
+        isGrouping={isGrouping}
+        isSelected={selected.has(fileKey(file))}
+        onToggle={(isOn) => onToggleFiles([file], isOn)}
+        onRemove={() => onRemove(file)}
+      >
+        <div className="mt-1 flex min-h-7 items-center gap-1">
+          {isEditing ? (
+            <NameInput inputProps={inputProps} number={number} className="w-full max-w-72" />
+          ) : (
+            <>
+              <span className={cn("truncate text-xs font-medium text-primary", group.name && "font-semibold")}>{label}</span>
+              {!isGrouping && renameButton}
+            </>
+          )}
+        </div>
+      </SelectableFile>
+    );
+  }
+
+  return (
+    <section aria-label={`${label}, ${filesLabel(group.files.length)}`} className="rounded-xl border border-primary/40 bg-primary/5 p-3">
+      <div className="flex flex-wrap items-center gap-2">
+        {isGrouping && (
+          <input
+            type="checkbox"
+            checked={allSelected}
+            onChange={(event) => onToggleFiles(group.files, event.target.checked)}
+            aria-label={`Zaznacz wszystkie pliki: ${label}`}
+            className="size-5 accent-primary"
+          />
+        )}
+        {isEditing ? (
+          <div className="flex min-w-0 flex-1 items-center gap-2 px-1">
+            <ChevronDown size={18} className={cn("shrink-0 text-primary", isCollapsed && "-rotate-90")} />
+            <NameInput inputProps={inputProps} number={number} className="w-full max-w-80" />
+            <span className="shrink-0 text-sm text-muted-foreground">· {filesLabel(group.files.length)}</span>
+          </div>
+        ) : (
+          <button
+            type="button"
+            aria-expanded={!isCollapsed}
+            aria-controls={bodyId}
+            onClick={onToggleCollapsed}
+            className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-1 py-1 text-left focus-ring"
+          >
+            <ChevronDown size={18} className={cn("shrink-0 text-primary transition-transform", isCollapsed && "-rotate-90")} />
+            <span className="truncate text-sm font-semibold">{label}</span>
+            <span className="shrink-0 text-sm text-muted-foreground">· {filesLabel(group.files.length)}</span>
+            {isCollapsed && (
+              <span className="ml-1 flex items-center gap-1" aria-hidden="true">
+                {group.files.slice(0, 6).map((file) => (
+                  <FileThumb key={fileKey(file)} file={file} size="xs" />
+                ))}
+                {group.files.length > 6 && (
+                  <span className="text-xs text-muted-foreground">+{group.files.length - 6}</span>
+                )}
+              </span>
+            )}
+          </button>
+        )}
+        {!isGrouping && !isEditing && renameButton}
+        {!isGrouping && (
+          <Button variant="ghost" size="sm" onClick={onSplit}>
+            Rozdziel
+          </Button>
+        )}
+      </div>
+      {!isCollapsed && (
+        <div id={bodyId} className="mt-3 space-y-2">
+          {group.files.map((file, index) => (
+            <SelectableFile
+              key={fileKey(file)}
+              file={file}
+              isGrouping={isGrouping}
+              isSelected={selected.has(fileKey(file))}
+              onToggle={(isOn) => onToggleFiles([file], isOn)}
+              onRemove={() => onRemove(file)}
+              className="bg-background"
+            >
+              <p className="mt-1 text-xs font-medium text-primary">
+                Plik {index + 1} z {group.files.length}
+              </p>
+            </SelectableFile>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+/** A file row; in grouping mode the whole row ticks the file. */
+function SelectableFile({ file, isGrouping, isSelected, onToggle, onRemove, className, children }) {
+  return (
+    <FileRow
+      file={file}
+      onClick={isGrouping ? () => onToggle(!isSelected) : undefined}
+      className={cn(
+        "bg-muted/20",
+        isGrouping && "cursor-pointer hover:border-primary/60",
+        isGrouping && isSelected && "border-primary bg-primary/10 ring-2 ring-primary/30",
+        className,
+      )}
+      leading={
+        isGrouping && (
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={(event) => onToggle(event.target.checked)}
+            onClick={(event) => event.stopPropagation()}
+            aria-label={`Zaznacz plik ${file.name}`}
+            className="size-5 shrink-0 accent-primary"
+          />
+        )
+      }
+      action={
+        !isGrouping && (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={`Usuń plik ${file.name}`}
+            onClick={onRemove}
+            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+          >
+            <X />
+          </Button>
+        )
+      }
+    >
+      {children}
+    </FileRow>
   );
 }
 
@@ -202,31 +551,5 @@ function DropZone({ isCompact, onFiles }) {
         }}
       />
     </label>
-  );
-}
-
-/** The line above a file: where its form starts, or a button that makes it start a new form. */
-function FormBoundary({ index, fileName, splitBefore, onToggle }) {
-  if (index === 0) {
-    return <Divider className="py-2 text-primary">Granica — Formularz 1</Divider>;
-  }
-
-  const isSplit = splitBefore.has(index);
-  return (
-    <button
-      type="button"
-      aria-label={
-        isSplit ? `Usuń granicę przed plikiem ${fileName}` : `Dodaj granicę przed plikiem ${fileName}`
-      }
-      onClick={() => onToggle(index)}
-      className={cn(
-        "block w-full rounded-sm py-2 focus-ring",
-        isSplit ? "text-primary" : "text-muted-foreground hover:text-primary",
-      )}
-    >
-      <Divider>
-        {isSplit ? `Granica — Formularz ${formNumberAt(index, splitBefore)}` : "Kliknij, aby ustawić granicę"}
-      </Divider>
-    </button>
   );
 }

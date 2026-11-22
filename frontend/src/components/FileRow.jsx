@@ -1,19 +1,19 @@
-import { FileText, Image } from "@/components/icons";
+import FileThumb from "@/components/FileThumb";
 import { fileExtension, formatFileSize } from "@/lib/uploads";
 import { cn } from "@/lib/utils";
 
 /**
- * One uploaded file: type icon, name and size. `children` go under the name, `action` on the right.
+ * One uploaded file: small preview with the type, name and size. `children` go under the name,
+ * `action` on the right, `leading` on the left (e.g. a checkbox). Other props go to the row element.
  * `file` may also be just `{ name }` when the File object is gone (after a page reload).
  */
-export default function FileRow({ file, action, className, children }) {
-  const TypeIcon = file.type?.startsWith("image/") ? Image : FileText;
-
+export default function FileRow({ file, action, leading, className, children, ...props }) {
   return (
-    <div className={cn("flex items-center gap-4 rounded-lg border bg-background p-4", className)}>
-      <span className="relative flex size-12 shrink-0 items-center justify-center rounded-md border bg-background text-primary">
-        <TypeIcon size={24} />
-        <span className="absolute right-1 -bottom-1 rounded-sm bg-primary px-1 py-0.5 text-[9px] leading-none font-bold text-primary-foreground">
+    <div className={cn("flex items-center gap-4 rounded-lg border bg-background p-4", className)} {...props}>
+      {leading}
+      <span className="relative shrink-0">
+        <FileThumb file={file} />
+        <span className="absolute -right-1.5 -bottom-1 rounded-sm bg-primary px-1 py-0.5 text-[9px] leading-none font-bold text-primary-foreground">
           {fileExtension(file.name).toUpperCase() || "PLIK"}
         </span>
       </span>
