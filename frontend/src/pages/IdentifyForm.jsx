@@ -94,15 +94,7 @@ export default function IdentifyForm() {
     statuses.every((status) =>
       status.state === "success" || status.state === "error"
     );
-  const successfulFormSections = formSections.filter((section) =>
-    section.files.every(({ index }) => statuses[index]?.state === "success")
-  );
-  const successfulFormNumbers = new Set(
-    successfulFormSections.map((section) => section.formNumber)
-  );
-  const successfulConvertedForms = convertedForms.filter(
-    (item) => successfulFormNumbers.has(item.formNumber)
-  );
+  const successfulConvertedForms = convertedForms.filter((item) => item?.convertedForm);
   const hasErrors = statuses.some((status) => status.state === "error");
   const canOpenVerify =
     (allFinished && successfulConvertedForms.length > 0) ||

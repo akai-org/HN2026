@@ -23,7 +23,7 @@ function objectRange(lines, id) {
   return [start, end];
 }
 
-export default function JsonPanel({ form, selectedId }) {
+export default function JsonPanel({ form, selectedId, onSelect }) {
   const text = useMemo(() => JSON.stringify(form, null, 2), [form]);
   const lines = useMemo(() => text.split("\n"), [text]);
   const range = useMemo(() => objectRange(lines, selectedId), [lines, selectedId]);
@@ -51,6 +51,7 @@ export default function JsonPanel({ form, selectedId }) {
   }
 
   const digits = String(lines.length).length;
+  const idPattern = /^\s*"id":\s*"((?:[^"\\]|\\.)*)",?\s*$/;
 
   return (
     <Panel
@@ -83,11 +84,27 @@ export default function JsonPanel({ form, selectedId }) {
       <pre className="min-w-max py-2 font-mono text-xs leading-5" aria-label="JSON formularza">
         {lines.map((line, index) => {
           const isHighlighted = range && index >= range[0] && index <= range[1];
+          const idMatch = line.match(idPattern);
+          const lineId = idMatch ? idMatch[1].replace(/\\(.)/g, "$1") : null;
           return (
             <div
               key={index}
               ref={range && index === range[0] ? startRef : undefined}
-              className={cn("flex pr-4", isHighlighted && "bg-amber-100")}
+              role={lineId && onSelect ? "button" : undefined}
+              tabIndex={lineId && onSelect ? 0 : undefined}
+              aria-label={lineId && onSelect ? `Zaznacz element ${lineId} w formularzu` : undefined}
+              onClick={lineId && onSelect ? () => onSelect(lineId) : undefined}
+              onKeyDown={lineId && onSelect ? (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  onSelect(lineId);
+                }
+              } : undefined}
+              className={cn(
+                "flex pr-4",
+                isHighlighted && "bg-amber-100",
+                lineId && onSelect && "cursor-pointer hover:bg-amber-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+              )}
             >
               <span
                 aria-hidden="true"
