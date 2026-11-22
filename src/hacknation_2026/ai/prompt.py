@@ -54,6 +54,7 @@ Te części dokłada później system, więc POMIŃ je całkowicie:
 - adresy wnioskodawcy (zamieszkania, korespondencyjny, siedziby),
 - dane kontaktowe wnioskodawcy (telefon, e-mail),
 - dane pełnomocnika oraz osoby, W IMIENIU KTÓREJ składa się wniosek, opłata skarbowa za pełnomocnictwo,
+  a także załączniki o pełnomocnictwie (dokument pełnomocnictwa, dowód opłaty skarbowej za pełnomocnictwo),
 - oświadczenia i zgody (trafiają do "consents"), klauzula RODO, pouczenia, instrukcje wypełniania druku,
 - miejscowość i data SPORZĄDZENIA wniosku z nagłówka ("X, dnia ____"), podpis, pieczęć, pola "wypełnia urząd".
 
