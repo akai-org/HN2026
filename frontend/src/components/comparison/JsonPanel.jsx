@@ -23,6 +23,16 @@ function objectRange(lines, id) {
   return [start, end];
 }
 
+function editableFragment(lines, range) {
+  if (!range) return "";
+  return lines
+    .slice(range[0], range[1] + 1)
+    .join("\n")
+    .trim()
+    .replace(/^"field":\s*/, "")
+    .replace(/,$/, "");
+}
+
 export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEditFragment, onRegenerateFragment }) {
   const text = useMemo(() => JSON.stringify(form, null, 2), [form]);
   const lines = useMemo(() => text.split("\n"), [text]);
@@ -42,8 +52,7 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEdit
 
   useEffect(() => {
     if (!editing || !range) return;
-    const fragment = lines.slice(range[0], range[1] + 1).join("\n").trim().replace(/,$/, "");
-    setEditDraft(fragment);
+    setEditDraft(editableFragment(lines, range));
   }, [editing, selectedId]);
 
   // Scroll only the panel (scrollIntoView would also move the page).
@@ -72,7 +81,7 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEdit
       setEditError("");
       return;
     }
-    const fragment = lines.slice(range[0], range[1] + 1).join("\n").trim().replace(/,$/, "");
+    const fragment = editableFragment(lines, range);
     setEditDraft(fragment);
     setEditError("");
     setEditing(true);
@@ -83,6 +92,10 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEdit
     setEditStatus("");
     try {
       const replacement = JSON.parse(value);
+      if (!replacement || typeof replacement !== "object" || Array.isArray(replacement)) {
+        setEditError("Fragment musi być obiektem JSON.");
+        return;
+      }
       if (replacement?.id !== selectedId) {
         setEditError("Pole id nie może zostać zmienione podczas edycji fragmentu.");
         return;
@@ -97,6 +110,10 @@ export default function JsonPanel({ form, selectedId, fieldIds, onSelect, onEdit
   function parseEditedFragment() {
     try {
       const replacement = JSON.parse(editDraft);
+      if (!replacement || typeof replacement !== "object" || Array.isArray(replacement)) {
+        setEditError("Fragment musi być obiektem JSON.");
+        return null;
+      }
       if (replacement?.id !== selectedId) {
         setEditError("Pole id nie może zostać zmienione podczas edycji fragmentu.");
         return null;
