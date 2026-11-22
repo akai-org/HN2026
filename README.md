@@ -6,17 +6,17 @@ Drużyna: **AKAI**
 
 Narzędzie udostępniające interfejs REST API oraz aplikację webową pozwalającą na automatyczną cyfryzację formularzy urzędowych (PDF, DOC, DOCX, ODS, XLSX, JPG/JPEG, PNG). Zwraca ustandaryzowaną strukturę w formacie JSON opisującą strony, sekcje i pola formularza, ich typy, walidacje, powiązania ze słownikami oraz dynamiczne zależności między polami.
 
-Całe przetwarzanie AI działa lokalnie (Ollama), a przesyłane pliki są przetwarzane wyłącznie w pamięci operacyjnej.
+Analizę treści wykonuje otwartoźródłowy model Gemma 4 31B przez API zgodne z OpenAI (domyślnie EdenAI; działa też z lokalną Ollamą). Przesyłane pliki są przetwarzane wyłącznie w pamięci operacyjnej, a do modelu trafia tylko tekst odczytany z formularza.
 
 ## Architektura
 
 ```text
-plik ─► walidacja ─► tekst z pliku ─► lokalny LLM ─► builder ─► kontrola reguł ─► JSON
+plik ─► walidacja ─► tekst z pliku ─► LLM (Gemma) ─► builder ─► kontrola reguł ─► JSON
 ```
 
 1. **Walidacja pliku** – sprawdzenie nazwy (maks. 250 znaków, brak znaków `; : > < / \ | ' * % $`), limitu rozmiaru oraz zgodności typu MIME z rozszerzeniem.
-2. **Ekstrakcja tekstu** – parsery per format (`pdfplumber`, `python-docx`, `olefile`, `openpyxl`, `odfpy`, Tesseract OCR z językiem polskim dla skanów i obrazów).
-3. **Analiza LLM** – lokalny model w Ollamie (API zgodne z OpenAI `/v1/chat/completions`) przekształca treść blankietu w pośredni model `FormSpec` wymuszony schematem JSON i walidowany przez Pydantic.
+2. **Ekstrakcja tekstu** – parsery per format (`pdfplumber`, `python-docx`, `olefile`, `openpyxl`, `lxml` dla ODS, Tesseract OCR z językiem polskim dla skanów i obrazów, OpenCV do wykrywania linii, kratek i ramek do wypełnienia).
+3. **Analiza LLM** – model językowy (API zgodne z OpenAI `/chat/completions`) przekształca treść blankietu w pośredni model `FormSpec` wymuszony schematem JSON i walidowany przez Pydantic. Gdy w odpowiedzi brakuje dużej części długiego formularza, idzie jedno zapytanie uzupełniające o brakujące strony.
 4. **Builder** – deterministyczny generator w Pythonie składa docelowy JSON formularza (sekcje standardowe, UUID, układ 3-kolumnowy, słowniki, dane inicjalne, reguły `states` i `flow`).
 5. **Kontrola reguł** – weryfikacja wymagań technicznych wynikowego JSON-a; wykryte niezgodności trafiają do listy ostrzeżeń w odpowiedzi.
 
@@ -24,7 +24,7 @@ plik ─► walidacja ─► tekst z pliku ─► lokalny LLM ─► builder ─
 
 - **Backend:** Python 3.14, FastAPI, Pydantic, `uv`
 - **Frontend:** React.js, Vite (serwowany statycznie przez FastAPI)
-- **AI / OCR:** Ollama (lokalne modele LLM), Tesseract OCR (`pol`)
+- **AI / OCR:** Gemma 4 31B (open source) przez EdenAI lub lokalną Ollamę, Tesseract OCR (`pol`), OpenCV
 - **Deployment:** Docker, Docker Compose
 
 ## Konfiguracja (`.env`)
@@ -38,9 +38,10 @@ cp .env.example .env
 | Zmienna | Opis | Wartość domyślna | Wymagana |
 |---|---|---|---|
 | `MAX_FILE_SIZE_MB` | Maksymalny rozmiar przesyłanego pliku w MB | `10` | Nie |
-| `LLM_BASE_URL` | Adres API kompatybilnego z OpenAI (`/chat/completions`). W `docker-compose.yml` nadpisywane na `http://ollama:11434/v1` | `https://api.groq.com/openai/v1` | Nie |
+| `LLM_BASE_URL` | Adres API kompatybilnego z OpenAI: bazowy (`…/v1`) albo pełny endpoint (`…/chat/completions`). Lokalna Ollama: `http://localhost:11434/v1` | `https://api.groq.com/openai/v1` (w `docker-compose.yml`: `https://api.edenai.run/v3`) | Nie |
 | `LLM_API_KEY` | Klucz API (dla lokalnej Ollamy dowolna niepusta wartość, np. `ollama`) | brak | Tak |
-| `LLM_MODEL` | Nazwa modelu językowego (np. z `ollama list`) | brak | Tak |
+| `LLM_MODEL` | Nazwa modelu. Dla EdenAI z przypiętym dostawcą, np. `google/gemma-4-31b-it` (bez prefiksu EdenAI wybiera dostawcę sam, a część z nich nie trzyma się schematu odpowiedzi) | brak (w `docker-compose.yml`: `google/gemma-4-31b-it`) | Tak |
+| `LLM_FALLBACK_MODEL` | Ten sam model u innego dostawcy, używany od razu, gdy `LLM_MODEL` odpowie HTTP 429 (limit zapytań). Pusty: ponowienia po 5, 15 i 30 s | pusty (w `docker-compose.yml`: `deepinfra/google/gemma-4-31B-it`) | Nie |
 | `LLM_TIMEOUT_S` | Limit czasu oczekiwania na odpowiedź modelu w sekundach | `300` | Nie |
 | `OCR_LANG` | Kod języka dla Tesseract OCR | `pol` | Nie |
 | `EMIT_VALIDATORS` | Czy emitować walidatory pól w wynikowym JSON-ie | `true` | Nie |
@@ -53,13 +54,15 @@ cp .env.example .env
 cp .env.example .env
 ```
 
-2. Zbuduj obraz i uruchom serwisy (`app` oraz `ollama`):
+   Wpisz w nim `LLM_API_KEY` (klucz EdenAI). Model i adres API mają w `docker-compose.yml` wartości domyślne (EdenAI, Gemma 4 31B przez Google, zapasowo przez DeepInfra), które nadpiszesz zmiennymi w `.env`.
+
+2. Zbuduj obraz i uruchom serwis `app`:
 
 ```bash
 docker compose up --build
 ```
 
-Przy pierwszym uruchomieniu kontener `ollama` automatycznie pobierze model z `LLM_MODEL` i zapisze go w wolumenie `ollama_data`.
+Obraz zawiera Tesseract z językiem polskim i zbudowany frontend. Kontener działa jako użytkownik bez uprawnień roota, a port 3000 jest wystawiony tylko na `127.0.0.1`.
 
 3. Sprawdź działanie usługi:
 
@@ -83,7 +86,7 @@ docker run --rm -p 3000:3000 --env-file .env cyfryzacja-formularzy:1.0.0
 
 ## Uruchomienie lokalne (bez Dockera)
 
-Wymagania: Python 3.14+, `uv`, `tesseract-ocr` z pakietem `tesseract-ocr-pol` oraz działająca lokalnie Ollama (lub inne API zgodne z OpenAI w `.env` do celów deweloperskich).
+Wymagania: Python 3.14+, `uv`, `tesseract-ocr` z pakietem `tesseract-ocr-pol` oraz klucz do API zgodnego z OpenAI w `.env` (EdenAI albo lokalna Ollama).
 
 ```bash
 cp .env.example .env
@@ -159,7 +162,9 @@ Testy w `tests/ai/` nie łączą się z żadnym API. HTTP jest zamockowany (`htt
 - poprawną odpowiedź: wynik to `FormSpec`, a żądanie ma `temperature=0`, schemat `FormSpec`, model i klucz z ustawień,
 - niepoprawną odpowiedź: jedna ponowna próba z dopisanym błędem walidacji, po drugiej porażce błąd `LLM_INVALID_RESPONSE` (502),
 - przejście na zwykły tryb JSON, gdy model nie obsługuje `json_schema`,
-- timeout, brak połączenia, 429 i 5xx: błąd `LLM_UNAVAILABLE` (503); zły klucz: błąd `LLM_CONFIG`,
+- 429: natychmiastowe przejście na `LLM_FALLBACK_MODEL`, a bez niego ponowienia po 5, 15 i 30 s,
+- timeout, brak połączenia, 5xx i 429 po ponowieniach: błąd `LLM_UNAVAILABLE` (503); zły klucz: błąd `LLM_CONFIG`,
+- długi formularz z dużą luką w odpowiedzi: jedno zapytanie uzupełniające, a przy jego błędzie zostaje pierwsza odpowiedź,
 - pusty dokument: błąd `EMPTY_DOCUMENT`, bez wywołania LLM.
 
 ### Ręczny test analizy LLM na prawdziwym modelu
@@ -184,8 +189,8 @@ Wynik to `FormSpec`: tytuł, urząd, flagi (`allows_other_person`, `allows_legal
 ### Aplikacja
 
 ```bash
-uv run hacknation-2026          # http://localhost:8000, sprawdzenie: GET /api/health
+uv run hacknation-2026          # http://localhost:3000, sprawdzenie: GET /api/health
 docker compose up --build       # http://localhost:3000
 ```
 
-`POST /api/forms/convert` (plik w polu `file`) zwraca `form` (gotowy JSON formularza zgodny z `FormDefinition`), `warnings` oraz `proposed_dictionaries`, czyli propozycje nowych słowników z nazwą, przykładowymi wartościami i polami, które by ich używały.
+`POST /api/forms/convert` (plik w polu `file`) zwraca `form` (gotowy JSON formularza zgodny z `FormDefinition`), `warnings` (naruszenia reguł technicznych z kontroli reguł, jako tekst „komunikat (ścieżka)”) oraz `proposed_dictionaries`, czyli propozycje nowych słowników z nazwą, przykładowymi wartościami i polami, które by ich używały.
