@@ -1,0 +1,771 @@
+{
+  "1": {
+    "pliki": [
+      {
+        "plik": "Wniosek o ustalenie numeru porządkowego nieruchomości (1).png",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o ustalenie numeru porządkowego",
+        "pola": 55,
+        "naruszenia": 0,
+        "czas_s": 8
+      },
+      {
+        "plik": "Wniosek o ustalenie numeru porządkowego nieruchomości.doc",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o ustalenie numeru porządkowego",
+        "pola": 55,
+        "naruszenia": 0,
+        "czas_s": 8
+      },
+      {
+        "plik": "Wniosek o ustalenie numeru porządkowego nieruchomości.docx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o ustalenie numeru porządkowego",
+        "pola": 55,
+        "naruszenia": 0,
+        "czas_s": 8
+      },
+      {
+        "plik": "Wniosek o ustalenie numeru porządkowego nieruchomości.jpeg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o ustalenie numeru porządkowego",
+        "pola": 55,
+        "naruszenia": 0,
+        "czas_s": 8
+      },
+      {
+        "plik": "Wniosek o ustalenie numeru porządkowego nieruchomości.jpg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o ustalenie numeru porządkowego",
+        "pola": 55,
+        "naruszenia": 0,
+        "czas_s": 8
+      },
+      {
+        "plik": "Wniosek o ustalenie numeru porządkowego nieruchomości.ods",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o ustalenie numeru porządkowego",
+        "pola": 55,
+        "naruszenia": 0,
+        "czas_s": 7
+      },
+      {
+        "plik": "Wniosek o ustalenie numeru porządkowego nieruchomości.pdf",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o ustalenie numeru porządkowego",
+        "pola": 55,
+        "naruszenia": 0,
+        "czas_s": 11
+      },
+      {
+        "plik": "Wniosek o ustalenie numeru porządkowego nieruchomości.xlsx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o ustalenie numeru porządkowego",
+        "pola": 55,
+        "naruszenia": 0,
+        "czas_s": 11
+      }
+    ],
+    "zgodnosc_formatow": 1.0,
+    "naruszenia": 0,
+    "wzorzec": {
+      "Wniosek o ustalenie numeru porządkowego nieruchomości (1).png": {
+        "strony": 0.5,
+        "etykiety": 0.84,
+        "typy": 1.0,
+        "states": "21/21"
+      },
+      "Wniosek o ustalenie numeru porządkowego nieruchomości.doc": {
+        "strony": 0.5,
+        "etykiety": 0.84,
+        "typy": 1.0,
+        "states": "21/21"
+      },
+      "Wniosek o ustalenie numeru porządkowego nieruchomości.docx": {
+        "strony": 0.5,
+        "etykiety": 0.84,
+        "typy": 1.0,
+        "states": "21/21"
+      },
+      "Wniosek o ustalenie numeru porządkowego nieruchomości.jpeg": {
+        "strony": 0.5,
+        "etykiety": 0.84,
+        "typy": 1.0,
+        "states": "21/21"
+      },
+      "Wniosek o ustalenie numeru porządkowego nieruchomości.jpg": {
+        "strony": 0.5,
+        "etykiety": 0.84,
+        "typy": 1.0,
+        "states": "21/21"
+      },
+      "Wniosek o ustalenie numeru porządkowego nieruchomości.ods": {
+        "strony": 0.5,
+        "etykiety": 0.84,
+        "typy": 1.0,
+        "states": "21/21"
+      },
+      "Wniosek o ustalenie numeru porządkowego nieruchomości.pdf": {
+        "strony": 0.5,
+        "etykiety": 0.84,
+        "typy": 1.0,
+        "states": "21/21"
+      },
+      "Wniosek o ustalenie numeru porządkowego nieruchomości.xlsx": {
+        "strony": 0.5,
+        "etykiety": 0.84,
+        "typy": 1.0,
+        "states": "21/21"
+      }
+    }
+  },
+  "2": {
+    "pliki": [
+      {
+        "plik": "Wniosek o zwrot opłaty skarbowej.doc",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o zwrot opłaty skarbowej",
+        "pola": 60,
+        "naruszenia": 0,
+        "czas_s": 27
+      },
+      {
+        "plik": "Wniosek o zwrot opłaty skarbowej.docx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o zwrot opłaty skarbowej",
+        "pola": 60,
+        "naruszenia": 0,
+        "czas_s": 22
+      },
+      {
+        "plik": "Wniosek o zwrot opłaty skarbowej.jpeg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o zwrot opłaty skarbowej",
+        "pola": 60,
+        "naruszenia": 0,
+        "czas_s": 22
+      },
+      {
+        "plik": "Wniosek o zwrot opłaty skarbowej.jpg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o zwrot opłaty skarbowej",
+        "pola": 60,
+        "naruszenia": 0,
+        "czas_s": 31
+      },
+      {
+        "plik": "Wniosek o zwrot opłaty skarbowej.ods",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o zwrot opłaty skarbowej",
+        "pola": 60,
+        "naruszenia": 0,
+        "czas_s": 36
+      },
+      {
+        "plik": "Wniosek o zwrot opłaty skarbowej.pdf",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o zwrot opłaty skarbowej",
+        "pola": 60,
+        "naruszenia": 0,
+        "czas_s": 35
+      },
+      {
+        "plik": "Wniosek o zwrot opłaty skarbowej.png",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o zwrot opłaty skarbowej",
+        "pola": 60,
+        "naruszenia": 0,
+        "czas_s": 35
+      },
+      {
+        "plik": "Wniosek o zwrot opłaty skarbowej.xlsx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o zwrot opłaty skarbowej",
+        "pola": 60,
+        "naruszenia": 0,
+        "czas_s": 44
+      }
+    ],
+    "zgodnosc_formatow": 0.97,
+    "naruszenia": 0
+  },
+  "3": {
+    "pliki": [
+      {
+        "plik": "Wniosek o wydanie zaświadczenia.doc",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zaświadczenia",
+        "pola": 39,
+        "naruszenia": 0,
+        "czas_s": 25
+      },
+      {
+        "plik": "Wniosek o wydanie zaświadczenia.docx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zaświadczenia",
+        "pola": 39,
+        "naruszenia": 0,
+        "czas_s": 39
+      },
+      {
+        "plik": "Wniosek o wydanie zaświadczenia.jpeg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zaświadczenia",
+        "pola": 39,
+        "naruszenia": 0,
+        "czas_s": 38
+      },
+      {
+        "plik": "Wniosek o wydanie zaświadczenia.jpg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zaświadczenia",
+        "pola": 39,
+        "naruszenia": 0,
+        "czas_s": 32
+      },
+      {
+        "plik": "Wniosek o wydanie zaświadczenia.ods",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zaświadczenia",
+        "pola": 39,
+        "naruszenia": 0,
+        "czas_s": 41
+      },
+      {
+        "plik": "Wniosek o wydanie zaświadczenia.pdf",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zaświadczenia",
+        "pola": 39,
+        "naruszenia": 0,
+        "czas_s": 44
+      },
+      {
+        "plik": "Wniosek o wydanie zaświadczenia.png",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zaświadczenia",
+        "pola": 39,
+        "naruszenia": 0,
+        "czas_s": 28
+      },
+      {
+        "plik": "Wniosek o wydanie zaświadczenia.xlsx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zaświadczenia",
+        "pola": 39,
+        "naruszenia": 0,
+        "czas_s": 21
+      }
+    ],
+    "zgodnosc_formatow": 0.87,
+    "naruszenia": 0
+  },
+  "4": {
+    "pliki": [
+      {
+        "plik": "Wniosek o wynajęcie świetlicy.doc",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wynajęcie/użyczenie świetlicy wiejskiej",
+        "pola": 41,
+        "naruszenia": 0,
+        "czas_s": 23
+      },
+      {
+        "plik": "Wniosek o wynajęcie świetlicy.docx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wynajęcie/użyczenie świetlicy wiejskiej",
+        "pola": 41,
+        "naruszenia": 0,
+        "czas_s": 23
+      },
+      {
+        "plik": "Wniosek o wynajęcie świetlicy.jpeg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wynajęcie/użyczenie świetlicy wiejskiej",
+        "pola": 41,
+        "naruszenia": 0,
+        "czas_s": 28
+      },
+      {
+        "plik": "Wniosek o wynajęcie świetlicy.jpg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wynajęcie/użyczenie świetlicy wiejskiej",
+        "pola": 42,
+        "naruszenia": 0,
+        "czas_s": 30
+      },
+      {
+        "plik": "Wniosek o wynajęcie świetlicy.ods",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wynajęcie/użyczenie świetlicy wiejskiej",
+        "pola": 41,
+        "naruszenia": 0,
+        "czas_s": 45
+      },
+      {
+        "plik": "Wniosek o wynajęcie świetlicy.pdf",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wynajęcie/użyczenie świetlicy wiejskiej",
+        "pola": 41,
+        "naruszenia": 0,
+        "czas_s": 31
+      },
+      {
+        "plik": "Wniosek o wynajęcie świetlicy.png",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wynajęcie/użyczenie świetlicy wiejskiej",
+        "pola": 41,
+        "naruszenia": 0,
+        "czas_s": 39
+      },
+      {
+        "plik": "Wniosek o wynajęcie świetlicy.xlsx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wynajęcie/użyczenie świetlicy wiejskiej",
+        "pola": 41,
+        "naruszenia": 0,
+        "czas_s": 28
+      }
+    ],
+    "zgodnosc_formatow": 0.89,
+    "naruszenia": 0
+  },
+  "5": {
+    "pliki": [
+      {
+        "plik": "Wniosek o stwierdzenie nadpłaty podatku.DOC",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o stwierdzenie nadpłaty podatku",
+        "pola": 58,
+        "naruszenia": 0,
+        "czas_s": 28
+      },
+      {
+        "plik": "Wniosek o stwierdzenie nadpłaty podatku.JPG",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o stwierdzenie nadpłaty podatku",
+        "pola": 58,
+        "naruszenia": 0,
+        "czas_s": 26
+      },
+      {
+        "plik": "Wniosek o stwierdzenie nadpłaty podatku.ODS",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o stwierdzenie nadpłaty podatku",
+        "pola": 58,
+        "naruszenia": 0,
+        "czas_s": 36
+      },
+      {
+        "plik": "Wniosek o stwierdzenie nadpłaty podatku.PDF",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o stwierdzenie nadpłaty podatku",
+        "pola": 58,
+        "naruszenia": 0,
+        "czas_s": 24
+      },
+      {
+        "plik": "Wniosek o stwierdzenie nadpłaty podatku.PNG",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o stwierdzenie nadpłaty podatku",
+        "pola": 58,
+        "naruszenia": 0,
+        "czas_s": 31
+      },
+      {
+        "plik": "Wniosek o stwierdzenie nadpłaty podatku.docx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o stwierdzenie nadpłaty podatku",
+        "pola": 58,
+        "naruszenia": 0,
+        "czas_s": 22
+      },
+      {
+        "plik": "Wniosek o stwierdzenie nadpłaty podatku.jpeg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o stwierdzenie nadpłaty podatku",
+        "pola": 58,
+        "naruszenia": 0,
+        "czas_s": 24
+      }
+    ],
+    "zgodnosc_formatow": 0.98,
+    "naruszenia": 0,
+    "wzorzec": {
+      "Wniosek o stwierdzenie nadpłaty podatku.DOC": {
+        "strony": 0.75,
+        "etykiety": 0.72,
+        "typy": 1.0,
+        "states": "23/23"
+      },
+      "Wniosek o stwierdzenie nadpłaty podatku.JPG": {
+        "strony": 0.75,
+        "etykiety": 0.72,
+        "typy": 1.0,
+        "states": "23/23"
+      },
+      "Wniosek o stwierdzenie nadpłaty podatku.ODS": {
+        "strony": 0.75,
+        "etykiety": 0.72,
+        "typy": 1.0,
+        "states": "23/23"
+      },
+      "Wniosek o stwierdzenie nadpłaty podatku.PDF": {
+        "strony": 0.75,
+        "etykiety": 0.72,
+        "typy": 1.0,
+        "states": "23/23"
+      },
+      "Wniosek o stwierdzenie nadpłaty podatku.PNG": {
+        "strony": 0.75,
+        "etykiety": 0.72,
+        "typy": 1.0,
+        "states": "23/23"
+      },
+      "Wniosek o stwierdzenie nadpłaty podatku.docx": {
+        "strony": 0.75,
+        "etykiety": 0.72,
+        "typy": 1.0,
+        "states": "23/23"
+      },
+      "Wniosek o stwierdzenie nadpłaty podatku.jpeg": {
+        "strony": 0.75,
+        "etykiety": 0.72,
+        "typy": 1.0,
+        "states": "23/23"
+      }
+    }
+  },
+  "6": {
+    "pliki": [
+      {
+        "plik": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego.doc",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego w celu prowadzenia robót",
+        "pola": 55,
+        "naruszenia": 0,
+        "czas_s": 17
+      },
+      {
+        "plik": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego.docx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego w celu prowadzenia robót",
+        "pola": 68,
+        "naruszenia": 0,
+        "czas_s": 45
+      },
+      {
+        "plik": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego.jpeg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego w celu prowadzenia robót",
+        "pola": 63,
+        "naruszenia": 0,
+        "czas_s": 32
+      },
+      {
+        "plik": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego.jpg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego w celu prowadzenia robót",
+        "pola": 73,
+        "naruszenia": 0,
+        "czas_s": 90
+      },
+      {
+        "plik": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego.ods",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego w celu prowadzenia robót",
+        "pola": 73,
+        "naruszenia": 0,
+        "czas_s": 56
+      },
+      {
+        "plik": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego.pdf",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego w celu prowadzenia robót",
+        "pola": 60,
+        "naruszenia": 0,
+        "czas_s": 37
+      },
+      {
+        "plik": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego.png",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego w celu prowadzenia robót",
+        "pola": 76,
+        "naruszenia": 0,
+        "czas_s": 103
+      },
+      {
+        "plik": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego.xlsx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na zajęcie pasa drogowego w celu prowadzenia robót",
+        "pola": 77,
+        "naruszenia": 0,
+        "czas_s": 94
+      }
+    ],
+    "zgodnosc_formatow": 0.67,
+    "naruszenia": 0
+  },
+  "7": {
+    "pliki": [
+      {
+        "plik": "Wniosek o wydanie zezwolenia na hodowanie lub utrzymywanie psów ras uznawanychza agresywne.DOC",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na hodowanie lub utrzymywanie psów ras uznawanych za agresywne",
+        "pola": 46,
+        "naruszenia": 0,
+        "czas_s": 43
+      },
+      {
+        "plik": "Wniosek o wydanie zezwolenia na hodowanie lub utrzymywanie psów ras uznawanychza agresywne.JPEG",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na hodowanie lub utrzymywanie psów ras uznawanych za agresywne",
+        "pola": 49,
+        "naruszenia": 0,
+        "czas_s": 79
+      },
+      {
+        "plik": "Wniosek o wydanie zezwolenia na hodowanie lub utrzymywanie psów ras uznawanychza agresywne.JPG",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na hodowanie lub utrzymywanie psów ras uznawanych za agresywne",
+        "pola": 48,
+        "naruszenia": 0,
+        "czas_s": 89
+      },
+      {
+        "plik": "Wniosek o wydanie zezwolenia na hodowanie lub utrzymywanie psów ras uznawanychza agresywne.ODS",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na hodowanie lub utrzymywanie psów ras uznawanych za agresywne",
+        "pola": 49,
+        "naruszenia": 0,
+        "czas_s": 99
+      },
+      {
+        "plik": "Wniosek o wydanie zezwolenia na hodowanie lub utrzymywanie psów ras uznawanychza agresywne.PDF",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na hodowanie lub utrzymywanie psów ras uznawanych za agresywne",
+        "pola": 50,
+        "naruszenia": 0,
+        "czas_s": 85
+      },
+      {
+        "plik": "Wniosek o wydanie zezwolenia na hodowanie lub utrzymywanie psów ras uznawanychza agresywne.PNG",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o wydanie zezwolenia na hodowanie lub utrzymywanie psów ras uznawanych za agresywne",
+        "pola": 49,
+        "naruszenia": 0,
+        "czas_s": 133
+      }
+    ],
+    "zgodnosc_formatow": 0.82,
+    "naruszenia": 0
+  },
+  "8": {
+    "pliki": [
+      {
+        "plik": "Deklaracja o wysokości opłaty.doc",
+        "status": 200,
+        "blad": null,
+        "tytul": "Deklaracja o wysokości miesięcznej opłaty za gospodarowanie odpadami komunalnymi",
+        "pola": 83,
+        "naruszenia": 0,
+        "czas_s": 246
+      },
+      {
+        "plik": "Deklaracja o wysokości opłaty.docx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Deklaracja o wysokości miesięcznej opłaty za gospodarowanie odpadami komunalnymi",
+        "pola": 62,
+        "naruszenia": 0,
+        "czas_s": 115
+      },
+      {
+        "plik": "Deklaracja o wysokości opłaty.jpeg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Deklaracja o wysokości miesięcznej opłaty za gospodarowanie odpadami komunalnymi",
+        "pola": 98,
+        "naruszenia": 0,
+        "czas_s": 271
+      },
+      {
+        "plik": "Deklaracja o wysokości opłaty.jpg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Deklaracja o wysokości miesięcznej opłaty za gospodarowanie odpadami komunalnymi",
+        "pola": 84,
+        "naruszenia": 0,
+        "czas_s": 197
+      },
+      {
+        "plik": "Deklaracja o wysokości opłaty.ods",
+        "status": 200,
+        "blad": null,
+        "tytul": "Deklaracja o wysokości miesięcznej opłaty za gospodarowanie odpadami komunalnymi",
+        "pola": 88,
+        "naruszenia": 0,
+        "czas_s": 285
+      },
+      {
+        "plik": "Deklaracja o wysokości opłaty.pdf",
+        "status": 200,
+        "blad": null,
+        "tytul": "Deklaracja o wysokości miesięcznej opłaty za gospodarowanie odpadami komunalnymi",
+        "pola": 95,
+        "naruszenia": 0,
+        "czas_s": 275
+      },
+      {
+        "plik": "Deklaracja o wysokości opłaty.png",
+        "status": 200,
+        "blad": null,
+        "tytul": "Deklaracja o wysokości miesięcznej opłaty za gospodarowanie odpadami komunalnymi",
+        "pola": 98,
+        "naruszenia": 0,
+        "czas_s": 254
+      },
+      {
+        "plik": "Deklaracja o wysokości opłaty.xlsx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Deklaracja o wysokości miesięcznej opłaty za gospodarowanie odpadami komunalnymi",
+        "pola": 104,
+        "naruszenia": 0,
+        "czas_s": 253
+      }
+    ],
+    "zgodnosc_formatow": 0.51,
+    "naruszenia": 0
+  },
+  "9": {
+    "pliki": [
+      {
+        "plik": "Wniosek o przyznanie stypendium.doc",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o przyznanie stypendium sportowego / nagrody sportowej / wyróżnienia sportowego Rady Miasta Zgierza",
+        "pola": 97,
+        "naruszenia": 0,
+        "czas_s": 215
+      },
+      {
+        "plik": "Wniosek o przyznanie stypendium.docx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o przyznanie stypendium sportowego / nagrody sportowej / wyróżnienia sportowego Rady Miasta Zgierza",
+        "pola": 74,
+        "naruszenia": 0,
+        "czas_s": 128
+      },
+      {
+        "plik": "Wniosek o przyznanie stypendium.jpeg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o przyznanie stypendium sportowego / nagrody sportowej / wyróżnienia sportowego Rady Miasta Zgierza",
+        "pola": 74,
+        "naruszenia": 0,
+        "czas_s": 180
+      },
+      {
+        "plik": "Wniosek o przyznanie stypendium.jpg",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o przyznanie stypendium sportowego / nagrody sportowej / wyróżnienia sportowego Rady Miasta Zgierza",
+        "pola": 74,
+        "naruszenia": 0,
+        "czas_s": 258
+      },
+      {
+        "plik": "Wniosek o przyznanie stypendium.ods",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o przyznanie stypendium sportowego / nagrody sportowej / wyróżnienia sportowego Rady Miasta Zgierza",
+        "pola": 77,
+        "naruszenia": 0,
+        "czas_s": 256
+      },
+      {
+        "plik": "Wniosek o przyznanie stypendium.pdf",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o przyznanie stypendium sportowego / nagrody sportowej / wyróżnienia sportowego Rady Miasta Zgierza",
+        "pola": 70,
+        "naruszenia": 0,
+        "czas_s": 105
+      },
+      {
+        "plik": "Wniosek o przyznanie stypendium.png",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o przyznanie stypendium sportowego / nagrody sportowej / wyróżnienia sportowego Rady Miasta Zgierza",
+        "pola": 75,
+        "naruszenia": 0,
+        "czas_s": 255
+      },
+      {
+        "plik": "Wniosek o przyznanie stypendium.xlsx",
+        "status": 200,
+        "blad": null,
+        "tytul": "Wniosek o przyznanie stypendium sportowego / nagrody sportowej / wyróżnienia sportowego Rady Miasta Zgierza",
+        "pola": 76,
+        "naruszenia": 0,
+        "czas_s": 251
+      }
+    ],
+    "zgodnosc_formatow": 0.63,
+    "naruszenia": 0
+  }
+}
