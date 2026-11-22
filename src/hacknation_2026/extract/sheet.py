@@ -1,4 +1,4 @@
-"""Spreadsheet extraction (block B3): forms laid out in XLSX / ODS cells, one sheet = one page.
+"""Spreadsheet extraction: forms laid out in XLSX / ODS cells, one sheet = one page.
 
 Fill-in places are not text in a spreadsheet: they are empty cells with borders. Every cell or merged range
 becomes an item with its position (rows, column); items that overlap vertically form one visual line,

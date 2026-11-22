@@ -1,4 +1,4 @@
-"""Block D: FormSpec -> FormDefinition."""
+"""FormSpec -> FormDefinition."""
 
 from hacknation_2026.builder.build import build_form
 

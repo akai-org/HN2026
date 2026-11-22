@@ -1,4 +1,4 @@
-"""Text helpers shared by the extractors (blocks B1-B3)."""
+"""Text helpers shared by the extractors."""
 
 import re
 

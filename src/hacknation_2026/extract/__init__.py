@@ -1,4 +1,4 @@
-"""Picks the extractor for a detected file format (blocks B1-B3)."""
+"""Picks the extractor for a detected file format."""
 
 from hacknation_2026.contracts import ExtractedDocument, FileFormat
 from hacknation_2026.extract.image import extract_image

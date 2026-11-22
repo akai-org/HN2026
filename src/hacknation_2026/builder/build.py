@@ -1,49 +1,33 @@
-"""Block D: FormSpec (LLM output) -> FormDefinition. Plain Python, no AI.
+"""FormSpec (LLM output) -> FormDefinition. Plain Python, no AI.
 
 The output follows the specification in `dane_zadania/materialy/` (Reguły techniczne, Opis importowanego pliku JSON,
 Standardy, Słowniki, Dane inicjalne). Rules that hold for every field are enforced here, in FieldFactory.
 """
 
-from dataclasses import dataclass, field as dc_field
+from dataclasses import dataclass
 
 from hacknation_2026 import initial_data
 from hacknation_2026.builder import jsonata, layout, standard_sections as std
 from hacknation_2026.config import Settings
 from hacknation_2026.contracts import Condition, FieldSpec, FormDefinition, FormSpec, PageSpec
+from hacknation_2026.enrich.enrich import Enrichment, enrich_field
 from hacknation_2026.initial_data import EXTERNAL_SYSTEM
-from hacknation_2026.rules.check import allowed_validators
+from hacknation_2026.rules.check import CHOICE_TYPES, MAX_TITLE, VALIDATORS, allowed_validators
 
-from hacknation_2026.enrich.enrich import enrich_field
-
-MAX_TITLE_LENGTH = 255  # Reguły techniczne: title max 255 characters
-# Reguły techniczne: the list of validators
-VALIDATORS = ("REQUIRED", "EMAIL", "PESEL", "NIP", "REGON", "ZIP_CODE", "EPUAP", "ADE", "SERIAL_NUMBER_ID_CARD")
 # presentational types: no required attribute, no input
 NO_VALIDATION = {"TEXT_BLOCK", "INFO_SECTION", "CONSENT_SECTION"}
 MAX_RADIO_OPTIONS = 5     # Standardy: dropdown when there are more than 5 options
 SEARCH_FROM_OPTIONS = 16  # Standardy: search when there are more than 15 options
 
 
-@dataclass
-class _NoEnrichment:
-  dictionary_name: str | None = None
-  multi_level_tree: bool = False
-  search_enabled: bool = False
-  default_value: str | None = None
-  external: bool = False
-  read_only: bool = False
-  validators: list[str] = dc_field(default_factory=list)
-  field_type: str | None = None
-
-
 class FieldFactory:
-  """Builds a field node. Explicit arguments win over block E's enrichment; the technical rules win over both:
+  """Builds a field node. Explicit arguments win over the enrichment; the technical rules win over both:
 
   - initial data (`defaultValueType: EXTERNAL_SYSTEM`) => read-only (Dane inicjalne), except the register attributes
     in `initial_data.EDITABLE_INITIAL_DATA` (domain experts: may be outdated), which are editable,
   - a dictionary only on SELECT/RADIO/CHECKBOX, and then `options` is empty (Reguły techniczne, Słowniki),
-  - block E may turn a TEXT_FIELD into a more specific type (country -> SELECT with Kraje, birth date -> DATEPICKER),
-  - block E's dictionary only for a field without options of its own: the paper form's options are kept,
+  - enrichment may turn a TEXT_FIELD into a more specific type (country -> SELECT with Kraje, birth date -> DATEPICKER),
+  - the enrichment's dictionary only for a field without options of its own: the paper form's options are kept,
   - validators only those allowed for the type (`rules.check.allowed_validators`: any on TEXT_FIELD, only REQUIRED
     on other inputs, none on presentational types), REQUIRED for required fields,
   - RADIO with more than 5 options becomes SELECT; SELECT with more than 15 options gets search (Standardy).
@@ -72,7 +56,7 @@ class FieldFactory:
     option_names = list(option_names or [])
     if type_ == "RADIO" and len(option_names) > MAX_RADIO_OPTIONS:
       type_ = "SELECT"
-    enrichment = self._enrich(title, type_, required, applicant_data) if enrich else _NoEnrichment()
+    enrichment = self._enrich(title, type_, required, applicant_data) if enrich else Enrichment()
     if enrichment.field_type and type_ == "TEXT_FIELD":
       type_ = enrichment.field_type
 
@@ -91,7 +75,7 @@ class FieldFactory:
       )
     optional.update(extra)
 
-    if type_ not in layout.CHOICE_TYPES:
+    if type_ not in CHOICE_TYPES:
       option_names = []
       for key in ("dictionaryName", "multiLevelTree", "searchEnabled"):
         optional.pop(key, None)
@@ -124,7 +108,7 @@ class FieldFactory:
 
   def _enrich(self, label: str, type_: str, required: bool, applicant_data: bool):
     if type_ in NO_VALIDATION:
-      return _NoEnrichment()
+      return Enrichment()
     return enrich_field(label, type_, required, applicant_data)
 
 
@@ -176,7 +160,7 @@ def _tech_names(pages: list[PageSpec]) -> tuple[list[list[str]], list[list[list[
 def condition_states(conditions: list[Condition], addresses: dict[str, Address]) -> list[dict]:
   """`show_if` as a SHOW state: conditions on different fields are ANDed, several options of the same field are ORed
   (the model writes "Mikroprocesor" and "Tatuaż" for one field, and a single choice cannot hold both).
-  Conditions pointing at unknown fields are dropped (block F reports them)."""
+  Conditions pointing at unknown fields are dropped (the rule check reports them)."""
   by_field: dict[str, list[str]] = {}
   for c in conditions:
     if c.field in addresses:
@@ -232,4 +216,4 @@ def build_form(spec: FormSpec, settings: Settings) -> FormDefinition:
     layout.page(std.CONTACT_PAGE, std.contact_sections(spec, make)),
     layout.page(std.FINISH_PAGE, std.finish_sections(spec, make), type_="FINISH"),
   ]
-  return {"title": spec.title.strip()[:MAX_TITLE_LENGTH], "tabs": tabs, "flow": layout.flow(tabs)}
+  return {"title": spec.title.strip()[:MAX_TITLE], "tabs": tabs, "flow": layout.flow(tabs)}

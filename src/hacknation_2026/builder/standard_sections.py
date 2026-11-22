@@ -4,16 +4,16 @@ Source of truth: the specification documents in `dane_zadania/materialy/` (Stand
 inicjalne, Słowniki). The reference JSONs are not followed where they differ. Generic for every form: only
 `spec.title`, `spec.authority_*`, the flags and `spec.consents` are used.
 
-Every standard field is configured explicitly (validators, initial data), without block E's label matching.
+Every standard field is configured explicitly (validators, initial data), without the enrichment's label matching.
 """
 
-import unicodedata
 from functools import partial
 from typing import Protocol
 
 from hacknation_2026.builder import jsonata
 from hacknation_2026.builder.layout import html_text, section, slug
 from hacknation_2026.contracts import FormSpec
+from hacknation_2026.enrich.enrich import normalize
 
 DATA_PAGE = "Dane"
 CONTACT_PAGE = "Kontakt i zgody"
@@ -276,13 +276,9 @@ def data_page_sections(spec: FormSpec, make: MakeField) -> list[dict]:
 
 # --- penultimate page: contact and consents ---------------------------------------------------------------------------
 
-def _plain(text: str) -> str:
-  return unicodedata.normalize("NFKD", text.lower()).encode("ascii", "ignore").decode()
-
-
 def consent_title(statements: list[str]) -> str:
   """Standardy: "Oświadczenie" when only statements, "Zgody i oświadczenia" when mixed, otherwise "Zgoda"."""
-  is_statement = ["oswiadcz" in _plain(text) for text in statements]
+  is_statement = ["oswiadcz" in normalize(text) for text in statements]
   if all(is_statement):
     return "Oświadczenie"
   if any(is_statement):
@@ -298,7 +294,7 @@ def contact_sections(spec: FormSpec, make: MakeField) -> list[dict]:
   ], description=CONTACT_DESCRIPTION)
   # The standard data-processing consent always stays; statements from the paper form are added next to it.
   statements = [DEFAULT_CONSENT] + [c.strip() for c in spec.consents
-                                    if c.strip() and _plain(c) != _plain(DEFAULT_CONSENT)]
+                                    if c.strip() and normalize(c) != normalize(DEFAULT_CONSENT)]
   consents = [{"description": html_text(text), "required": True} for text in statements]
   config = {"consents": consents, "required": any(c["required"] for c in consents), "files": []}
   if len(consents) > 1:

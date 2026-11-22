@@ -1,4 +1,4 @@
-"""Block E: field enrichment from the label, checked against the documents in dane_zadania/materialy/."""
+"""Field enrichment from the label, checked against the documents in dane_zadania/materialy/."""
 
 from collections import Counter
 
@@ -8,6 +8,7 @@ from hacknation_2026.builder import build_form
 from hacknation_2026.config import Settings
 from hacknation_2026.contracts import FieldSpec, FormSpec, PageSpec, SectionSpec
 from hacknation_2026.enrich import catalog, enrich_field, normalize, proposed_dictionaries
+from hacknation_2026.rules.check import VALIDATORS
 
 
 def test_normalize():
@@ -23,7 +24,7 @@ def test_catalog_follows_the_documents():
   for prefix in (catalog.TEMPORARY_PREFIX, catalog.PERMANENT_PREFIX):
     assert {prefix + r.value for r in catalog.REGISTERED_ADDRESS_RULES} <= set(catalog.ATTRIBUTES)
   # Reguły techniczne: only validators from the allowed list
-  assert {r.value for r in catalog.VALIDATOR_RULES} <= set(catalog.VALIDATORS)
+  assert {r.value for r in catalog.VALIDATOR_RULES} <= set(VALIDATORS)
   # Standardy name these two; the rest of the example dictionaries has no technical name in the documents
   assert {d.value for d in catalog.DICTIONARIES} == {"Kraje", "TERYT_4G_DOWODOWY"}
   # every phrase is already normalized, otherwise it could never match
@@ -190,7 +191,7 @@ def test_no_proposals_for_short_trivial_predefined_or_long_values():
   assert proposed_dictionaries(spec) == []
 
 
-# --- with the real builder (block D) ----------------------------------------------------------------------------------
+# --- with the real builder --------------------------------------------------------------------------------------------
 
 def form_fields(form: dict):
   for tab in form["tabs"]:

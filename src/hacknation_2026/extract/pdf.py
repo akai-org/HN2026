@@ -1,4 +1,4 @@
-"""PDF extraction (block B1): text layer via pdfplumber, OCR fallback for scanned pages."""
+"""PDF extraction: text layer via pdfplumber, OCR fallback for scanned pages."""
 
 import io
 

@@ -1,4 +1,4 @@
-"""OCR of images and scanned pages (block B1)."""
+"""OCR of images and scanned pages."""
 
 import io
 import math

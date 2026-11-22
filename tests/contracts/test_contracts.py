@@ -19,7 +19,7 @@ def test_as_text_flattens_blocks_with_page_markers():
 
 
 def test_form_spec_schema_and_roundtrip():
-  # Block C sends this schema to Ollama as `format`, so it must be generatable.
+  # analyze() sends this schema to the LLM, so it must be generatable.
   assert "pages" in FormSpec.model_json_schema()["properties"]
   raw = ('{"title": "Wniosek o test", "pages": [{"title": "Sprawa", "sections": [{"key": "s", "title": "S", '
          '"fields": [{"key": "f", "label": "F", "type": "RADIO", "required": true, "options": ["A"], '

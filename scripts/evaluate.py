@@ -1,4 +1,4 @@
-"""Block I: runs every sample form through the pipeline, saves the results and reports their quality.
+"""Runs every sample form through the pipeline, saves the results and reports their quality.
 
 Usage: uv run python scripts/evaluate.py [--out wyniki/] [--only 1,5] [--workers 3]   (uses the LLM from .env)
 

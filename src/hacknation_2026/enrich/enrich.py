@@ -1,6 +1,6 @@
-"""Block E: hints for a field from its label (dictionary, initial data, validators). Plain Python, no LLM.
+"""Hints for a field from its label (dictionary, initial data, validators). Plain Python, no LLM.
 
-The builder (block D) calls `enrich_field` for every subject-matter field and applies the result under the technical
+The builder calls `enrich_field` for every subject-matter field and applies the result under the technical
 rules (e.g. initial data => read-only). Data and the documents it comes from: catalog.py.
 """
 
@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from hacknation_2026.contracts import FieldSpec, FormSpec, ProposedDictionary
 from hacknation_2026.enrich import catalog
 from hacknation_2026.enrich.catalog import Rule
+from hacknation_2026.rules.check import CHOICE_TYPES, FORMAT_VALIDATOR_TYPES, VALIDATORS
 
 Span = tuple[int, int]  # word positions [start, end) of a phrase in the label
 
@@ -23,7 +24,7 @@ class Enrichment(BaseModel):
   default_value: str | None = None  # initial data, e.g. "MLPZ.email"
   external: bool = False            # -> defaultValueType "EXTERNAL_SYSTEM"
   read_only: bool = False           # Dane inicjalne: a field fed with initial data is read-only
-  validators: list[str] = []        # from catalog.VALIDATORS; REQUIRED when the field is required
+  validators: list[str] = []        # from rules.check.VALIDATORS; REQUIRED when the field is required
   field_type: str | None = None     # the TEXT_FIELD should become this type (country -> SELECT, birth date -> DATEPICKER)
 
 
@@ -90,10 +91,10 @@ def _best(matches: list[tuple[Rule, Span]]) -> tuple[Rule, Span] | None:
 
 def _validators(words: list[str], field_type: str, required: bool) -> list[str]:
   found: set[str] = set()
-  if field_type in catalog.TEXT_INPUT_TYPES and not set(words).intersection(catalog.ALTERNATIVE_WORDS):
+  if field_type in FORMAT_VALIDATOR_TYPES and not set(words).intersection(catalog.ALTERNATIVE_WORDS):
     found = {rule.value for rule, _ in _matches(words, catalog.VALIDATOR_RULES)}
   wanted = (["REQUIRED"] if required else []) + (sorted(found) if len(found) == 1 else [])
-  return [v for v in catalog.VALIDATORS if v in wanted]
+  return [v for v in VALIDATORS if v in wanted]
 
 
 def _initial_data(words: list[str], field_type: str) -> tuple[catalog.Attribute, str] | None:
@@ -138,7 +139,6 @@ MIN_SHARED_VALUES = 3    # a shorter list is worth one when several fields repea
 MAX_VALUE_LENGTH = 60    # dictionary entries are short names, not sentences
 MAX_NAME_LENGTH = 50
 TRIVIAL_VALUES = {"tak", "nie", "nie dotyczy", "nie wiem", "inne", "inny", "inna"}
-CHOICE_TYPES = {"SELECT", "RADIO", "CHECKBOX"}
 
 
 def proposed_dictionaries(spec: FormSpec) -> list[ProposedDictionary]:

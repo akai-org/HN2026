@@ -1,4 +1,4 @@
-"""Initial data sources (Dane inicjalne) shared by the builder (block D) and the rule check (block F).
+"""Initial data sources (Dane inicjalne) shared by the builder and the rule check.
 
 A field fed from a register has `defaultValue: "SOURCE.attribute"`, `defaultValueType: EXTERNAL_SYSTEM` and is
 read-only. Domain experts allow exceptions for attributes that may be outdated in the source: those may be edited by

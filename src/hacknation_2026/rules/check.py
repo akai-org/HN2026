@@ -1,7 +1,7 @@
-"""Block F: checks a FormDefinition against the form configuration rules. Plain Python, never raises.
+"""Checks a FormDefinition against the form configuration rules. Plain Python, never raises.
 
 Sources: `dane_zadania/materialy/` (Reguły techniczne, Opis importowanego pliku JSON + schema, Słowniki, Dane inicjalne)
-plus clarifications from the domain experts (see docs/bloki/F-kontrola-regul.md):
+plus clarifications from the domain experts (see CLAUDE.md):
 - the FINISH page may hold INFO_SECTION and TEXT_BLOCK,
 - initial data (EXTERNAL_SYSTEM) is read-only, except the attributes in `initial_data.EDITABLE_INITIAL_DATA`,
 - page, field and flow link ids are UUIDs.
@@ -24,7 +24,8 @@ CHOICE_TYPES = {"SELECT", "RADIO", "CHECKBOX"}
 INPUT_TYPES = CHOICE_TYPES | {"TEXT_FIELD", "NUMBER", "TEXTAREA", "FILE_UPLOADER", "DATEPICKER"}
 FIELD_TYPES = INPUT_TYPES | {"CONSENT_SECTION", "TEXT_BLOCK", "INFO_SECTION"}
 FINISH_FIELD_TYPES = {"INFO_SECTION", "TEXT_BLOCK"}
-VALIDATORS = {"REQUIRED", "EMAIL", "PESEL", "NIP", "REGON", "ZIP_CODE", "EPUAP", "ADE", "SERIAL_NUMBER_ID_CARD"}
+# Reguły techniczne: the list of validators, in output order
+VALIDATORS = ("REQUIRED", "EMAIL", "PESEL", "NIP", "REGON", "ZIP_CODE", "EPUAP", "ADE", "SERIAL_NUMBER_ID_CARD")
 # Reguły techniczne, component tables: TEXT_FIELD may have any validator, the other inputs only REQUIRED,
 # presentational components (TEXT_BLOCK, INFO_SECTION, CONSENT_SECTION) and sections none
 FORMAT_VALIDATOR_TYPES = {"TEXT_FIELD"}
