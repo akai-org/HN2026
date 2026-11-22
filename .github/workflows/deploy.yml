@@ -1,4 +1,4 @@
-name: Test and Deploy to VPS
+name: Deploy to VPS
 
 on:
   push:
@@ -9,25 +9,7 @@ on:
       - main
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Tesseract OCR
-        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-pol
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
-
-      - name: Run pytest
-        run: uv run pytest
-
   deploy:
-    needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:

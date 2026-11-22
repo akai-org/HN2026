@@ -90,6 +90,8 @@ class PageSpec(BaseModel):
 
 
 class FormSpec(BaseModel):
+  is_form: bool = True                         # False: not a form to fill in and submit (menu, contract, manual...)
+  not_form_reason: str = ""                    # what the document is instead, when is_form is False
   title: str                                   # starts with Wniosek/Zgłoszenie/Deklaracja/Oświadczenie
   authority_name: str = ""                     # e.g. "Urząd Gminy X" / "Wójt Gminy Y"
   authority_kind: Literal["URZAD", "ORGAN"] = "URZAD"
