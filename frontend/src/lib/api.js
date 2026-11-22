@@ -15,11 +15,11 @@ function getErrorMessage(payload, fileName, status) {
   return `Nie udało się przesłać pliku „${fileName}” (HTTP ${status}).`;
 }
 
-export async function convertFormFile(file) {
+async function postFile(path, file) {
   const formData = new FormData();
   formData.append("file", file, file.name);
 
-  const response = await fetch(`${API_BASE_URL}/forms/convert`, {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
     method: "POST",
     body: formData,
   });
@@ -39,8 +39,25 @@ export async function convertFormFile(file) {
     throw error;
   }
 
+  return payload;
+}
+
+export async function convertFormFile(file) {
+  const payload = await postFile("/forms/convert", file);
+
   if (!payload?.form) {
     throw new Error(`Backend zwrócił niepoprawną odpowiedź dla pliku „${file.name}”.`);
+  }
+
+  return payload;
+}
+
+/** Text the backend read from the file (no AI): `{format, blocks: [{kind, text, checked, rows, page}]}`. */
+export async function extractFormFile(file) {
+  const payload = await postFile("/forms/extract", file);
+
+  if (!Array.isArray(payload?.blocks)) {
+    throw new Error(`Backend zwrócił niepoprawny odczyt pliku „${file.name}”.`);
   }
 
   return payload;

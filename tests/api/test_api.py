@@ -2,12 +2,15 @@ import pathlib
 
 import httpx
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from hacknation_2026 import pipeline
-from hacknation_2026.app import app
+from hacknation_2026.app import SpaStaticFiles, app
 from hacknation_2026.config import Settings, get_settings
-from hacknation_2026.contracts import AppError, FieldSpec, FileFormat, FormSpec, PageSpec, RuleViolation, SectionSpec
+from hacknation_2026.contracts import (
+  AppError, ExtractedDocument, FieldSpec, FileFormat, FormSpec, PageSpec, RuleViolation, SectionSpec,
+)
 from hacknation_2026.extract import extract_document
 
 BLANKIETY = pathlib.Path(__file__).parents[2] / "dane_zadania" / "blankiety"
@@ -69,12 +72,15 @@ def test_convert_enriches_fields_and_proposes_dictionaries(client, monkeypatch):
   ]
 
 
-@pytest.mark.parametrize("name,data,status,code", [
+BAD_FILES = [
   ("wniosek.txt", b"%PDF-1.4", 415, "UNSUPPORTED_FORMAT"),
   ("wniosek.png", b"%PDF-1.4", 415, "MIME_MISMATCH"),
   ("wnio$ek.pdf", b"%PDF-1.4", 422, "INVALID_FILENAME"),
   ("wniosek.pdf", b"%PDF-1.4" + b"x" * 1024 * 1024, 413, "FILE_TOO_LARGE"),
-])
+]
+
+
+@pytest.mark.parametrize("name,data,status,code", BAD_FILES)
 def test_convert_rejects_bad_files(client, name, data, status, code):
   http, calls = client
   response = upload(http, name, data)
@@ -82,6 +88,40 @@ def test_convert_rejects_bad_files(client, name, data, status, code):
   assert response.json()["code"] == code
   assert response.json()["message"]                        # the frontend shows `message`
   assert not calls
+
+
+@pytest.mark.parametrize("pattern,fmt", [("5.*/*.docx", "docx"), ("1.*/*.xlsx", "xlsx"), ("1.*/*.ods", "ods")])
+def test_extract_returns_text_read_from_file_without_llm(client, pattern, fmt):
+  """The frontend shows this text next to the digital form: browsers cannot display Word files and sheets."""
+  http, calls = client
+  path = next(p for p in BLANKIETY.glob(pattern) if "wizualizacja" not in p.name)
+  response = http.post("/api/forms/extract", files={"file": (path.name, path.read_bytes())})
+  assert response.status_code == 200
+  document = ExtractedDocument.model_validate(response.json())
+  assert document.format == fmt and document.as_text().strip()
+  assert not calls                                         # no LLM call
+
+
+@pytest.mark.parametrize("name,data,status,code", BAD_FILES)
+def test_extract_rejects_bad_files(client, name, data, status, code):
+  http, _ = client
+  response = http.post("/api/forms/extract", files={"file": (name, data)})
+  assert response.status_code == status
+  assert response.json()["code"] == code
+
+
+def test_frontend_routes_survive_reload(tmp_path):
+  """/verify is a client-side route: the server returns index.html; missing assets and /api paths stay 404."""
+  (tmp_path / "index.html").write_text("<div id=root></div>")
+  (tmp_path / "assets").mkdir()
+  (tmp_path / "assets" / "app.js").write_text("console.log(1)")
+  site = FastAPI()
+  site.mount("/", SpaStaticFiles(directory=tmp_path, html=True))
+  http = TestClient(site)
+  assert http.get("/").text == http.get("/verify").text == "<div id=root></div>"
+  assert http.get("/assets/app.js").text == "console.log(1)"
+  assert http.get("/assets/missing.js").status_code == 404
+  assert http.get("/api/unknown").status_code == 404
 
 
 def test_convert_reports_llm_errors(client, monkeypatch):

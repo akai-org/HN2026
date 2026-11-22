@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowUpAZ, FileText, Image, Trash2, Upload, X } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { convertFormFile } from "@/lib/api";
+import { keepFile, keepOnly } from "@/lib/fileStore";
 
 const ACCEPTED_FORMATS = ".pdf,.doc,.docx,.ods,.xlsx,.jpg,.jpeg,.png";
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -106,6 +107,7 @@ function ImportForm() {
 
         convertedForms.push({
           fileName: selectedFile.name,
+          fileId: keepFile(selectedFile),   // the original is shown next to the digital form in "Sprawdź i zatwierdź"
           convertedForm,
           formNumber: 1 + [...splitBefore].filter((index) =>
             fileIndex >= index
@@ -113,6 +115,7 @@ function ImportForm() {
         });
       }
 
+      keepOnly(convertedForms.map((item) => item.fileId));
       navigate("/digitalize", {
         state: {
           convertedForms,

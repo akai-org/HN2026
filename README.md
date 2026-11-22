@@ -143,6 +143,27 @@ W przypadku błędu walidacji lub przetwarzania API zwraca komunikat błędu w f
 }
 ```
 
+### `POST /api/forms/extract`
+
+Przyjmuje plik tak samo jak `convert` (te same formaty, walidacja i błędy), ale bez modelu AI: zwraca tekst odczytany z pliku (`ExtractedDocument`). Frontend pokazuje go na ekranie „Sprawdź i zatwierdź” obok formularza cyfrowego, bo przeglądarka nie wyświetla plików Word ani arkuszy, a przy skanach widać, co odczytał OCR.
+
+```bash
+curl -X POST http://localhost:3000/api/forms/extract \
+  -F "file=@sciezka/do/formularza.docx"
+```
+
+Przykładowa odpowiedź (`200 OK`):
+
+```json
+{
+  "format": "docx",
+  "blocks": [
+    {"kind": "text", "text": "WNIOSEK o stwierdzenie nadpłaty podatku", "checked": null, "rows": null, "page": 1},
+    {"kind": "checkbox", "text": "zwrócić przelewem", "checked": false, "rows": null, "page": 1}
+  ]
+}
+```
+
 ## Testowanie
 
 ### Testy automatyczne

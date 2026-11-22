@@ -6,7 +6,7 @@ from fastapi.concurrency import run_in_threadpool
 
 from hacknation_2026 import pipeline
 from hacknation_2026.config import Settings, get_settings
-from hacknation_2026.contracts import AppError, ConvertResult
+from hacknation_2026.contracts import AppError, ConvertResult, ExtractedDocument
 
 router = APIRouter()
 SettingsDep = Annotated[Settings, Depends(get_settings)]
@@ -30,8 +30,21 @@ def _llm_status(settings: Settings) -> str:
 
 @router.post("/forms/convert")
 async def convert(settings: SettingsDep, file: Annotated[UploadFile, File()]) -> ConvertResult:
+  data = await _read_upload(file, settings)
+  return await run_in_threadpool(pipeline.convert, file.filename or "", data, settings)
+
+
+@router.post("/forms/extract")
+async def extract(settings: SettingsDep, file: Annotated[UploadFile, File()]) -> ExtractedDocument:
+  """Text read from the file, without the LLM. The frontend shows it next to the digital form,
+  because a browser cannot display Word files and spreadsheets, and it shows what OCR found in scans."""
+  data = await _read_upload(file, settings)
+  return await run_in_threadpool(pipeline.read_document, file.filename or "", data, settings)
+
+
+async def _read_upload(file: UploadFile, settings: Settings) -> bytes:
   # Read at most one byte past the limit so a huge upload is never held in memory whole.
   data = await file.read(settings.max_file_size_bytes + 1)
   if len(data) > settings.max_file_size_bytes:
     raise AppError("FILE_TOO_LARGE", f"Plik przekracza limit {settings.max_file_size_mb} MB", 413)
-  return await run_in_threadpool(pipeline.convert, file.filename or "", data, settings)
+  return data

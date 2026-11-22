@@ -42,6 +42,45 @@ export function ArrowUpAZ(props) {
   );
 }
 
+export function Check(props) {
+  return <Icon {...props}><path d="M20 6 9 17l-5-5" /></Icon>;
+}
+
+export function ChevronDown(props) {
+  return <Icon {...props}><path d="m6 9 6 6 6-6" /></Icon>;
+}
+
+export function Copy(props) {
+  return (
+    <Icon {...props}>
+      <rect x="9" y="9" width="12" height="12" rx="2" />
+      <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
+    </Icon>
+  );
+}
+
+export function Download(props) {
+  return <Icon {...props}><path d="M12 4v12M7 11l5 5 5-5M4 20h16" /></Icon>;
+}
+
+export function ExternalLink(props) {
+  return (
+    <Icon {...props}>
+      <path d="M14 4h6v6M20 4l-9 9" />
+      <path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+    </Icon>
+  );
+}
+
+export function TriangleAlert(props) {
+  return (
+    <Icon {...props}>
+      <path d="M10.3 3.9 2.2 18a2 2 0 0 0 1.7 3h16.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+      <path d="M12 9v4M12 17h.01" />
+    </Icon>
+  );
+}
+
 export function CircleCheck(props) {
   return (
     <Icon {...props}>
