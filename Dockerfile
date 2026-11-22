@@ -5,12 +5,14 @@ RUN npm ci
 COPY frontend/ ./
 RUN npm run build
 
-FROM ghcr.io/astral-sh/uv:python3.14-bookworm-slim
+FROM python:3.14.10-slim-trixie
+
+RUN pip install --no-cache-dir uv==0.13.3
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-    tesseract-ocr \
-    tesseract-ocr-pol \
+  tesseract-ocr \
+  tesseract-ocr-pol \
   && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd --system appuser \
@@ -18,9 +20,10 @@ RUN groupadd --system appuser \
 
 WORKDIR /app
 ENV UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy \
-    HOST=0.0.0.0 \
-    PORT=3000
+  UV_LINK_MODE=copy \
+  UV_PYTHON_DOWNLOADS=never \
+  HOST=0.0.0.0 \
+  PORT=3000
 
 COPY pyproject.toml uv.lock README.md ./
 RUN uv sync --frozen --no-dev --no-install-project
