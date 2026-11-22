@@ -21,7 +21,7 @@ export default function FormPreview({ form, index, page, onPageChange, selectedI
     <Panel number={2} title="Formularz" subtitle="kliknij pole, aby zobaczyć jego JSON" bodyClassName="bg-muted/30">
       <div className="sticky top-0 z-10 border-b border-border bg-background/95 px-3 py-2 backdrop-blur">
         <p className="truncate text-sm font-semibold" title={form?.title}>{form?.title || "Formularz bez tytułu"}</p>
-        <div role="tablist" aria-label="Strony formularza" className="mt-2 flex gap-1 overflow-x-auto pb-1">
+        <div role="tablist" aria-label="Strony formularza" className="mt-2 flex gap-2 overflow-x-auto pb-1 pr-1">
           {tabs.map((item, tabIndex) => (
             <button
               key={item.id || tabIndex}
@@ -30,7 +30,7 @@ export default function FormPreview({ form, index, page, onPageChange, selectedI
               aria-selected={tabIndex === page}
               onClick={() => onPageChange(tabIndex)}
               className={cn(
-                "flex shrink-0 items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                "flex shrink-0 items-center gap-2 rounded-md border px-3 py-2 text-sm font-medium shadow-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
                 tabIndex === page
                   ? "border-primary bg-primary/10 text-primary"
                   : "border-border bg-background text-muted-foreground hover:text-foreground",

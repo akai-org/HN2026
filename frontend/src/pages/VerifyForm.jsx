@@ -15,6 +15,7 @@ const VIEWS = [
   { key: "json", label: "JSON" },
 ];
 const VIEWS_STORAGE_KEY = "uniform-comparison-views";
+const VERIFY_ITEMS_STORAGE_KEY = "uniform-verify-items";
 const DEFAULT_VIEWS = { original: true, form: true, json: true };
 
 function readViews() {
@@ -35,9 +36,27 @@ function saveViews(views) {
   }
 }
 
+function readVerifyItems() {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(VERIFY_ITEMS_STORAGE_KEY) || "[]");
+    return Array.isArray(saved) ? saved : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveVerifyItems(items) {
+  try {
+    sessionStorage.setItem(VERIFY_ITEMS_STORAGE_KEY, JSON.stringify(items));
+  } catch {
+    // session data is optional; the app remains usable without storage
+  }
+}
+
 export default function VerifyForm() {
   const location = useLocation();
-  const items = location.state?.convertedForms || [];
+  const stateItems = location.state?.convertedForms;
+  const items = stateItems?.length ? stateItems : readVerifyItems();
   const [current, setCurrent] = useState(0);
   const [views, setViews] = useState(readViews);
   const item = items[Math.min(current, items.length - 1)];
@@ -46,6 +65,10 @@ export default function VerifyForm() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  useEffect(() => {
+    if (stateItems?.length) saveVerifyItems(stateItems);
+  }, [stateItems]);
 
   function toggleView(key) {
     setViews((currentViews) => {
@@ -136,7 +159,7 @@ function Comparison({ item, items, current, onCurrentChange, views, onToggleView
               <select
                 value={current}
                 onChange={(event) => onCurrentChange(Number(event.target.value))}
-                className="h-8 max-w-72 rounded-lg border border-border bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+                className="h-10 max-w-72 rounded-lg border border-foreground/25 bg-background px-3 py-2 text-sm font-medium shadow-sm focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
               >
                 {items.map((entry, entryIndex) => (
                   <option key={entryIndex} value={entryIndex}>
@@ -198,26 +221,27 @@ function Comparison({ item, items, current, onCurrentChange, views, onToggleView
         </div>
       )}
 
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <span className="text-sm text-muted-foreground">Widok:</span>
-        {VIEWS.map(({ key, label }) => (
-          <button
-            key={key}
-            type="button"
-            aria-pressed={views[key]}
-            onClick={() => onToggleView(key)}
-            className={cn(
-              "rounded-full border px-3 py-1 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-              views[key]
-                ? "border-primary bg-primary text-primary-foreground"
-                : "border-border bg-background text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {label}
-          </button>
-        ))}
-        <span className="hidden text-xs text-muted-foreground md:inline">
-          Porównaj oryginał z wersją cyfrową. Kliknięte pole podświetla się w JSON-ie.
+      <div className="mb-3 flex items-center justify-end gap-3">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {VIEWS.map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              aria-pressed={views[key]}
+              onClick={() => onToggleView(key)}
+              className={cn(
+                "rounded-full border px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                views[key]
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-foreground/25 bg-background text-foreground shadow-sm hover:bg-muted",
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <span className="hidden max-w-72 text-right text-xs text-muted-foreground md:inline">
+          Porównaj oryginał z wersją cyfrową. Kliknij element formularza lub JSON, aby zaznaczyć go po drugiej stronie.
         </span>
       </div>
 
@@ -233,7 +257,7 @@ function Comparison({ item, items, current, onCurrentChange, views, onToggleView
             onSelect={select}
           />
         )}
-        {views.json && <JsonPanel form={form} selectedId={selectedId} />}
+        {views.json && <JsonPanel form={form} selectedId={selectedId} onSelect={select} />}
       </div>
     </>
   );
