@@ -17,6 +17,8 @@ Zadania J1–J6 są od siebie niezależne. Każde może zrobić inny agent, bo d
 
 ### J1 – Rozdzielanie kolumn w PDF
 
+> **Status: do zrobienia.** Sprawdzone 2026-11-22: w formularzu 1 nadal jest `(imię i nazwisko/nazwa wnioskodawcy) Wójt Gminy Elbląg` w jednej linii, a w 3 `/ adres / Urząd Miasta i Gminy Młynary`. Model mimo to podaje poprawny organ.
+
 **Pliki:** `src/hacknation_2026/extract/pdf.py`, `tests/extract_pdf_image/test_columns.py`
 
 - W `_page_blocks` linia z dużą poziomą przerwą między znakami (np. > 40 pt, do dobrania na danych) jest dzielona na osobne bloki: lewa i prawa kolumna, w tej kolejności.
@@ -28,6 +30,8 @@ Zadania J1–J6 są od siebie niezależne. Każde może zrobić inny agent, bo d
 **Gotowe, gdy:** w formularzach 1 i 3 (PDF) etykieta i nazwa urzędu są w osobnych blokach, a dotychczasowe testy B1 przechodzą.
 
 ### J2 – Metadane formularza regułami
+
+> **Status: do zrobienia.** `extract/metadata.py` nie istnieje. Tytuł, organ i flagi podaje model (blok C) i z przypiętym dostawcą robi to poprawnie we wszystkich 9 blankietach.
 
 **Pliki:** `src/hacknation_2026/extract/metadata.py`, `tests/metadata/`
 
@@ -56,6 +60,8 @@ Blok C dołoży te wskazówki do promptu i nadpisze nimi pola `FormSpec`, gdy ni
 
 ### J3 – Linie do wypełnienia w OCR
 
+> **Status: częściowo.** Linie, kratki i ramki wykrywa OpenCV (`extract/fields.py`), a nie rzut pikseli. W formularzu 5 (PNG) pod „Uzasadnienie” jest `____`, ale po „rachunek” nie.
+
 **Pliki:** `src/hacknation_2026/extract/image.py`, `tests/extract_pdf_image/test_blank_lines.py`
 
 - Przed OCR wykryj na obrazie poziome linie z kropek lub kresek, np. przez rzut pikseli w wierszu (Pillow, bez nowych zależności): długi odcinek z regularnymi ciemnymi punktami lub ciągłą kreską.
@@ -65,6 +71,8 @@ Blok C dołoży te wskazówki do promptu i nadpisze nimi pola `FormSpec`, gdy ni
 
 ### J4 – Checkboxy-kształty i kolejność ramek w DOCX
 
+> **Status: częściowo.** Kolejność ramek działa (formularz 8 DOCX idzie od strony 1/6 do 6/6). Kratek-kształtów przy „1. właściciel/współwłaściciel” nadal nie ma.
+
 **Pliki:** `src/hacknation_2026/extract/word.py` (część DOCX), `tests/extract_word/test_shapes.py`
 
 - **Kształty:** mały kwadratowy kształt (`wps:wsp` z `a:prstGeom prst="rect"` albo `v:rect`, bok ok. 0,3–0,6 cm z `wp:extent` lub stylu VML) bez tekstu, zakotwiczony w akapicie, staje się `☐` na początku tego akapitu. Dotyczy DOCX skonwertowanych z PDF (formularze 2 i 8).
@@ -73,6 +81,8 @@ Blok C dołoży te wskazówki do promptu i nadpisze nimi pola `FormSpec`, gdy ni
 **Gotowe, gdy:** formularz 8 (DOCX) ma checkboxy przy opcjach „1. właściciel/współwłaściciel…”, a jego tekst idzie w kolejności stron 1/6 → 6/6.
 
 ### J5 – Punktory i ramki w binarnym DOC
+
+> **Status: do zrobienia.** Formularz 3 (`.doc`) nie ma punktorów `- `, a formularz 9 (`.doc`) ma 12 kratek zamiast 50 jak w DOCX.
 
 **Pliki:** `src/hacknation_2026/extract/word.py` (część DOC), `tests/extract_word/test_doc_lists.py`
 

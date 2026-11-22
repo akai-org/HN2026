@@ -4,6 +4,8 @@ Część rozwiązania opisanego w `docs/plan-implementacji.md`. Indeks bloków i
 
 **Wymaga:** ukończonego bloku 0. Typy (`AppError`, `FileFormat`, `ExtractedDocument`, `FormSpec`, `FormDefinition`, `RuleViolation`, `ConvertResult`, `Settings`) importuj z `hacknation_2026.contracts` i `hacknation_2026.config`; ich pełna definicja jest w `docs/bloki/00-kontrakty.md`.
 
+> **Status: zrobione.** `src/hacknation_2026/rules/check.py`, testy w `tests/rules/`. Pipeline (blok G) woła `check_form()` na formularzu z buildera, a każde naruszenie trafia do `ConvertResult.warnings` jako tekst „komunikat (ścieżka)”. Formularz wraca także wtedy, gdy łamie regułę. Przebieg 9 blankietów (PDF) przez cały pipeline dał 0 naruszeń.
+
 ## Zadanie
 
 **Pliki:** `src/hacknation_2026/rules/` (`check.py`), `tests/rules/`

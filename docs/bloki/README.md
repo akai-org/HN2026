@@ -12,11 +12,11 @@ Każdy plik opisuje jeden blok do zrobienia przez niezależnego agenta. Agent do
 | [C](C-analiza-llm.md) | Analiza LLM – **zrobione** |
 | [D](D-builder.md) | Builder FormDefinition – **zrobione** |
 | [E](E-wzbogacanie-pol.md) | Wzbogacanie pól – **zrobione** |
-| [F](F-kontrola-regul.md) | Kontrola reguł |
-| [G](G-api-pipeline.md) | API i pipeline – **zrobione** (D i E podpięte, F do podpięcia) |
+| [F](F-kontrola-regul.md) | Kontrola reguł – **zrobione** (podpięte w pipeline, naruszenia w `warnings`) |
+| [G](G-api-pipeline.md) | API i pipeline – **zrobione** (A–F podpięte) |
 | [H](H-docker-readme.md) | Docker, compose, README |
 | [I](I-ewaluacja.md) | Ewaluacja |
-| [J](J-poprawa-detekcji.md) | Poprawa detekcji: kolumny, metadane regułami, linie w OCR, kształty DOCX, listy DOC, konwersja (po B1/B2) |
+| [J](J-poprawa-detekcji.md) | Poprawa detekcji – **częściowo**: J3 i J4 częściowo, J1, J2, J5 do zrobienia, J6 odrzucone |
 
 ## Mapa zależności
 

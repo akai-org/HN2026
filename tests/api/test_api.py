@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from hacknation_2026 import pipeline
 from hacknation_2026.app import app
 from hacknation_2026.config import Settings, get_settings
-from hacknation_2026.contracts import AppError, FieldSpec, FileFormat, FormSpec, PageSpec, SectionSpec
+from hacknation_2026.contracts import AppError, FieldSpec, FileFormat, FormSpec, PageSpec, RuleViolation, SectionSpec
 from hacknation_2026.extract import extract_document
 
 BLANKIETY = pathlib.Path(__file__).parents[2] / "dane_zadania" / "blankiety"
@@ -127,3 +127,18 @@ def test_health_with_full_endpoint_url(client, monkeypatch):
   monkeypatch.setattr(httpx, "get", lambda url, **_: seen.append(url) or httpx.Response(200, json={"data": []}))
   assert http.get("/api/health").json()["llm"] == "ok"
   assert seen == ["https://llm.test/v3/models"]
+
+
+def test_convert_reports_rule_violations_as_warnings(client, monkeypatch):
+  http, _ = client
+  checked = []
+
+  def fake_check(form):
+    checked.append(form)
+    return [RuleViolation(code="TITLE_TOO_LONG", message="Tytuł ma ponad 255 znaków", path="title"),
+            RuleViolation(code="NO_FINISH", message="Brak strony końcowej")]
+
+  monkeypatch.setattr(pipeline, "check_form", fake_check)
+  body = upload(http, FORM5.name, FORM5.read_bytes()).json()
+  assert checked and checked[0]["title"] == "Wniosek o test"   # block F checks the built form
+  assert body["warnings"] == ["Tytuł ma ponad 255 znaków (title)", "Brak strony końcowej"]

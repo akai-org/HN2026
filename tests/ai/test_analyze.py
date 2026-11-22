@@ -269,3 +269,48 @@ def test_rate_limit_switches_to_fallback_model(monkeypatch, settings, doc):
 
   assert analyze(doc, fallback).title == VALID_SPEC["title"]
   assert [r["body"]["model"] for r in requests] == ["test-model", "other/test-model"]
+
+
+LONG_DOC = ExtractedDocument(format=FileFormat.PDF, blocks=[
+  Block(kind="text", text="WNIOSEK O TESTOWE ZEZWOLENIE", page=1),
+  Block(kind="text", text="Opis ____", page=1),
+  *[Block(kind="text", text=f"Liczba gospodarstw domowych w lokalu nr {n} ____", page=2) for n in range(6)],
+  Block(kind="checkbox", text="Załącznik kalkulacyjny", page=2),
+])
+MISSING_PAGES = {"pages": [{"title": "Obliczenie opłaty", "sections": [{"key": "sprawa", "title": "Gospodarstwa", "fields": [
+  {"key": "opis", "label": "Opis", "type": "TEXTAREA", "required": True},                       # repeats an existing field
+  {"key": "liczba_gospodarstw", "label": "Liczba gospodarstw domowych", "type": "NUMBER", "required": True},
+  {"key": "czy_dotyczy", "label": "Załącznik kalkulacyjny", "type": "FILE_UPLOADER", "required": False},  # key collision
+]}]}]}
+
+
+def test_long_form_with_a_gap_gets_one_completion_request(monkeypatch, settings):
+  def handler(req, n):
+    return httpx.Response(200, json=completion(json.dumps(VALID_SPEC if n == 1 else MISSING_PAGES)))
+
+  requests = mock_llm(monkeypatch, handler)
+  spec = analyze(LONG_DOC, settings)
+
+  assert len(requests) == 2
+  follow_up = requests[1]["body"]
+  assert list(follow_up["response_format"]["json_schema"]["schema"]["properties"]) == ["pages"]
+  assert "(strona 2) Liczba gospodarstw domowych w lokalu nr 0 ____" in follow_up["messages"][-1]["content"]
+  assert follow_up["messages"][-2] == {"role": "assistant", "content": json.dumps(VALID_SPEC)}
+  added = spec.pages[1]
+  assert added.title == "Obliczenie opłaty" and added.sections[0].key == "sprawa_2"
+  assert [(f.key, f.label) for f in added.sections[0].fields] == [
+    ("liczba_gospodarstw", "Liczba gospodarstw domowych"), ("czy_dotyczy_2", "Załącznik kalkulacyjny")]
+
+
+def test_completion_failure_keeps_the_first_answer(monkeypatch, settings):
+  requests = mock_llm(monkeypatch, lambda req, n: httpx.Response(200, json=completion(json.dumps(VALID_SPEC))) if n == 1
+                      else httpx.Response(500))
+  spec = analyze(LONG_DOC, settings)
+  assert len(requests) == 2 and [p.title for p in spec.pages] == ["Informacje o sprawie"]
+
+
+def test_covered_form_needs_no_completion(monkeypatch, settings):
+  covering = {**VALID_SPEC, "pages": VALID_SPEC["pages"] + MISSING_PAGES["pages"]}
+  requests = mock_llm(monkeypatch, lambda req, n: httpx.Response(200, json=completion(json.dumps(covering))))
+  analyze(LONG_DOC, settings)
+  assert len(requests) == 1
