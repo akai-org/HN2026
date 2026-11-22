@@ -1,6 +1,6 @@
-// Uploaded files kept in memory between pages, so "Sprawdź i zatwierdź" can show the original next to the
-// digital form. Router state carries only the id: files never go to history state or browser storage.
-// After a page reload the store is empty and the comparison asks to add the file again.
+// Uploaded files kept in memory, so the verify step can show the original next to the digital form.
+// Conversion results refer to their file by id: the results are also saved in sessionStorage, which cannot
+// hold files. After a page reload the store is empty and the comparison asks to add the file again.
 
 const files = new Map();
 const objectUrls = new WeakMap();
@@ -22,7 +22,7 @@ export function fileUrl(file) {
   return objectUrls.get(file);
 }
 
-/** Drops files of earlier conversions, keeping only the given ids. */
+/** Drops the files of earlier conversions, keeping only the given ids. */
 export function keepOnly(ids) {
   const wanted = new Set(ids);
   for (const [id, file] of files) {

@@ -28,7 +28,7 @@ async function postFile(path, file) {
   try {
     payload = await response.json();
   } catch {
-    // Non-JSON responses are handled by the status-specific fallback below.
+    // Not JSON: getErrorMessage falls back to a message with the HTTP status.
   }
 
   if (!response.ok) {
@@ -42,6 +42,7 @@ async function postFile(path, file) {
   return payload;
 }
 
+/** The form read from the file by the AI pipeline: `{form, warnings, proposed_dictionaries}`. */
 export async function convertFormFile(file) {
   const payload = await postFile("/forms/convert", file);
 

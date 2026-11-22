@@ -13,16 +13,27 @@ export const VALIDATOR_LABELS = {
 
 export const SECTION_TYPES = new Set(["SECTION", "REPEATING_SECTION"]);
 
+// `validation` is an array in the schema, but the example files also have `"validation": {}`.
+function validationOf(field) {
+  return Array.isArray(field?.validation) ? field.validation : [];
+}
+
 export function isRequired(field) {
-  return (field?.validation || []).includes("REQUIRED");
+  return validationOf(field).includes("REQUIRED");
+}
+
+/** Format validators of the field (everything except REQUIRED). */
+export function fieldValidators(field) {
+  return validationOf(field).filter((name) => name !== "REQUIRED");
 }
 
 /** Plain-text paragraphs of an HTML description. DOMParser builds an inert document: no scripts, no requests. */
 export function htmlParagraphs(html) {
   if (!html || !html.includes("<")) return html?.trim() ? [html.trim()] : [];
   const body = new DOMParser().parseFromString(html, "text/html").body;
-  const blocks = [...body.querySelectorAll("p, li, h1, h2, h3, h4, h5, h6")]
-    .filter((element) => !element.querySelector("p, li"));
+  const blocks = [...body.querySelectorAll("p, li, h1, h2, h3, h4, h5, h6")].filter(
+    (element) => !element.querySelector("p, li"),
+  );
   return (blocks.length ? blocks : [body])
     .map((element) => element.textContent.replace(/\s+/g, " ").trim())
     .filter(Boolean);
@@ -69,7 +80,8 @@ export function indexForm(form) {
 
 // `("Opcja" in tabs['Strona' in title].questions['sekcja' in field.techName].field.repeatingSectionGrid['pole' in field.techName].field.__userAnswer)`
 // and the repeating-section variant from Reguły techniczne; `$not(...)` negates.
-const CONDITION = /(\$not)?\(\s*"((?:[^"\\]|\\.)*)"\s+in\s+tabs\[.*?\]\.questions\['((?:[^'\\]|\\.)*)'\s+in\s+field\.techName\]\.field\.(?:repeatingSectionGrid\['((?:[^'\\]|\\.)*)'\s+in\s+field\.techName\]\.field\.__userAnswer|__userAnswer\[\$repeatingSectionIndex\]\['((?:[^'\\]|\\.)*)'\s+in\s+fieldTechName\]\.answers)/g;
+const CONDITION =
+  /(\$not)?\(\s*"((?:[^"\\]|\\.)*)"\s+in\s+tabs\[.*?\]\.questions\['((?:[^'\\]|\\.)*)'\s+in\s+field\.techName\]\.field\.(?:repeatingSectionGrid\['((?:[^'\\]|\\.)*)'\s+in\s+field\.techName\]\.field\.__userAnswer|__userAnswer\[\$repeatingSectionIndex\]\['((?:[^'\\]|\\.)*)'\s+in\s+fieldTechName\]\.answers)/g;
 
 /** Human-readable SHOW condition, e.g. `„Kraj” = „Polska”`; null when the node has none. */
 export function describeShowCondition(states, titles) {
@@ -77,11 +89,13 @@ export function describeShowCondition(states, titles) {
   if (!queries.length) return null;
 
   const parts = queries.map((query) => {
-    const conditions = [...query.matchAll(CONDITION)].map(([, not, value, section, field, repeatingField]) => {
-      const techName = field ?? repeatingField;
-      const title = titles.get(`${section}|${techName}`) || techName;
-      return `„${title}” ${not ? "≠" : "="} „${value.replace(/\\(.)/g, "$1")}”`;
-    });
+    const conditions = [...query.matchAll(CONDITION)].map(
+      ([, not, value, section, field, repeatingField]) => {
+        const techName = field ?? repeatingField;
+        const title = titles.get(`${section}|${techName}`) || techName;
+        return `„${title}” ${not ? "≠" : "="} „${value.replace(/\\(.)/g, "$1")}”`;
+      },
+    );
     if (!conditions.length) return "warunek JSONata";
     return conditions.join(/\)\s+or\s+/.test(query) ? " lub " : " i ");
   });
@@ -94,7 +108,8 @@ export function resolveWarning(warning, form) {
   if (!match) return { text: warning, path: "", tabIndex: null, id: null };
 
   const [, text, path] = match;
-  const location = /^tabs\[(\d+)\](?:\.questions\[(\d+)\](?:\.field(?:\.repeatingSectionGrid\[(\d+)\])?)?)?/.exec(path);
+  const location =
+    /^tabs\[(\d+)\](?:\.questions\[(\d+)\](?:\.field(?:\.repeatingSectionGrid\[(\d+)\])?)?)?/.exec(path);
   if (!location) return { text, path, tabIndex: null, id: null };
 
   const [, tab, question, item] = location.map((value) => (value === undefined ? undefined : Number(value)));
@@ -103,26 +118,38 @@ export function resolveWarning(warning, form) {
   return { text, path, tabIndex: form?.tabs?.[tab] ? tab : null, id: node?.id ?? null };
 }
 
-/** Saves the form (the importable FormDefinition) as a .json file. */
+/** Copy of `value` with the object whose `id` is `id` swapped for `replacement`; untouched branches are reused. */
+export function replaceNode(value, id, replacement) {
+  if (Array.isArray(value)) {
+    const next = value.map((entry) => replaceNode(entry, id, replacement));
+    return next.some((entry, index) => entry !== value[index]) ? next : value;
+  }
+  if (!value || typeof value !== "object") return value;
+  if (value.id === id) return replacement;
+
+  const entries = Object.entries(value).map(([key, entry]) => [key, replaceNode(entry, id, replacement)]);
+  return entries.some(([key, entry]) => entry !== value[key]) ? Object.fromEntries(entries) : value;
+}
+
+/** Saves the form (the importable FormDefinition) as a .json file named after its title. */
 export function downloadJson(form) {
   const blob = new Blob([JSON.stringify(form, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = jsonFileName(form);
+  link.download = `${slug(form?.title || "") || "formularz"}.json`;
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
-/** File name for downloading the form JSON. */
-function jsonFileName(form, fallback = "formularz") {
-  const slug = (form?.title || fallback)
+/** ASCII file-name version of a title: "Wniosek o zwrot opłaty" → "Wniosek_o_zwrot_oplaty". */
+function slug(text) {
+  return text
     .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/ł/g, "l")
     .replace(/Ł/g, "L")
-    .replace(/[̀-ͯ]/g, "")
     .replace(/[^A-Za-z0-9]+/g, "_")
     .replace(/^_+|_+$/g, "")
     .slice(0, 80);
-  return `${slug || fallback}.json`;
 }

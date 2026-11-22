@@ -4,7 +4,7 @@ Znalezione podczas przeglądu zgodności z wymaganiami (2026-11-22).
 
 ## Frontend: odświeżenie podstrony daje 404
 
-Frontend ma routing po stronie klienta (`/digitalize`, `/verify` w `frontend/src/main.jsx`), a FastAPI montuje
+Frontend ma routing po stronie klienta (`/digitalize`, `/verify` w `frontend/src/App.jsx`), a FastAPI montuje
 `StaticFiles(html=True)`, który zwraca `index.html` tylko dla `/`. Bezpośrednie wejście albo odświeżenie
 `/verify` czy `/digitalize` kończy się 404.
 

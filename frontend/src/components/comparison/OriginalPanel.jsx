@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ExternalLink, FileQuestion, Minus, Plus } from "@/components/icons";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { extractFormFile } from "@/lib/api";
 import { fileUrl } from "@/lib/fileStore";
-import { cn } from "@/lib/utils";
+import { fileExtension } from "@/lib/uploads";
 import Panel, { SegmentedControl } from "./Panel";
 
 const ZOOM_STEPS = [50, 75, 100, 125, 150, 200, 300];
@@ -15,7 +15,7 @@ const extractions = new WeakMap();
 
 /** "pdf" and "image" have a browser preview; Word files and sheets ("document") only the text read by the backend. */
 function fileKind(fileName) {
-  const extension = (fileName || "").split(".").pop().toLowerCase();
+  const extension = fileExtension(fileName);
   if (extension === "pdf") return "pdf";
   if (IMAGE_EXTENSIONS.has(extension)) return "image";
   return "document";
@@ -24,7 +24,7 @@ function fileKind(fileName) {
 function readDocument(file) {
   if (!extractions.has(file)) {
     const request = extractFormFile(file).catch((error) => {
-      extractions.delete(file);   // allow a retry
+      extractions.delete(file); // let the next attempt ask again
       throw error;
     });
     extractions.set(file, request);
@@ -62,32 +62,32 @@ export default function OriginalPanel({ file, fileName }) {
     <>
       {view === "file" && kind === "image" && (
         <div className="flex items-center gap-0.5" role="group" aria-label="Powiększenie">
-          <button
-            type="button"
-            className={cn(buttonVariants({ variant: "ghost", size: "icon-xs" }))}
+          <Button
+            variant="ghost"
+            size="icon-xs"
             aria-label="Pomniejsz"
             disabled={zoomIndex <= 0}
             onClick={() => setZoom(ZOOM_STEPS[zoomIndex - 1])}
           >
             <Minus />
-          </button>
+          </Button>
           <button
             type="button"
-            className="min-w-11 rounded-md px-1 text-xs tabular-nums text-muted-foreground hover:bg-muted"
             title="Dopasuj do szerokości"
             onClick={() => setZoom(100)}
+            className="min-w-11 rounded-md px-1 text-xs text-muted-foreground tabular-nums focus-ring hover:bg-muted"
           >
             {zoom}%
           </button>
-          <button
-            type="button"
-            className={cn(buttonVariants({ variant: "ghost", size: "icon-xs" }))}
+          <Button
+            variant="ghost"
+            size="icon-xs"
             aria-label="Powiększ"
             disabled={zoomIndex >= ZOOM_STEPS.length - 1}
             onClick={() => setZoom(ZOOM_STEPS[zoomIndex + 1])}
           >
             <Plus />
-          </button>
+          </Button>
         </div>
       )}
       {url && kind !== "document" && view === "file" && (
@@ -95,7 +95,7 @@ export default function OriginalPanel({ file, fileName }) {
           href={url}
           target="_blank"
           rel="noreferrer"
-          className={cn(buttonVariants({ variant: "ghost", size: "icon-xs" }))}
+          className={buttonVariants({ variant: "ghost", size: "icon-xs" })}
           aria-label="Otwórz oryginał w nowej karcie"
           title="Otwórz w nowej karcie"
         >
@@ -130,11 +130,7 @@ export default function OriginalPanel({ file, fileName }) {
       {!file ? (
         <MissingFile />
       ) : view === "text" ? (
-        <ExtractedText
-          state={extracted}
-          kind={kind}
-          onRetry={() => setAttempt((count) => count + 1)}
-        />
+        <ExtractedText state={extracted} kind={kind} onRetry={() => setAttempt((count) => count + 1)} />
       ) : !url ? null : kind === "pdf" ? (
         <iframe
           title={`Oryginał: ${file.name}`}
@@ -160,8 +156,8 @@ function MissingFile() {
     <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
       <FileQuestion size={36} className="text-muted-foreground" />
       <p className="max-w-xs text-sm text-muted-foreground">
-        Oryginał nie jest już dostępny. Pliki są trzymane tylko w pamięci przeglądarki, więc po odświeżeniu strony
-        trzeba je dodać ponownie.
+        Oryginał nie jest już dostępny. Pliki są trzymane tylko w pamięci przeglądarki, więc po odświeżeniu
+        strony trzeba je dodać ponownie.
       </p>
       <Link to="/" className={buttonVariants({ variant: "outline", size: "sm" })}>
         Dodaj pliki
@@ -174,26 +170,26 @@ function ExtractedText({ state, kind, onRetry }) {
   if (state.status === "error") {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
-        <p className="max-w-xs text-sm text-destructive" role="alert">{state.message}</p>
-        <button type="button" className={buttonVariants({ variant: "outline", size: "sm" })} onClick={onRetry}>
+        <p className="max-w-xs text-sm text-destructive" role="alert">
+          {state.message}
+        </p>
+        <Button variant="outline" size="sm" onClick={onRetry}>
           Spróbuj ponownie
-        </button>
+        </Button>
       </div>
     );
   }
   if (state.status !== "done") {
     return (
       <p className="p-6 text-center text-sm text-muted-foreground" role="status">
-        {kind === "document" ? "Odczytywanie pliku…" : "Odczytywanie tekstu z pliku (skany przechodzą przez OCR)…"}
+        {kind === "document"
+          ? "Odczytywanie pliku…"
+          : "Odczytywanie tekstu z pliku (skany przechodzą przez OCR)…"}
       </p>
     );
   }
 
-  const pages = new Map();
-  for (const block of state.document.blocks) {
-    if (!pages.has(block.page)) pages.set(block.page, []);
-    pages.get(block.page).push(block);
-  }
+  const pages = Map.groupBy(state.document.blocks, (block) => block.page);
 
   return (
     <div className="space-y-4 p-4 text-sm">
@@ -207,7 +203,7 @@ function ExtractedText({ state, kind, onRetry }) {
       {[...pages].map(([page, blocks]) => (
         <section key={page} aria-label={`Strona ${page}`} className="space-y-2">
           {pages.size > 1 && (
-            <p className="border-b border-border pb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <p className="border-b pb-1 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
               Strona {page}
             </p>
           )}
@@ -229,7 +225,7 @@ function TextBlock({ block }) {
             {(block.rows || []).map((row, rowIndex) => (
               <tr key={rowIndex}>
                 {row.map((cell, cellIndex) => (
-                  <td key={cellIndex} className="whitespace-pre-wrap border border-border px-2 py-1 align-top">
+                  <td key={cellIndex} className="border px-2 py-1 align-top whitespace-pre-wrap">
                     {cell}
                   </td>
                 ))}
@@ -249,5 +245,5 @@ function TextBlock({ block }) {
       </p>
     );
   }
-  return <p className="whitespace-pre-wrap break-words">{block.text}</p>;
+  return <p className="break-words whitespace-pre-wrap">{block.text}</p>;
 }
